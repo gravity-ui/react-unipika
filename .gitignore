@@ -1,0 +1,31 @@
+#npm
+npm-debug.log*
+node_modules
+
+#temporary
+tmp/
+temp/
+*~
+
+#personal
+.idea/
+.DS_Store
+
+# git merge leftovers
+*.orig
+
+# storybook
+.cache
+build/
+types/
+storybook-static/
+
+# package
+lib/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+coverage/

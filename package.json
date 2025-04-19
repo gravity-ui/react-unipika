@@ -1,0 +1,111 @@
+{
+  "name": "@gravity-ui/react-unipika",
+  "version": "0.0.1",
+  "description": "The library helps to create dialogs with forms by using registered field-types. Also it is possible to extend it with your own field-types.",
+  "repository": {
+    "type": "arc",
+    "url": "https://github.com/gravity-ui/react-unipika.git"
+  },
+  "license": "MIT",
+  "main": "build/cjs/index.js",
+  "module": "build/esm/index.js",
+  "types": "types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/src/index.d.ts",
+      "require": "./build/cjs/index.js",
+      "import": "./build/esm/index.js"
+    }
+  },
+  "files": [
+    "build",
+    "types"
+  ],
+  "scripts": {
+    "build": "DF_BUILD_LIB=true app-builder build --config ./app-builder.config.ts && npm run build:check-esm",
+    "build:check-esm": "grep -HrnEo '\\brequire\\([^)]+)?' build/esm && echo '\nrequire() should not be used for esm-modules\n' ; test $? != 0",
+    "build-storybook": "storybook build -c .storybook -o storybook-static",
+    "dev": "storybook dev -p 8888 -c .storybook",
+    "lint": "npm run lint:code && npm run lint:styles && npm run lint:other",
+    "lint:code": "eslint src",
+    "lint:code:fix": "eslint src --fix",
+    "lint:fix": "npm run lint:code:fix && npm run lint:styles:fix && npm run lint:other:fix",
+    "lint:other": "prettier --check '**/*.{yaml,yml,json}'",
+    "lint:other:fix": "prettier --write '**/*.{yaml,yml,json}'",
+    "lint:styles": "stylelint 'src/**/*.scss'",
+    "lint:styles:fix": "stylelint 'src/**/*.scss' --fix",
+    "prepare": "husky install",
+    "prepublishOnly": "npm run build",
+    "playwright": "playwright test -c ./playwright.config.ts",
+    "playwright:update": "npm run playwright -- -u",
+    "playwright:docker": "./playwright/docker-run.sh npm run playwright",
+    "playwright:docker:clear": "./playwright/docker-run.sh clear-cache",
+    "playwright:docker:update": "npm run playwright:docker -- -- -u",
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@bem-react/classname": "^1.6.0",
+    "@commitlint/cli": "^17.3.0",
+    "@commitlint/config-conventional": "^17.3.0",
+    "@gravity-ui/app-builder": "^0.15.0",
+    "@gravity-ui/eslint-config": "^1.0.2",
+    "@gravity-ui/i18n": "^1.0.0",
+    "@gravity-ui/icons": "^2.13.0",
+    "@gravity-ui/prettier-config": "^1.0.1",
+    "@gravity-ui/react-data-table": "^2.2.1",
+    "@gravity-ui/stylelint-config": "^2.0.0",
+    "@gravity-ui/tsconfig": "^1.0.0",
+    "@gravity-ui/uikit": "^7.1.1",
+    "@gravity-ui/unipika": "^5.3.0",
+    "@playwright/experimental-ct-core": "1.50",
+    "@playwright/experimental-ct-react": "1.50",
+    "@playwright/test": "1.50",
+    "@storybook/addon-actions": "^8.5.2",
+    "@storybook/addon-essentials": "^8.5.2",
+    "@storybook/addon-interactions": "^8.5.2",
+    "@storybook/addon-links": "^8.5.2",
+    "@storybook/addon-webpack5-compiler-babel": "^3.0.5",
+    "@storybook/preset-scss": "^1.0.3",
+    "@storybook/react": "^8.5.2",
+    "@storybook/react-webpack5": "^8.5.2",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "^22.13.0",
+    "eslint": "^8.23.1",
+    "husky": "^8.0.2",
+    "jest": "^29.7.0",
+    "lodash": "~4.17.13",
+    "nano-staged": "^0.8.0",
+    "postcss": "^8.4.14",
+    "prettier": "^2.8.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sass": "^1.56.1",
+    "sass-loader": "^10.2.1",
+    "storybook": "^8.5.2",
+    "style-loader": "^3.3.3",
+    "stylelint": "^14.16.1"
+  },
+  "peerDependencies": {
+    "@bem-react/classname": "^1.6.0",
+    "@gravity-ui/i18n": "^1.0.0",
+    "@gravity-ui/icons": "^2.0.0",
+    "@gravity-ui/uikit": "^7.1.1"
+  },
+  "nano-staged": {
+    "*.{scss}": [
+      "stylelint --fix --quiet"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix --quiet"
+    ],
+    "*.{md,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  }
+}

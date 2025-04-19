@@ -1,0 +1,18 @@
+{
+  "extends": "@gravity-ui/tsconfig/tsconfig",
+  "compilerOptions": {
+    "outDir": "build",
+    "module": "ESNext",
+    "jsx": "react",
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "isolatedModules": true,
+    "paths": {
+      "~playwright/*": ["playwright/*"]
+    },
+    "declaration": true,
+    "declarationDir": "types"
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "build", "storybook-static", "src/**/*.spec.ts"]
+}
