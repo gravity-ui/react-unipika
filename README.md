@@ -23,6 +23,9 @@ Depending on your package manager you may need to install `peerDependencies` man
 ## Usage
 
 ```ts
+import '@gravity-ui/uikit/styles/styles.scss';
+import '@gravity-ui/unipika/styles/unipika.scss';
+
 import {ReactUnipika} from '@gravity-ui/react-unipika';
 
 function renderJson(data: any) {

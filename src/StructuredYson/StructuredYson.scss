@@ -1,4 +1,8 @@
 .g-ru-structured-yson {
+    * {
+        box-sizing: border-box;
+    }
+
     $rowHeight: 20px;
 
     &__toolbar {
@@ -31,8 +35,9 @@
     }
 
     &__match-counter {
-        color: var(--secondary-text);
+        color: var(--g-color-text-secondary);
         padding-left: 1ex;
+        white-space: nowrap;
     }
 
     &__key {
@@ -61,7 +66,7 @@
 
     &__filtered {
         &_highlighted {
-            background-color: var(--action-button-color);
+            background-color: var(--g-color-base-selection);
         }
     }
 

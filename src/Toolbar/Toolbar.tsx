@@ -1,7 +1,8 @@
 import React from 'react';
-import {ruCN} from '../utils/classname';
+import {cn} from '../utils/classname';
+import './Toolbar.scss';
 
-const block = ruCN('toolbar');
+const block = cn('g-ru-toolbar');
 
 export const TOOLBAR_COMPONENT_HEIGHT = 48;
 

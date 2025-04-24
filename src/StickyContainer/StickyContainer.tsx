@@ -1,9 +1,10 @@
 import React from 'react';
 
-import {ruCN} from '../utils/classname';
+import {cn} from '../utils/classname';
 import './StickyContainer.scss';
+import {CSSProperties} from '@gravity-ui/uikit';
 
-const block = ruCN('sticky-container');
+const block = cn('g-ru-sticky-container');
 
 export function StickyContainer({
     className,
@@ -45,12 +46,16 @@ export function StickyContainer({
         setElement(div);
     }, []);
 
+    const style = React.useMemo(() => {
+        return {'--g-ru-sticky-container-top': `${topOffset}px`} as CSSProperties;
+    }, [topOffset]);
+
     return (
-        <div className={block(null, className)}>
+        <div className={block(null, className)} style={style}>
             <div className={block('top')} ref={onRef} />
             {children({
                 sticky,
-                topStickyClassName: sticky ? block('sticky', {top: true}) : undefined,
+                topStickyClassName: sticky ? block('sticky') : undefined,
             })}
         </div>
     );

@@ -1,13 +1,13 @@
 import React from 'react';
-import {ruCN} from '../utils/classname';
 
 import fill_ from 'lodash/fill';
 import isEmpty_ from 'lodash/isEmpty';
 import reduce_ from 'lodash/reduce';
 
-import {Button, Dialog, Flex, SegmentedRadioGroup, TextInput} from '@gravity-ui/uikit';
+import {Button, Dialog, Flex, Icon, SegmentedRadioGroup, TextInput} from '@gravity-ui/uikit';
 // @ts-ignore
-import unipika from '@gravity-ui/unipika';
+import unipika from '@gravity-ui/unipika/lib/unipika';
+
 import DataTable, {
     Column as DataTableColumn,
     DynamicInnerRefT as DataTableDynamicInnerRefT,
@@ -38,9 +38,11 @@ import {Toolbar} from '../Toolbar/Toolbar';
 import {MultiHighlightedText} from '../HighlightedText/HighlightedText';
 import {ClickableText} from '../ClickableText/ClickableText';
 
+import {cn} from '../utils/classname';
+
 import './StructuredYson.scss';
 
-const block = ruCN('structured-yson');
+const block = cn('g-ru-structured-yson');
 
 interface Props {
     value: UnipikaValue;
@@ -48,7 +50,7 @@ interface Props {
     extraTools?: React.ReactNode;
     tableSettings?: DataTableSettings;
     customLayout?: (args: {toolbar: React.ReactNode; content: React.ReactNode}) => React.ReactNode;
-    toolbarStickyTop: number;
+    toolbarStickyTop?: number;
 }
 
 interface State {
@@ -303,11 +305,11 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                         node: (
                             <span className={block('buttons')}>
                                 <Button title="Expand all" onClick={this.onExpandAll}>
-                                    <ArrowDownToLine />
+                                    <Icon data={ArrowDownToLine} />
                                 </Button>
                                 &nbsp;&nbsp;
                                 <Button onClick={this.onCollapseAll} title="Collapse all">
-                                    <ArrowUpToLine />
+                                    <Icon data={ArrowUpToLine} />
                                 </Button>
                             </span>
                         ),
@@ -353,7 +355,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                     disabled={!count}
                     pin={'clear-clear'}
                 >
-                    <ChevronDown />
+                    <Icon data={ChevronDown} />
                 </Button>
                 <Button
                     className={block('match-btn')}
@@ -363,7 +365,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                     disabled={!count}
                     pin={'brick-brick'}
                 >
-                    <ChevronUp />
+                    <Icon data={ChevronUp} />
                 </Button>
                 <span className={block('match-counter')} title={'Matched rows'}>
                     {matchPosition} / {count || 0}
@@ -601,7 +603,7 @@ function renderStringWithFilter(props: ValueProps, className: string, maxWidth =
                     onClick={showFullText}
                 >
                     {'\u2026'}
-                    <ArrowUpRightFromSquare />
+                    <Icon data={ArrowUpRightFromSquare} />
                 </ClickableText>
             )}
             &quot;

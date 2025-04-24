@@ -2,6 +2,7 @@ import React from 'react';
 
 import type {Preview, Decorator} from '@storybook/react';
 import '@gravity-ui/uikit/styles/styles.scss';
+import '@gravity-ui/unipika/styles/unipika.scss';
 
 import {ThemeProvider, MobileProvider, configure as uikitConfigure} from '@gravity-ui/uikit';
 import {configure} from '../src/configure';

@@ -3,16 +3,13 @@
         position: sticky;
         z-index: 1;
 
-        background-color: var(--main-background);
-        box-shadow: 0 1px 10px var(--opacity-background);
+        background-color: var(--g-color-base-background);
+        box-shadow: 0 3px 3px 0px var(--g-color-sfx-shadow-light);
 
-        width: calc(100vw - var(--gn-aside-header-size));
         margin-left: -20px;
         padding-left: 20px;
         padding-right: 20px;
 
-        &_top {
-            top: var(--app-header-height);
-        }
+        top: var(--g-ru-sticky-container-top);
     }
 }

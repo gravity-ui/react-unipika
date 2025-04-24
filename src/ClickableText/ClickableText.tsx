@@ -1,9 +1,9 @@
 import React from 'react';
 
-import {ruCN} from '../utils/classname';
+import {cn} from '../utils/classname';
 
 import './ClickableText.scss';
-const block = ruCN('yt-clickable-text');
+const block = cn('g-ru-clickable-text');
 
 export type ClickableTextProps = {
     className?: string;

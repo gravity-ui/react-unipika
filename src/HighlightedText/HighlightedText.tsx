@@ -72,6 +72,7 @@ export function MultiHighlightedText({
         if (substr) {
             substrs.push(
                 <HighlightedText
+                    key={i}
                     className={className}
                     classNameHighlighted={classNameHighlighted}
                     text={substr}

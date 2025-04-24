@@ -1,5 +1,3 @@
 import {withNaming} from '@bem-react/classname';
 
-export const NAMESPACE = 'g-ru-';
-
-export const ruCN = withNaming({n: NAMESPACE, e: '__', m: '_'});
+export const cn = withNaming({e: '__', m: '_'});
