@@ -2,6 +2,7 @@ $TOOLBAR_COMPONENT_HEIGHT: 48px;
 
 .g-ru-toolbar {
     &__container {
+        padding: 0 4px;
         display: flex;
         flex-wrap: nowrap;
         align-items: center;

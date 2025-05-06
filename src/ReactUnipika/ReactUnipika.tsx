@@ -1,6 +1,5 @@
 import React from 'react';
 
-import type {Settings} from '@gravity-ui/react-data-table';
 // @ts-expect-error
 import unipika from '@gravity-ui/unipika/lib/unipika';
 
@@ -19,7 +18,6 @@ export interface ReactUnipikaProps {
     extraTools?: React.ReactNode;
     virtualized?: boolean;
     className?: string;
-    tableSettings?: Settings;
     customLayout?: (args: {toolbar: React.ReactNode; content: React.ReactNode}) => React.ReactNode;
     toolbarStickyTop?: number;
 }
@@ -41,7 +39,6 @@ export function ReactUnipika({
     virtualized = true,
     extraTools,
     className,
-    tableSettings,
     customLayout,
     toolbarStickyTop = 0,
 }: ReactUnipikaProps) {
@@ -90,7 +87,6 @@ export function ReactUnipika({
         <div className={classes} title={getFormattedTitle()} dir="auto">
             {virtualized ? (
                 <StructuredYson
-                    tableSettings={tableSettings}
                     value={convertedValue}
                     settings={settings}
                     extraTools={extraTools}

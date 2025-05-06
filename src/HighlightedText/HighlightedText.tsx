@@ -42,7 +42,7 @@ export default function HighlightedText({
     );
 }
 
-interface MultiProps extends Omit<Props, 'start'> {
+export interface MultiHighlightedTextProps extends Omit<Props, 'start'> {
     starts: Array<number>;
 }
 
@@ -53,7 +53,7 @@ export function MultiHighlightedText({
     starts,
     length,
     hasComa,
-}: MultiProps) {
+}: MultiHighlightedTextProps) {
     if (!length || !starts.length) {
         const comma = hasComa ? <>,&nbsp;</> : null;
         return (

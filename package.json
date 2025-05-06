@@ -53,7 +53,6 @@
     "@gravity-ui/i18n": "^1.0.0",
     "@gravity-ui/icons": "^2.13.0",
     "@gravity-ui/prettier-config": "^1.0.1",
-    "@gravity-ui/react-data-table": "^2.2.1",
     "@gravity-ui/stylelint-config": "^2.0.0",
     "@gravity-ui/tsconfig": "^1.0.0",
     "@gravity-ui/uikit": "^7.1.1",
@@ -90,6 +89,7 @@
     "@bem-react/classname": "^1.6.0",
     "@gravity-ui/i18n": "^1.0.0",
     "@gravity-ui/icons": "^2.0.0",
+    "@gravity-ui/table": "^1.10.1",
     "@gravity-ui/uikit": "^7.1.1"
   },
   "nano-staged": {

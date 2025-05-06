@@ -1,0 +1,49 @@
+.g-ru-cell {
+    position: relative;
+
+    white-space: nowrap;
+    * {
+        white-space: nowrap;
+    }
+
+    &__key {
+        color: var(--color-unipika-key);
+    }
+
+    &__value {
+        &_type {
+            &_string {
+                color: var(--color-unipika-string);
+            }
+            &_boolean {
+                color: var(--color-unipika-bool);
+            }
+            &_null {
+                color: var(--color-unipika-null);
+            }
+            &_int64 {
+                color: var(--color-unipika-int);
+            }
+            &_double {
+                color: var(--color-unipika-float);
+            }
+        }
+    }
+
+    &__filtered {
+        &_highlighted {
+            background-color: var(--g-color-base-selection);
+        }
+    }
+
+    &__collapse {
+        margin-left: -4ex;
+        margin-top: -2px;
+        position: absolute;
+
+        & button {
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+    }
+}

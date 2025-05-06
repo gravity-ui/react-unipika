@@ -1,0 +1,16 @@
+.g-ru-table {
+    --g-text-body-font-family: var(--g-font-family-monospace);
+
+    &__header-cell {
+        display: none;
+    }
+
+    & &__row {
+        height: 20px;
+    }
+
+    &__cell {
+        padding: 0;
+        border-width: 0px;
+    }
+}
