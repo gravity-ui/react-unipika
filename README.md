@@ -35,7 +35,43 @@ function renderJson(data: any) {
 
 ## YSON notice
 
-Actually the library does not support YSON-format "as is", it is impossible to parse any YSON.
-But the library may display JSON-objects as YSON, such JSON-objects has reserver field names like `$attributes`, `$value`.
+The library does not support YSON-format "as is", i.e. it is impossible to use/parse YSON data.
+But it provides the way to render JSON-objects as YSON, such JSON-objects has reserver field names like `$attributes`, `$value`.
 
 See more examples in [storybook](https://preview.yandexcloud.dev/react-unipika).
+
+## Props
+
+### ReactUnipika Component Props
+
+| Prop               | Type                                                                              | Default   | Description                                                  |
+| ------------------ | --------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------ |
+| `value`            | `any`                                                                             | required  | The data to be rendered                                      |
+| `settings`         | `UnipikaSettings`                                                                 | See below | Settings for Unipika formatting                              |
+| `inline`           | `boolean`                                                                         | `false`   | Render in inline mode                                        |
+| `children`         | `React.ReactNode`                                                                 | -         | React nodes to render as children                            |
+| `extraTools`       | `React.ReactNode`                                                                 | -         | Additional React nodes for tools                             |
+| `virtualized`      | `boolean`                                                                         | `true`    | Enable virtualization for better performance with large data |
+| `className`        | `string`                                                                          | -         | Custom CSS class name                                        |
+| `customLayout`     | `(args: {toolbar: React.ReactNode; content: React.ReactNode}) => React.ReactNode` | -         | Function to customize the layout                             |
+| `toolbarStickyTop` | `number`                                                                          | `0`       | Top position in pixels for sticky toolbar                    |
+
+### UnipikaSettings
+
+| Setting             | Type      | Default  | Description                                        |
+| ------------------- | --------- | -------- | -------------------------------------------------- |
+| `asHTML`            | `boolean` | `true`   | Render as HTML                                     |
+| `format`            | `string`  | `'json'` | Format type ('json', 'yson', 'raw-json')           |
+| `compact`           | `boolean` | `false`  | Use compact rendering                              |
+| `escapeWhitespace`  | `boolean` | `true`   | Escape whitespace characters                       |
+| `showDecoded`       | `boolean` | `true`   | Show decoded values                                |
+| `binaryAsHex`       | `boolean` | `true`   | Display binary data as hexadecimal                 |
+| `nonBreakingIndent` | `boolean` | -        | Use non-breaking spaces for indentation            |
+| `escapeYQLStrings`  | `boolean` | -        | Escape YQL strings                                 |
+| `decodeUTF8`        | `boolean` | -        | Decode UTF-8 encoded strings                       |
+| `indent`            | `number`  | -        | Indentation size                                   |
+| `break`             | `boolean` | -        | Add line breaks                                    |
+| `maxListSize`       | `number`  | -        | Maximum number of items to display in a list       |
+| `maxStringSize`     | `number`  | -        | Maximum string length to display before truncating |
+| `omitStructNull`    | `boolean` | -        | Omit null values in structures                     |
+| `treatValAsData`    | `boolean` | -        | Treat values as data                               |
