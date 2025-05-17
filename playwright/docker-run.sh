@@ -17,7 +17,7 @@ else
 fi
 
 IMAGE_NAME="mcr.microsoft.com/playwright"
-IMAGE_TAG="v"${VERSION}"-focal"
+IMAGE_TAG="v"${VERSION}"-noble"
 PW_VERSION=$(echo $IMAGE_TAG | awk -F "-" '{print $1}' | sed -e 's/^v//')
 
 NAME=$(node -e 'console.log(require("./package.json").name)')
@@ -28,6 +28,15 @@ echo Using cache directory: ${NODE_MODULES_CACHE_DIR}
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
+
+if command_exists docker; then
+    CONTAINER_TOOL="docker"
+elif command_exists podman; then
+    CONTAINER_TOOL="podman"
+else
+    echo "Neither Docker nor Podman is installed on the system."
+    exit 1
+fi
 
 run_command() {
     toRun="$@"
@@ -46,11 +55,14 @@ run_command() {
         echo Env file is found:
         echo "    $useEnvFile"
     else
+        useEnvFile=
         echo "Use the file to provide environment variables:"
         echo "    $envFile"
     fi
 
-    $CONTAINER_TOOL run --rm --network host -it -w /work \
+    $CONTAINER_TOOL run --rm --network host -it \
+        -e DOCKER_CI=1 \
+        -w /work \
         -v $(pwd):/work \
         -v "$NODE_MODULES_CACHE_DIR/node_modules:/work/node_modules" \
         -v "$NODE_MODULES_CACHE_DIR/.cache-playwright:/work/.cache-playwright" \
@@ -58,15 +70,6 @@ run_command() {
         "$IMAGE_NAME:$IMAGE_TAG" \
         /bin/bash -c "umask 0000; $toRun"
 }
-
-if command_exists docker; then
-    CONTAINER_TOOL="docker"
-elif command_exists podman; then
-    CONTAINER_TOOL="podman"
-else
-    echo "Neither Docker nor Podman is installed on the system."
-    exit 1
-fi
 
 action=${1:-test}
 
