@@ -10,8 +10,15 @@ const meta: Meta<ReactUnipikaProps> = {
 };
 export default meta;
 
-export const Default: StoryObj<ReactUnipikaProps> = {
+export const Json: StoryObj<ReactUnipikaProps> = {
     args: {
         value: data,
+    },
+};
+
+export const Yson: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        settings: {format: 'yson'},
     },
 };

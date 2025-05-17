@@ -19,11 +19,14 @@ export const expectScreenshotFixture: PlaywrightFixture<ExpectScreenshotFixture>
         ...pageScreenshotOptions
     } = defaultParams) => {
         const captureScreenshot = async () => {
+            await page.waitForLoadState('networkidle');
             return (component || page.locator('.playwright-wrapper-test')).screenshot({
                 animations: 'disabled',
                 ...pageScreenshotOptions,
             });
         };
+
+        await page.mouse.move(0, 0);
 
         //console.log({nameScreenshot, nameSuffix, testInfo: testInfo});
 

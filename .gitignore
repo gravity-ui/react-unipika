@@ -29,3 +29,5 @@ lib/
 /blob-report/
 /playwright/.cache/
 coverage/
+
+.cache-playwright*

@@ -54,6 +54,7 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                     onUpdate={onFilterChange}
                     autoFocus={false}
                     onKeyDown={onEnterKeyDown}
+                    qa={'qa:structuredyson:search'}
                 />
                 <Button
                     className={block('match-btn')}
@@ -62,6 +63,7 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                     onClick={onNextMatch}
                     disabled={!count}
                     pin={'clear-clear'}
+                    qa={'qa:structuredyson:search:next'}
                 >
                     <Icon data={ChevronDown} />
                 </Button>
@@ -72,6 +74,7 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                     onClick={onPrevMatch}
                     disabled={!count}
                     pin={'brick-brick'}
+                    qa={'qa:structuredyson:search:prev'}
                 >
                     <Icon data={ChevronUp} />
                 </Button>
