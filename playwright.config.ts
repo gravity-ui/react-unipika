@@ -26,7 +26,8 @@ export default defineConfig({
         trace: 'on-first-retry',
         headless: true,
         testIdAttribute: 'data-qa',
-        ctCacheDir: __dirname + '/.cache-playwright',
+        ctCacheDir: process.env.DOCKER_CI ? './.cache-playwright.docker' : './.cache-playwright',
+        viewport: {width: 1280, height: 720},
     },
 
     /* Configure projects for major browsers */

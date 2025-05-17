@@ -1,11 +1,14 @@
 .g-ru-sticky-container {
+    border-bottom: 1px solid rgb(0, 0, 0, 0);
+
     &__sticky {
         position: sticky;
         z-index: 1;
 
         background-color: var(--g-color-base-background);
-        box-shadow: 0 4px 4px -3px var(--g-color-sfx-shadow-light);
 
         top: var(--g-ru-sticky-container-top);
+
+        border-bottom: 1px solid var(--g-color-line-generic);
     }
 }
