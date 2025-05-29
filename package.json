@@ -12,7 +12,7 @@
   "types": "types/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
+      "types": "./types/src/index.d.ts",
       "require": "./build/cjs/index.js",
       "import": "./build/esm/index.js"
     }
