@@ -1,7 +1,7 @@
 ## Short description
 
 The purpose of `@gravity-ui/react-unipika` is visualizing of JSON and [YSON](https://ytsaurus.tech/docs/en/user-guide/storage/yson) data objects.
-The library uses [`@gravity-ui/unipika`](https://github.com/gravity-ui/unipika) and [`@gravity-ui/table`](https://github.com/gravity-ui/table internally.
+The library uses [`@gravity-ui/unipika`](https://github.com/gravity-ui/unipika) and [`@gravity-ui/table`](https://github.com/gravity-ui/table) internally.
 
 ### Features
 
