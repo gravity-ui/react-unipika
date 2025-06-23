@@ -56,10 +56,13 @@ export const Table: React.FC<TableProps> = ({
         data,
     });
 
+    const bodyRef = React.useRef<HTMLTableSectionElement>(null);
+
     const rowVirtulization = useWindowRowVirtualizer({
         count: table.getRowModel().rows.length,
         estimateSize: () => 20,
         overscan: 5,
+        scrollMargin: bodyRef.current?.offsetTop ?? 0,
     });
 
     React.useEffect(() => {
@@ -77,6 +80,7 @@ export const Table: React.FC<TableProps> = ({
                 rowClassName={rowClassName}
                 cellClassName={block('cell')}
                 headerCellClassName={block('header-cell')}
+                bodyRef={bodyRef}
             />
         </div>
     );
