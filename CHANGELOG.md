@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/gravity-ui/react-unipika/compare/v0.1.2...v0.1.3) (2025-06-23)
+
+
+### Bug Fixes
+
+* **Talbe:** fix for scrolling with content above ([05a5951](https://github.com/gravity-ui/react-unipika/commit/05a5951d0a77e82d9328b07a854628c875303def))
+
 ## [0.1.2](https://github.com/gravity-ui/react-unipika/compare/v0.1.1...v0.1.2) (2025-05-29)
 
 

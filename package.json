@@ -1,6 +1,6 @@
 {
   "name": "@gravity-ui/react-unipika",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The library helps to create dialogs with forms by using registered field-types. Also it is possible to extend it with your own field-types.",
   "repository": {
     "type": "arc",
