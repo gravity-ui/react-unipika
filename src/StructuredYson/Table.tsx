@@ -31,6 +31,8 @@ export const Table: React.FC<TableProps> = ({
     onShowFullText,
     scrollToRef,
 }) => {
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
     const renderCell: ColumnDef<UnipikaFlattenTreeItem>['cell'] = ({row}) => {
         const {original, index} = row;
         return (
@@ -56,10 +58,13 @@ export const Table: React.FC<TableProps> = ({
         data,
     });
 
+    const [scrollMargin, setScrollMargin] = React.useState(0);
+
     const rowVirtulization = useWindowRowVirtualizer({
         count: table.getRowModel().rows.length,
         estimateSize: () => 20,
         overscan: 5,
+        scrollMargin,
     });
 
     React.useEffect(() => {
@@ -69,8 +74,29 @@ export const Table: React.FC<TableProps> = ({
         };
     }, [scrollToRef, rowVirtulization]);
 
+    React.useEffect(() => {
+        if (containerRef.current) {
+            const updateScrollMargin = () => {
+                const rect = containerRef.current?.getBoundingClientRect();
+                const offsetTop = rect ? rect.top + window.scrollY : 0;
+                setScrollMargin(offsetTop);
+            };
+
+            updateScrollMargin();
+            window.addEventListener('resize', updateScrollMargin);
+            window.addEventListener('scroll', updateScrollMargin);
+
+            return () => {
+                window.removeEventListener('resize', updateScrollMargin);
+                window.removeEventListener('scroll', updateScrollMargin);
+            };
+        }
+
+        return () => {};
+    }, []);
+
     return (
-        <div className={block()}>
+        <div className={block()} ref={containerRef}>
             <GravityTable
                 table={table}
                 rowVirtualizer={rowVirtulization}
