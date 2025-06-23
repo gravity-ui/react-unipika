@@ -67,3 +67,11 @@ test('ReactUnipika:yson', async ({mount, expectScreenshot, page}) => {
 
     await expectScreenshot({component: page});
 });
+
+test('ReactUnipika: with content above', async ({mount, expectScreenshot, page}) => {
+    await mount(<Stories.WithContentAbove />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('level8_item4');
+
+    await expectScreenshot({component: page});
+});
