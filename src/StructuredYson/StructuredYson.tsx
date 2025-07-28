@@ -6,7 +6,12 @@ import reduce_ from 'lodash/reduce';
 // @ts-ignore
 import unipika from '@gravity-ui/unipika/lib/unipika';
 
-import {UnipikaSettings, UnipikaValue} from '../StructuredYson/types';
+import {
+    CollapseIconType,
+    ToolbarProps,
+    UnipikaSettings,
+    UnipikaValue,
+} from '../StructuredYson/types';
 import {
     CollapsedState,
     FlattenUnipikaResult,
@@ -26,13 +31,6 @@ import './StructuredYson.scss';
 
 const block = cn('g-ru-structured-yson');
 
-export interface ToolbarProps {
-    onFilterChange: (filter: string) => void;
-    onExpandAll: () => void;
-    onCollapseAll: () => void;
-    isCollapsed: boolean;
-}
-
 interface Props {
     value: UnipikaValue;
     settings: UnipikaSettings;
@@ -40,6 +38,7 @@ interface Props {
     customLayout?: (args: {toolbar: React.ReactNode; content: React.ReactNode}) => React.ReactNode;
     toolbarStickyTop?: number;
     renderToolbar?: (props: ToolbarProps) => React.ReactNode;
+    collapseIconType?: CollapseIconType;
 }
 
 interface State {
@@ -156,6 +155,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
             settings,
             filter,
         } = this.state;
+        const {collapseIconType} = this.props;
 
         return (
             <Table
@@ -167,6 +167,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                 onToggleCollapse={this.onTogglePathCollapse}
                 onShowFullText={this.onShowFullText}
                 scrollToRef={this.tableRef}
+                collapseIconType={collapseIconType}
             />
         );
     }

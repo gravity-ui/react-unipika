@@ -2,7 +2,7 @@ import React from 'react';
 import {Table as GravityTable, useTable, useWindowRowVirtualizer} from '@gravity-ui/table';
 import type {ColumnDef, Row} from '@gravity-ui/table/tanstack';
 import {UnipikaFlattenTreeItem, SearchInfo} from '../utils/flattenUnipika';
-import {UnipikaSettings} from '../StructuredYson/types';
+import {CollapseIconType, UnipikaSettings} from '../StructuredYson/types';
 import {asModifier, Cell} from './Cell';
 import {cn} from '../utils/classname';
 
@@ -19,6 +19,7 @@ export interface TableProps {
     onToggleCollapse: (path: string) => void;
     onShowFullText: (index: number) => void;
     scrollToRef: React.RefObject<null | {scrollToIndex(index: number): void}>;
+    collapseIconType?: CollapseIconType;
 }
 
 export const Table: React.FC<TableProps> = ({
@@ -30,6 +31,7 @@ export const Table: React.FC<TableProps> = ({
     onToggleCollapse,
     onShowFullText,
     scrollToRef,
+    collapseIconType,
 }) => {
     const renderCell: ColumnDef<UnipikaFlattenTreeItem>['cell'] = ({row}) => {
         const {original, index} = row;
@@ -43,6 +45,7 @@ export const Table: React.FC<TableProps> = ({
                 filter={filter}
                 showFullText={onShowFullText}
                 index={index}
+                collapseIconType={collapseIconType}
             />
         );
     };
