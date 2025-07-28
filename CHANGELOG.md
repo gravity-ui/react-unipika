@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0](https://github.com/gravity-ui/react-unipika/compare/v0.1.3...v0.2.0) (2025-07-28)
+
+
+### Features
+
+* **ReactUnipika:** add renderToolbar property ([eb55175](https://github.com/gravity-ui/react-unipika/commit/eb55175c60ab060b7b414c2b0091df40e65102a6))
+* **StructuredYson/Cell:** add configurable collapse indicators ([1106e05](https://github.com/gravity-ui/react-unipika/commit/1106e05c52a744cccad8dee1c7b574806b2c1aac))
+
 ## [0.1.3](https://github.com/gravity-ui/react-unipika/compare/v0.1.2...v0.1.3) (2025-06-23)
 
 
