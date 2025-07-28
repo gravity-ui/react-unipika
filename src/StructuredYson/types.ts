@@ -19,6 +19,15 @@ export type UnipikaSettings = {
     normalizeUrl?: (url?: string) => string;
 };
 
+export type CollapseIconType = 'chevron';
+
+export interface ToolbarProps {
+    onFilterChange: (filter: string) => void;
+    onExpandAll: () => void;
+    onCollapseAll: () => void;
+    isCollapsed: boolean;
+}
+
 interface BaseUnipikaValue {
     $attributes?: UnipikaMap['$value'];
 }

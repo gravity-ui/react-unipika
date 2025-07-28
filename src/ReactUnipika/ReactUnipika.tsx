@@ -3,9 +3,9 @@ import React from 'react';
 // @ts-expect-error
 import unipika from '@gravity-ui/unipika/lib/unipika';
 
-import {UnipikaSettings} from '../StructuredYson/types';
+import {CollapseIconType, ToolbarProps, UnipikaSettings} from '../StructuredYson/types';
 
-import {StructuredYson, ToolbarProps} from '../StructuredYson/StructuredYson';
+import {StructuredYson} from '../StructuredYson/StructuredYson';
 import {cn} from '../utils/classname';
 
 const block = cn('g-ru-react-unipika');
@@ -21,6 +21,7 @@ export interface ReactUnipikaProps {
     customLayout?: (args: {toolbar: React.ReactNode; content: React.ReactNode}) => React.ReactNode;
     toolbarStickyTop?: number;
     renderToolbar?: (props: ToolbarProps) => React.ReactNode;
+    collapseIconType?: CollapseIconType;
 }
 
 const defaultUnipikaSettings = {
@@ -43,6 +44,7 @@ export function ReactUnipika({
     customLayout,
     toolbarStickyTop = 0,
     renderToolbar,
+    collapseIconType,
 }: ReactUnipikaProps) {
     const convertedValue = React.useMemo(() => {
         // TODO: fix me later
@@ -95,6 +97,7 @@ export function ReactUnipika({
                     customLayout={customLayout}
                     toolbarStickyTop={toolbarStickyTop}
                     renderToolbar={renderToolbar}
+                    collapseIconType={collapseIconType}
                 />
             ) : (
                 <pre

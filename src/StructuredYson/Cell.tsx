@@ -4,9 +4,9 @@ import {Button, Icon} from '@gravity-ui/uikit';
 // @ts-ignore
 import unipika from '@gravity-ui/unipika/lib/unipika';
 
-import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
+import {ArrowUpRightFromSquare, ChevronUp, ChevronRight} from '@gravity-ui/icons';
 
-import {UnipikaSettings} from './types';
+import {CollapseIconType, UnipikaSettings} from './types';
 import {BlockType, SearchInfo, UnipikaFlattenTreeItem} from '../utils/flattenUnipika';
 
 import {MultiHighlightedText, MultiHighlightedTextProps} from '../HighlightedText/HighlightedText';
@@ -28,6 +28,7 @@ export interface CellProps {
     filter?: string;
     index: number;
     showFullText: (index: number) => void;
+    collapseIconType?: CollapseIconType;
 }
 
 export const JSON_VALUE_KEY = {
@@ -69,6 +70,7 @@ export function Cell(props: CellProps) {
         filter,
         showFullText,
         index,
+        collapseIconType,
     } = props;
 
     const handleToggleCollapse = React.useCallback(() => {
@@ -90,6 +92,7 @@ export function Cell(props: CellProps) {
                     collapsed={collapsed}
                     path={path}
                     onToggle={handleToggleCollapse}
+                    collapseIconType={collapseIconType}
                 />
             )}
             <Key
@@ -287,14 +290,27 @@ interface ToggleCollapseProps {
     collapsed?: boolean;
     path?: UnipikaFlattenTreeItem['path'];
     onToggle: () => void;
+    collapseIconType?: CollapseIconType;
 }
 
 function ToggleCollapseButton(props: ToggleCollapseProps) {
-    const {collapsed, onToggle, path} = props;
+    const {collapsed, onToggle, path, collapseIconType} = props;
+
+    // Function to render the appropriate collapse indicator based on type
+    const renderCollapseIndicator = () => {
+        switch (collapseIconType) {
+            case 'chevron':
+                return <Icon className={'unipika'} data={collapsed ? ChevronRight : ChevronUp} />;
+            // Future icon types can be added here as new cases
+            default:
+                return <span className={'unipika'}>{collapsed ? '[+]' : '[-]'}</span>;
+        }
+    };
+
     return (
         <span title={path} className={block('collapse')}>
             <Button onClick={onToggle} view="flat-secondary" size={'s'}>
-                <span className={'unipika'}>{collapsed ? '[+]' : '[-]'}</span>
+                {renderCollapseIndicator()}
             </Button>
         </span>
     );
