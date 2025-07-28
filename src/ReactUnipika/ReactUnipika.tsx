@@ -5,7 +5,7 @@ import unipika from '@gravity-ui/unipika/lib/unipika';
 
 import {UnipikaSettings} from '../StructuredYson/types';
 
-import {StructuredYson} from '../StructuredYson/StructuredYson';
+import {StructuredYson, ToolbarProps} from '../StructuredYson/StructuredYson';
 import {cn} from '../utils/classname';
 
 const block = cn('g-ru-react-unipika');
@@ -20,6 +20,7 @@ export interface ReactUnipikaProps {
     className?: string;
     customLayout?: (args: {toolbar: React.ReactNode; content: React.ReactNode}) => React.ReactNode;
     toolbarStickyTop?: number;
+    renderToolbar?: (props: ToolbarProps) => React.ReactNode;
 }
 
 const defaultUnipikaSettings = {
@@ -41,6 +42,7 @@ export function ReactUnipika({
     className,
     customLayout,
     toolbarStickyTop = 0,
+    renderToolbar,
 }: ReactUnipikaProps) {
     const convertedValue = React.useMemo(() => {
         // TODO: fix me later
@@ -92,6 +94,7 @@ export function ReactUnipika({
                     extraTools={extraTools}
                     customLayout={customLayout}
                     toolbarStickyTop={toolbarStickyTop}
+                    renderToolbar={renderToolbar}
                 />
             ) : (
                 <pre
