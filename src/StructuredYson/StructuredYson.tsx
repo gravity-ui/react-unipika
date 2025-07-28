@@ -26,12 +26,20 @@ import './StructuredYson.scss';
 
 const block = cn('g-ru-structured-yson');
 
+export interface ToolbarProps {
+    onFilterChange: (filter: string) => void;
+    onExpandAll: () => void;
+    onCollapseAll: () => void;
+    isCollapsed: boolean;
+}
+
 interface Props {
     value: UnipikaValue;
     settings: UnipikaSettings;
     extraTools?: React.ReactNode;
     customLayout?: (args: {toolbar: React.ReactNode; content: React.ReactNode}) => React.ReactNode;
     toolbarStickyTop?: number;
+    renderToolbar?: (props: ToolbarProps) => React.ReactNode;
 }
 
 interface State {
@@ -224,8 +232,21 @@ export class StructuredYson extends React.PureComponent<Props, State> {
     };
 
     renderToolbar(className?: string) {
-        const {matchIndex, matchedRows, filter} = this.state;
-        const {extraTools} = this.props;
+        const {matchIndex, matchedRows, filter, collapsedState} = this.state;
+        const {extraTools, renderToolbar} = this.props;
+
+        // Calculate if there are any collapsed nodes
+        const isCollapsed = Object.keys(collapsedState).length > 0;
+
+        if (renderToolbar) {
+            return renderToolbar({
+                onFilterChange: this.onFilterChange,
+                onExpandAll: this.onExpandAll,
+                onCollapseAll: this.onCollapseAll,
+                isCollapsed,
+            });
+        }
+
         return (
             <StructuredYsonToolbar
                 className={className}

@@ -1,6 +1,6 @@
 import React from 'react';
-
 import {Button, Icon} from '@gravity-ui/uikit';
+
 // @ts-ignore
 import unipika from '@gravity-ui/unipika/lib/unipika';
 
@@ -130,7 +130,10 @@ interface KeyProps {
 function Key(props: KeyProps) {
     const {yson} = props;
     const text: React.ReactNode = renderKeyWithFilter(props);
-    return !text ? null : (
+    if (!text) {
+        return null;
+    }
+    return (
         <React.Fragment>
             {text}
             <SlaveText text={yson ? ' = ' : ': '} />
