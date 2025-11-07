@@ -81,3 +81,13 @@ test('ReactUnipika: json with container size', async ({mount, expectScreenshot, 
 
     await expectScreenshot({component: page});
 });
+
+test('ReactUnipika: json with container size collapsed initially', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithContainerSizeCollapsed />, {width: 1280});
+
+    await expectScreenshot({component: page});
+});

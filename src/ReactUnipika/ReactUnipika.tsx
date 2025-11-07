@@ -23,6 +23,7 @@ export interface ReactUnipikaProps {
     renderToolbar?: (props: ToolbarProps) => React.ReactNode;
     collapseIconType?: CollapseIconType;
     showContainerSize?: boolean;
+    initiallyCollapsed?: boolean;
 }
 
 const defaultUnipikaSettings = {
@@ -47,6 +48,7 @@ export function ReactUnipika({
     renderToolbar,
     collapseIconType,
     showContainerSize,
+    initiallyCollapsed,
 }: ReactUnipikaProps) {
     const convertedValue = React.useMemo(() => {
         // TODO: fix me later
@@ -101,6 +103,7 @@ export function ReactUnipika({
                     renderToolbar={renderToolbar}
                     collapseIconType={collapseIconType}
                     showContainerSize={showContainerSize}
+                    initiallyCollapsed={initiallyCollapsed}
                 />
             ) : (
                 <pre

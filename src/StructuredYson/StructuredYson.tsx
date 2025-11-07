@@ -40,6 +40,7 @@ interface Props {
     renderToolbar?: (props: ToolbarProps) => React.ReactNode;
     collapseIconType?: CollapseIconType;
     showContainerSize?: boolean;
+    initiallyCollapsed?: boolean;
 }
 
 interface State {
@@ -100,20 +101,29 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         return isEmpty_(res) ? null : res;
     }
 
-    state: State = {
-        value: {} as any, // valid value will be provided from getDerivedStateFromProps call
-        flattenResult: {data: [], searchIndex: {}},
-        settings: {},
-        yson: true,
-        collapsedState: {},
-
-        filter: '',
-        matchIndex: -1,
-        matchedRows: [],
-    };
+    state: State = this.getInitialState();
 
     tableRef: TableProps['scrollToRef'] = React.createRef();
     searchRef = React.createRef<HTMLInputElement>();
+
+    getInitialState(): State {
+        const {initiallyCollapsed, value, settings} = this.props;
+        const collapsedState = initiallyCollapsed
+            ? this.getFullyCollapsedState(value, settings.format !== 'yson')
+            : {};
+
+        return {
+            value: {} as any, // valid value will be provided from getDerivedStateFromProps call
+            flattenResult: {data: [], searchIndex: {}},
+            settings: {},
+            yson: true,
+            collapsedState,
+
+            filter: '',
+            matchIndex: -1,
+            matchedRows: [],
+        };
+    }
 
     onTogglePathCollapse = (path: string) => {
         const {collapsedState: oldState} = this.state;
@@ -181,17 +191,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
 
     onCollapseAll = () => {
         const {value, yson} = this.state;
-        const {data} = flattenUnipika(value, {isJson: !yson});
-        const collapsedState = reduce_(
-            data,
-            (acc, {path}) => {
-                if (path) {
-                    acc[path] = true;
-                }
-                return acc;
-            },
-            {} as CollapsedState,
-        );
+        const collapsedState = this.getFullyCollapsedState(value, !yson);
         this.updateState({collapsedState});
     };
 
@@ -324,6 +324,20 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                 )}
                 {this.renderFullValueModal()}
             </React.Fragment>
+        );
+    }
+
+    getFullyCollapsedState(value: UnipikaValue, isJson: boolean): CollapsedState {
+        const {data} = flattenUnipika(value, {isJson});
+        return reduce_<UnipikaFlattenTreeItem, CollapsedState>(
+            data,
+            (acc, {path}) => {
+                if (path) {
+                    acc[path] = true;
+                }
+                return acc;
+            },
+            {},
         );
     }
 }
