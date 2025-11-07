@@ -2078,6 +2078,15 @@ describe('flattenUnipika', () => {
                 });
                 expect(result).toEqual({data: expected, searchIndex});
             });
+            it('find part of a string case-sensitive', () => {
+                const searchIndex: FlattenUnipikaResult['searchIndex'] = {};
+                const result = flattenUnipika(converted, {
+                    filter: 'Size',
+                    settings: {format: 'yson'},
+                    caseSensitive: true,
+                });
+                expect(result).toEqual({data: expected, searchIndex});
+            });
             it('find part of a number', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
                     '3': {
