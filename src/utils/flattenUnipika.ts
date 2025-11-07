@@ -517,17 +517,17 @@ function rowSearchInfo(
         tmp = tmp.substring(1, tmp.length - 1); // skip quotes
     }
     let from = 0;
-    let normolizedFilter = filter;
+    let normalizedFilter = filter;
     if (!caseSensitive) {
         tmp = tmp.toLowerCase();
-        normolizedFilter = filter.toLowerCase();
+        normalizedFilter = filter.toLowerCase();
     }
     while (from >= 0 && from < tmp.length) {
-        const index = tmp.indexOf(normolizedFilter, from);
+        const index = tmp.indexOf(normalizedFilter, from);
         if (-1 === index) {
             break;
         }
-        from = index + normolizedFilter.length;
+        from = index + normalizedFilter.length;
         res.push(index);
     }
     return res.length ? res : undefined;
