@@ -39,6 +39,7 @@ interface Props {
     toolbarStickyTop?: number;
     renderToolbar?: (props: ToolbarProps) => React.ReactNode;
     collapseIconType?: CollapseIconType;
+    showContainerSize?: boolean;
 }
 
 interface State {
@@ -155,7 +156,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
             settings,
             filter,
         } = this.state;
-        const {collapseIconType} = this.props;
+        const {collapseIconType, showContainerSize} = this.props;
 
         return (
             <Table
@@ -168,6 +169,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                 onShowFullText={this.onShowFullText}
                 scrollToRef={this.tableRef}
                 collapseIconType={collapseIconType}
+                showContainerSize={showContainerSize}
             />
         );
     }
