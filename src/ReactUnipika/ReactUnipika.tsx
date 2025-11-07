@@ -24,6 +24,7 @@ export interface ReactUnipikaProps {
     collapseIconType?: CollapseIconType;
     showContainerSize?: boolean;
     initiallyCollapsed?: boolean;
+    caseSensitiveSearch?: boolean;
 }
 
 const defaultUnipikaSettings = {
@@ -49,6 +50,7 @@ export function ReactUnipika({
     collapseIconType,
     showContainerSize,
     initiallyCollapsed,
+    caseSensitiveSearch,
 }: ReactUnipikaProps) {
     const convertedValue = React.useMemo(() => {
         // TODO: fix me later
@@ -104,6 +106,7 @@ export function ReactUnipika({
                     collapseIconType={collapseIconType}
                     showContainerSize={showContainerSize}
                     initiallyCollapsed={initiallyCollapsed}
+                    caseSensitiveSearch={caseSensitiveSearch}
                 />
             ) : (
                 <pre

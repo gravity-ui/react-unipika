@@ -5,6 +5,9 @@
   "action_back": "Назад",
   "description_search": "Поиск...",
   "description_matched-rows": "Совпадающие строки",
+  "description_full-value": "Полное значение",
+  "context_case-sensitive-search": "Поиск с учетом регистра включен",
+  "context_case-sensitive-search-disabled": "Поиск с учетом регистра отключен",
   "context_items-count": [
     " {{count}} элемент ",
     " {{count}} элемента ",

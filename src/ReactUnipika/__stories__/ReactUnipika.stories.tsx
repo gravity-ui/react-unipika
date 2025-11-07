@@ -25,6 +25,13 @@ export const Yson: StoryObj<ReactUnipikaProps> = {
     },
 };
 
+export const WithCaseSensitiveSearch: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        caseSensitiveSearch: true,
+    },
+};
+
 export const WithContentAbove: StoryObj<ReactUnipikaProps> = {
     render() {
         return (
