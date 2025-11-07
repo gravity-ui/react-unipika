@@ -75,3 +75,9 @@ test('ReactUnipika: with content above', async ({mount, expectScreenshot, page})
 
     await expectScreenshot({component: page});
 });
+
+test('ReactUnipika: json with container size', async ({mount, expectScreenshot, page}) => {
+    await mount(<Stories.WithContainerSize />, {width: 1280});
+
+    await expectScreenshot({component: page});
+});
