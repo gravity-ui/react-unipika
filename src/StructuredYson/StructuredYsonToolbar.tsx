@@ -89,7 +89,6 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
             </React.Fragment>
         );
     };
-
     return (
         <Toolbar
             className={block('toolbar', className)}
@@ -99,13 +98,13 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                     node: (
                         <span className={block('buttons')}>
                             <ActionTooltip title={i18n('action_expand-all')}>
-                                <Button onClick={onExpandAll} view="flat-secondary">
+                                <Button onClick={onExpandAll}>
                                     <Icon data={ArrowDownToLine} />
                                 </Button>
                             </ActionTooltip>
                             &nbsp;&nbsp;
                             <ActionTooltip title={i18n('action_collapse-all')}>
-                                <Button onClick={onCollapseAll} view="flat-secondary">
+                                <Button onClick={onCollapseAll}>
                                     <Icon data={ArrowUpToLine} />
                                 </Button>
                             </ActionTooltip>
