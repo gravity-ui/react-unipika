@@ -17,7 +17,7 @@ export interface UnipikaFlattenTreeItem {
     level: number;
     open?: BlockType;
     close?: BlockType;
-    depth?: number;
+    size?: number;
 
     path?: string; // if present the block is collapsible/expandable
 
@@ -161,7 +161,7 @@ function flattenUnipikaJsonImpl(value: UnipikaValue, level = 0, ctx: FlatContext
 
     if (isContainerType) {
         if (containerSize) {
-            ctx.dst[itemPathIndex].depth = containerSize;
+            ctx.dst[itemPathIndex].size = containerSize;
         }
         if (hasAttributes || containerSize) {
             handlePath(ctx, itemPathIndex); // handle 'array item'/'object field' path
@@ -274,7 +274,7 @@ function flattenUnipikaYsonImpl(value: UnipikaValue, level = 0, ctx: FlatContext
     }
 
     if (isContainerType && containerSize) {
-        ctx.dst[itemPathIndex].depth = containerSize;
+        ctx.dst[itemPathIndex].size = containerSize;
     }
 
     if (
@@ -301,8 +301,8 @@ function handleCollapsedValue(value: UnipikaValue, level: number, ctx: FlatConte
     }
 }
 
-function handleCollapsedBlock(type: BlockType, level: number, ctx: FlatContext, depth?: number) {
-    openBlock(type, level, ctx, depth || 0);
+function handleCollapsedBlock(type: BlockType, level: number, ctx: FlatContext, size?: number) {
+    openBlock(type, level, ctx, size || 0);
     const item = ctx.dst[ctx.dst.length - 1];
     item.collapsed = true;
     handlePath(ctx, ctx.dst.length - 1);
@@ -341,12 +341,12 @@ function openBlock(type: BlockType, level: number, ctx: FlatContext, length: num
     if (last?.key && last.level === level) {
         last.open = type;
         if (length > 0) {
-            last.depth = length;
+            last.size = length;
         }
     } else {
         const item: UnipikaFlattenTreeItem = {level, open: type};
         if (length > 0) {
-            item.depth = length;
+            item.size = length;
         }
         dst.push(item);
     }

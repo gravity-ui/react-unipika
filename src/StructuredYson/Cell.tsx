@@ -75,7 +75,7 @@ export function Cell(props: CellProps) {
             path,
             collapsed,
             isAfterAttributes,
-            depth,
+            size,
         },
         settings,
         yson,
@@ -118,8 +118,8 @@ export function Cell(props: CellProps) {
                 isAfterAttributes={isAfterAttributes}
             />
             {open && <OpenClose type={open} yson={yson} settings={settings} />}
-            {props.showContainerSize && depth !== undefined && (
-                <span className={'unipika'}>{i18n('context_items-count', {count: depth})}</span>
+            {props.showContainerSize && size !== undefined && (
+                <span className={'unipika'}>{i18n('context_items-count', {count: size})}</span>
             )}
             {value !== undefined && (
                 <Value
@@ -131,7 +131,7 @@ export function Cell(props: CellProps) {
                     showFullText={handleShowFullText}
                 />
             )}
-            {collapsed && depth === undefined && <span className={'unipika'}>...</span>}
+            {collapsed && size === undefined && <span className={'unipika'}>...</span>}
             {close && <OpenClose type={close} yson={yson} settings={settings} close />}
             {hasDelimiter && <SlaveText text={yson ? ';' : ','} />}
         </div>
