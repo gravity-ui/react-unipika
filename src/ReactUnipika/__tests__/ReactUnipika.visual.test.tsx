@@ -92,47 +92,46 @@ test('ReactUnipika: json with container size collapsed initially', async ({
     await expectScreenshot({component: page});
 });
 
-test('ReactUnipika: with case insensitive search with matches', async ({
+test('ReactUnipika: search in collapsed - collapsed tree with search', async ({
     mount,
     expectScreenshot,
     page,
 }) => {
-    await mount(<Stories.WithCaseInsensitiveSearch />, {width: 1280});
+    await mount(<Stories.SearchInCollapsed />, {width: 1280});
 
-    await page.getByTestId('qa:structuredyson:search').locator('input').fill('Attr');
+    // Collapse all
+    await page.getByTestId('qa:structuredyson:collapse-all').click();
 
-    await expectScreenshot({component: page});
-});
-test('ReactUnipika: with case insensitive search with matches 2', async ({
-    mount,
-    expectScreenshot,
-    page,
-}) => {
-    await mount(<Stories.WithCaseInsensitiveSearch />, {width: 1280});
-
+    // Enter search term
     await page.getByTestId('qa:structuredyson:search').locator('input').fill('attr');
 
+    // Wait for search to complete
+    await page.waitForTimeout(300);
+
     await expectScreenshot({component: page});
 });
-test('ReactUnipika: with case sensitive search no matches', async ({
+
+test('ReactUnipika: search in collapsed - navigate forward', async ({
     mount,
     expectScreenshot,
     page,
 }) => {
-    await mount(<Stories.Json />, {width: 1280});
+    await mount(<Stories.SearchInCollapsed />, {width: 1280});
 
-    await page.getByTestId('qa:structuredyson:search').locator('input').fill('Attr');
+    // Collapse all
+    await page.getByTestId('qa:structuredyson:collapse-all').click();
 
-    await expectScreenshot({component: page});
-});
-test('ReactUnipika: with case sensitive search with matches', async ({
-    mount,
-    expectScreenshot,
-    page,
-}) => {
-    await mount(<Stories.Json />, {width: 1280});
-
+    // Enter search term
     await page.getByTestId('qa:structuredyson:search').locator('input').fill('attr');
+
+    // Wait for search to complete
+    await page.waitForTimeout(300);
+
+    // Navigate forward (should expand first collapsed node with match)
+    await page.getByTestId('qa:structuredyson:search:next').click();
+
+    // Wait for expansion and navigation
+    await page.waitForTimeout(300);
 
     await expectScreenshot({component: page});
 });

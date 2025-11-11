@@ -42,6 +42,11 @@ export interface UnipikaFlattenTreeItem {
     //isAttributes?: boolean // to determine is it required to write '"$value": ' for JSON view
 
     collapsed?: boolean;
+
+    /**
+     * Number of search matches hidden inside collapsed children
+     */
+    hiddenMatches?: number;
 }
 
 export type UnipikaFlattenTree = Array<UnipikaFlattenTreeItem>;
@@ -53,11 +58,13 @@ interface FlattenUnipikaOptions {
     settings?: UnipikaSettings;
     filter?: string;
     caseInsensitive?: boolean;
+    searchInCollapsed?: boolean;
 }
 
 export interface FlattenUnipikaResult {
     data: UnipikaFlattenTree;
     searchIndex: {[index: number]: SearchInfo};
+    allMatchPaths?: Array<string>;
 }
 
 export function flattenUnipika(
@@ -79,7 +86,19 @@ export function flattenUnipika(
         settings: options?.settings,
         caseInsensitive: options?.caseInsensitive,
     });
-    return {data: ctx.dst, searchIndex};
+
+    // Collect all match paths if searchInCollapsed is enabled
+    let allMatchPaths: Array<string> | undefined;
+    if (options?.searchInCollapsed && options?.filter && options?.settings) {
+        allMatchPaths = collectAllMatchPaths(
+            value,
+            options.filter,
+            options.settings,
+            Boolean(options?.isJson),
+        );
+    }
+
+    return {data: ctx.dst, searchIndex, allMatchPaths};
 }
 
 interface LevelInfo {
@@ -471,7 +490,7 @@ export interface SearchInfo {
 
 type SearchIndex = {[index: number]: SearchInfo};
 
-export function makeSearchIndex(
+function makeSearchIndex(
     tree: UnipikaFlattenTree,
     filter?: string,
     options?: SearchParams,
@@ -531,4 +550,137 @@ function rowSearchInfo(
         res.push(index);
     }
     return res.length ? res : undefined;
+}
+
+/**
+ * Check if primitive value matches filter
+ */
+function checkPrimitiveMatch(
+    value: UnipikaValue,
+    filter: string,
+    settings: UnipikaSettings,
+    currentPath: string,
+): Array<string> {
+    if (value.$type === 'map' || value.$type === 'list') {
+        return [];
+    }
+    const valueMatch = rowSearchInfo(value, filter, settings);
+    return valueMatch && currentPath ? [currentPath] : [];
+}
+
+/**
+ * Collect matches from attributes
+ */
+function collectAttributeMatches(
+    value: UnipikaValue,
+    filter: string,
+    settings: UnipikaSettings,
+    isJson: boolean,
+    currentPath: string,
+): Array<string> {
+    const paths: Array<string> = [];
+    if (value.$attributes && value.$attributes.length > 0) {
+        for (const [_key, attrValue] of value.$attributes) {
+            const attrPath = currentPath ? `${currentPath}/@` : '@';
+            const attrPaths = collectAllMatchPaths(attrValue, filter, settings, isJson, attrPath);
+            paths.push(...attrPaths);
+        }
+    }
+    return paths;
+}
+
+/**
+ * Get value path with JSON $ prefix if needed
+ */
+function getJsonValuePath(value: UnipikaValue, isJson: boolean, currentPath: string): string {
+    if (
+        isJson &&
+        value.$attributes &&
+        value.$attributes.length > 0 &&
+        (value.$type === 'map' || value.$type === 'list')
+    ) {
+        return currentPath ? `${currentPath}/$` : '$';
+    }
+    return currentPath;
+}
+
+/**
+ * Collect matches from map entries
+ */
+function collectMapMatches(
+    mapValue: UnipikaMap['$value'],
+    filter: string,
+    settings: UnipikaSettings,
+    isJson: boolean,
+    valuePath: string,
+): Array<string> {
+    const paths: Array<string> = [];
+    for (const [key, childValue] of mapValue) {
+        const childPath = valuePath ? `${valuePath}/${key.$value}` : key.$value;
+
+        // Check if key matches
+        const keyMatch = rowSearchInfo(key, filter, settings);
+        if (keyMatch) {
+            paths.push(childPath);
+        }
+
+        // Recursively collect from value
+        const childPaths = collectAllMatchPaths(childValue, filter, settings, isJson, childPath);
+        paths.push(...childPaths);
+    }
+    return paths;
+}
+
+/**
+ * Collect matches from list items
+ */
+function collectListMatches(
+    listValue: UnipikaList['$value'],
+    filter: string,
+    settings: UnipikaSettings,
+    isJson: boolean,
+    valuePath: string,
+): Array<string> {
+    const paths: Array<string> = [];
+    for (let i = 0; i < listValue.length; i++) {
+        const childPath = valuePath ? `${valuePath}/${i}` : String(i);
+        const childPaths = collectAllMatchPaths(listValue[i], filter, settings, isJson, childPath);
+        paths.push(...childPaths);
+    }
+    return paths;
+}
+
+/**
+ * Collect all paths that contain search matches (including in collapsed nodes)
+ */
+function collectAllMatchPaths(
+    value: UnipikaValue,
+    filter: string,
+    settings: UnipikaSettings,
+    isJson: boolean,
+    currentPath = '',
+): Array<string> {
+    if (!filter) {
+        return [];
+    }
+
+    const paths: Array<string> = [];
+
+    // Check primitive values
+    paths.push(...checkPrimitiveMatch(value, filter, settings, currentPath));
+
+    // Check attributes
+    paths.push(...collectAttributeMatches(value, filter, settings, isJson, currentPath));
+
+    // Get value path with JSON $ prefix if needed
+    const valuePath = getJsonValuePath(value, isJson, currentPath);
+
+    // Process nested structures
+    if (value.$type === 'map' && value.$value) {
+        paths.push(...collectMapMatches(value.$value, filter, settings, isJson, valuePath));
+    } else if (value.$type === 'list' && value.$value) {
+        paths.push(...collectListMatches(value.$value, filter, settings, isJson, valuePath));
+    }
+
+    return paths;
 }

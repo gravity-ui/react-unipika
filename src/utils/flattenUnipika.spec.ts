@@ -2269,6 +2269,140 @@ describe('flattenUnipika', () => {
             });
         });
     });
+
+    describe('Search in collapsed nodes', () => {
+        it('should return allMatchPaths when searchInCollapsed is true', () => {
+            const converted = unipika.converters.yson({
+                $attributes: {attr1: 'test'},
+                $value: {
+                    level1: {
+                        $attributes: {attr2: 'test'},
+                        $value: {
+                            level2: 'test',
+                        },
+                    },
+                },
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+                searchInCollapsed: true,
+            });
+
+            expect(result.allMatchPaths).toEqual(['@', 'level1/@', 'level1/level2']);
+        });
+
+        it('should not return allMatchPaths when searchInCollapsed is false', () => {
+            const converted = unipika.converters.yson({
+                $attributes: {attr1: 'test'},
+                $value: {
+                    level1: 'test',
+                },
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+                searchInCollapsed: false,
+            });
+
+            expect(result.allMatchPaths).toBeUndefined();
+        });
+
+        it('should find matches in collapsed map keys', () => {
+            const converted = unipika.converters.yson({
+                testKey: 'value',
+                anotherKey: {
+                    nestedTest: 'data',
+                },
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+                searchInCollapsed: true,
+                collapsedState: {anotherKey: true},
+            });
+
+            // Only visible matches are found when node is collapsed
+            expect(result.allMatchPaths).toContain('testKey');
+            // Matches inside collapsed nodes are not included in this case
+            // because collapsedState prevents traversal into collapsed nodes
+        });
+
+        it('should find matches in list items inside collapsed nodes', () => {
+            const converted = unipika.converters.yson({
+                items: ['test1', 'test2', 'test3'],
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+                searchInCollapsed: true,
+                collapsedState: {items: true},
+            });
+
+            expect(result.allMatchPaths).toEqual(['items/0', 'items/1', 'items/2']);
+        });
+
+        it('should find matches in deeply nested attributes', () => {
+            const converted = unipika.converters.yson({
+                $attributes: {
+                    schema: {
+                        $attributes: {
+                            testAttr: 'value',
+                        },
+                        $value: {
+                            columns: ['testCol'],
+                        },
+                    },
+                },
+                $value: 'data',
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+                searchInCollapsed: true,
+            });
+
+            expect(result.allMatchPaths).toContain('@/columns/0');
+        });
+
+        it('should return empty allMatchPaths when no matches found', () => {
+            const converted = unipika.converters.yson({
+                key: 'value',
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'nomatch',
+                settings: {format: 'yson'},
+                searchInCollapsed: true,
+            });
+
+            expect(result.allMatchPaths).toEqual([]);
+        });
+
+        it('should work with JSON format', () => {
+            const converted = unipika.converters.raw({
+                $attributes: {testAttr: 'value'},
+                $value: {
+                    testKey: 'testValue',
+                },
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'json'},
+                isJson: true,
+                searchInCollapsed: true,
+            });
+
+            expect(result.allMatchPaths).toContain('$attributes/testAttr');
+            expect(result.allMatchPaths).toContain('$value/testKey');
+        });
+    });
 });
 
 function makeRawKey(key: string) {

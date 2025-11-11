@@ -67,3 +67,10 @@ export const WithContainerSizeYson: StoryObj<ReactUnipikaProps> = {
         showContainerSize: true,
     },
 };
+
+export const SearchInCollapsed: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        searchInCollapsed: true,
+    },
+};

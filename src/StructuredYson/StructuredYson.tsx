@@ -42,6 +42,7 @@ interface Props {
     showContainerSize?: boolean;
     initiallyCollapsed?: boolean;
     caseInsensitiveSearch?: boolean;
+    searchInCollapsed?: boolean;
 }
 
 interface State {
@@ -53,6 +54,7 @@ interface State {
     filter: string;
     matchIndex: number;
     matchedRows: Array<number>;
+    allMatchPaths: Array<string>;
     fullValue?: {
         value: UnipikaFlattenTreeItem['value'];
         searchInfo?: SearchInfo;
@@ -65,6 +67,7 @@ function calculateState(
     filter: string,
     caseInsensitive: boolean | undefined,
     settings: UnipikaSettings,
+    searchInCollapsed?: boolean,
 ) {
     const flattenResult = flattenUnipika(value, {
         isJson: settings.format !== 'yson',
@@ -72,13 +75,34 @@ function calculateState(
         filter,
         settings: settings,
         caseInsensitive,
+        searchInCollapsed,
     });
+
+    const allMatchPaths = flattenResult.allMatchPaths || [];
+    // Calculate hiddenMatches for collapsed nodes if searchInCollapsed is enabled
+    if (searchInCollapsed && allMatchPaths.length > 0) {
+        // Count matches that are inside or at collapsed nodes
+        flattenResult.data.forEach((item) => {
+            if (item.collapsed && item.path) {
+                const prefix = item.path + '/';
+                const count = allMatchPaths.filter((matchPath) => {
+                    // Match if path is exactly the item path (match at the node itself)
+                    // or starts with prefix (match inside the node)
+                    return matchPath === item.path || matchPath.startsWith(prefix);
+                }).length;
+                if (count > 0) {
+                    item.hiddenMatches = count;
+                }
+            }
+        });
+    }
 
     return Object.assign(
         {},
         {
             flattenResult,
             matchedRows: Object.keys(flattenResult.searchIndex).map(Number),
+            allMatchPaths,
         },
     );
 }
@@ -86,7 +110,7 @@ function calculateState(
 export class StructuredYson extends React.PureComponent<Props, State> {
     static getDerivedStateFromProps(props: Props, state: State) {
         const {value: prevValue, settings: prevSettings, yson: prevYson} = state;
-        const {value, settings} = props;
+        const {value, settings, searchInCollapsed} = props;
         const res: Partial<State> = {};
         const yson = settings.format === 'yson';
         if (prevSettings !== settings || yson !== prevYson) {
@@ -104,6 +128,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                     state.filter,
                     props.caseInsensitiveSearch,
                     settings,
+                    searchInCollapsed,
                 ),
             });
         }
@@ -131,6 +156,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
             filter: '',
             matchIndex: -1,
             matchedRows: [],
+            allMatchPaths: [],
         };
     }
 
@@ -151,7 +177,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         cb?: () => void,
     ) {
         const {value, settings} = this.state;
-        const {caseInsensitiveSearch} = this.props;
+        const {caseInsensitiveSearch, searchInCollapsed} = this.props;
         const {
             collapsedState = this.state.collapsedState,
             matchIndex = this.state.matchIndex,
@@ -163,7 +189,14 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                 collapsedState,
                 filter,
                 matchIndex,
-                ...calculateState(value, collapsedState, filter, caseInsensitiveSearch, settings),
+                ...calculateState(
+                    value,
+                    collapsedState,
+                    filter,
+                    caseInsensitiveSearch,
+                    settings,
+                    searchInCollapsed,
+                ),
             },
             cb,
         );
@@ -211,23 +244,62 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         });
     };
 
+    findCollapsedParent = (matchPath: string, collapsedState: CollapsedState): string | null => {
+        const pathParts = matchPath.split('/');
+        for (let i = 1; i <= pathParts.length; i++) {
+            const checkPath = pathParts.slice(0, i).join('/');
+            if (collapsedState[checkPath]) {
+                return checkPath;
+            }
+        }
+        return null;
+    };
+
     onNextMatch = (_event: unknown, diff = 1) => {
-        const {matchIndex, matchedRows} = this.state;
-        if (isEmpty_(matchedRows)) {
+        const {matchIndex, matchedRows, allMatchPaths, collapsedState} = this.state;
+
+        const totalMatches = allMatchPaths?.length || 0;
+
+        if (totalMatches === 0) {
             return;
         }
 
-        let index = (matchIndex + diff) % matchedRows.length;
-        if (index < 0) {
-            index = matchedRows.length + index;
+        // Calculate next index in total matches
+        let nextTotalIndex = matchIndex + diff;
+        nextTotalIndex = ((nextTotalIndex % totalMatches) + totalMatches) % totalMatches;
+
+        const targetMatchPath = allMatchPaths[nextTotalIndex];
+
+        const collapsedParent = this.findCollapsedParent(targetMatchPath, collapsedState);
+
+        // If target is not hidden, it's visible - navigate to it
+        if (collapsedParent === null) {
+            // Count how many visible matches are before our target
+            let visibleMatchCount = 0;
+            for (let i = 0; i < nextTotalIndex; i++) {
+                if (this.findCollapsedParent(allMatchPaths[i], collapsedState) === null) {
+                    visibleMatchCount++;
+                }
+            }
+
+            // Navigate to the visible match
+            if (visibleMatchCount < matchedRows.length) {
+                this.setState({matchIndex: nextTotalIndex});
+                this.tableRef.current?.scrollToIndex(matchedRows[visibleMatchCount]);
+                this.searchRef.current?.focus();
+            }
+            return;
         }
 
-        if (index !== matchIndex) {
-            this.setState({matchIndex: index});
-        }
+        // Target is hidden - expand the collapsed parent
+        const newCollapsedState = {...collapsedState};
+        delete newCollapsedState[collapsedParent];
 
-        this.tableRef.current?.scrollToIndex(matchedRows[index]);
-        this.searchRef.current?.focus();
+        // Recalculate state with new collapsed state
+        this.updateState({collapsedState: newCollapsedState, matchIndex: nextTotalIndex}, () => {
+            // Retry navigation to the same target
+            this.onNextMatch(null, 0);
+        });
     };
 
     onPrevMatch = () => {
@@ -245,7 +317,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
     };
 
     renderToolbar(className?: string) {
-        const {matchIndex, matchedRows, filter, collapsedState} = this.state;
+        const {matchIndex, matchedRows, filter, collapsedState, allMatchPaths} = this.state;
         const {extraTools, renderToolbar} = this.props;
 
         // Calculate if there are any collapsed nodes
@@ -266,6 +338,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                 filter={filter}
                 matchIndex={matchIndex}
                 matchedRows={matchedRows}
+                allMatchPaths={allMatchPaths}
                 extraTools={extraTools}
                 onExpandAll={this.onExpandAll}
                 onCollapseAll={this.onCollapseAll}

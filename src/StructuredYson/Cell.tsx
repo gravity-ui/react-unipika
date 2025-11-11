@@ -76,6 +76,7 @@ export function Cell(props: CellProps) {
             collapsed,
             isAfterAttributes,
             size,
+            hiddenMatches,
         },
         settings,
         yson,
@@ -134,6 +135,11 @@ export function Cell(props: CellProps) {
             {collapsed && size === undefined && <span className={'unipika'}>...</span>}
             {close && <OpenClose type={close} yson={yson} settings={settings} close />}
             {hasDelimiter && <SlaveText text={yson ? ';' : ','} />}
+            {collapsed && hiddenMatches && (
+                <span className={block('hidden-matches')}>
+                    ({i18n('context_matches-count', {count: hiddenMatches})})
+                </span>
+            )}
         </div>
     );
 }
