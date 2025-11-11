@@ -4,5 +4,11 @@
   "action_next": "Далее",
   "action_back": "Назад",
   "description_search": "Поиск...",
-  "description_matched-rows": "Совпадающие строки"
+  "description_matched-rows": "Совпадающие строки",
+  "context_items-count": [
+    " {{count}} элемент ",
+    " {{count}} элемента ",
+    " {{count}} элементов ",
+    " {{count}} элементов "
+  ]
 }
