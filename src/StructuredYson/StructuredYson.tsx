@@ -256,6 +256,33 @@ export class StructuredYson extends React.PureComponent<Props, State> {
     };
 
     onNextMatch = (_event: unknown, diff = 1) => {
+        const {searchInCollapsed} = this.props;
+        if (searchInCollapsed) {
+            return this.onNextMatchWithHidden(_event, diff);
+        }
+        return this.onNextMatchVisible(_event, diff);
+    };
+
+    onNextMatchVisible = (_event: unknown, diff: number) => {
+        const {matchIndex, matchedRows} = this.state;
+        if (isEmpty_(matchedRows)) {
+            return;
+        }
+
+        let index = (matchIndex + diff) % matchedRows.length;
+        if (index < 0) {
+            index = matchedRows.length + index;
+        }
+
+        if (index !== matchIndex) {
+            this.setState({matchIndex: index});
+        }
+
+        this.tableRef.current?.scrollToIndex(matchedRows[index]);
+        this.searchRef.current?.focus();
+    };
+
+    onNextMatchWithHidden = (_event: unknown, diff: number) => {
         const {matchIndex, matchedRows, allMatchPaths, collapsedState} = this.state;
 
         const totalMatches = allMatchPaths?.length || 0;
