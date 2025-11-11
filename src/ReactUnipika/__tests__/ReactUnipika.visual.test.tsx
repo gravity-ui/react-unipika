@@ -97,7 +97,7 @@ test('ReactUnipika: search in collapsed - collapsed tree with search', async ({
     expectScreenshot,
     page,
 }) => {
-    await mount(<Stories.SearchInCollapsed />, {width: 1280});
+    await mount(<Stories.Json />, {width: 1280});
 
     // Collapse all
     await page.getByTestId('qa:structuredyson:collapse-all').click();
@@ -116,7 +116,7 @@ test('ReactUnipika: search in collapsed - navigate forward', async ({
     expectScreenshot,
     page,
 }) => {
-    await mount(<Stories.SearchInCollapsed />, {width: 1280});
+    await mount(<Stories.Json />, {width: 1280});
 
     // Collapse all
     await page.getByTestId('qa:structuredyson:collapse-all').click();

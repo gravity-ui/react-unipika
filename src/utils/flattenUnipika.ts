@@ -58,7 +58,6 @@ interface FlattenUnipikaOptions {
     settings?: UnipikaSettings;
     filter?: string;
     caseInsensitive?: boolean;
-    searchInCollapsed?: boolean;
 }
 
 export interface FlattenUnipikaResult {
@@ -87,9 +86,9 @@ export function flattenUnipika(
         caseInsensitive: options?.caseInsensitive,
     });
 
-    // Collect all match paths if searchInCollapsed is enabled
+    // Collect all match paths
     let allMatchPaths: Array<string> | undefined;
-    if (options?.searchInCollapsed && options?.filter && options?.settings) {
+    if (options?.filter && options?.settings) {
         allMatchPaths = collectAllMatchPaths(
             value,
             options.filter,

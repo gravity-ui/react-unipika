@@ -42,7 +42,6 @@ interface Props {
     showContainerSize?: boolean;
     initiallyCollapsed?: boolean;
     caseInsensitiveSearch?: boolean;
-    searchInCollapsed?: boolean;
 }
 
 interface State {
@@ -67,7 +66,6 @@ function calculateState(
     filter: string,
     caseInsensitive: boolean | undefined,
     settings: UnipikaSettings,
-    searchInCollapsed?: boolean,
 ) {
     const flattenResult = flattenUnipika(value, {
         isJson: settings.format !== 'yson',
@@ -75,12 +73,11 @@ function calculateState(
         filter,
         settings: settings,
         caseInsensitive,
-        searchInCollapsed,
     });
 
     const allMatchPaths = flattenResult.allMatchPaths || [];
-    // Calculate hiddenMatches for collapsed nodes if searchInCollapsed is enabled
-    if (searchInCollapsed && allMatchPaths.length > 0) {
+    // Calculate hiddenMatches for collapsed nodes
+    if (allMatchPaths.length > 0) {
         // Count matches that are inside or at collapsed nodes
         flattenResult.data.forEach((item) => {
             if (item.collapsed && item.path) {
@@ -110,7 +107,7 @@ function calculateState(
 export class StructuredYson extends React.PureComponent<Props, State> {
     static getDerivedStateFromProps(props: Props, state: State) {
         const {value: prevValue, settings: prevSettings, yson: prevYson} = state;
-        const {value, settings, searchInCollapsed} = props;
+        const {value, settings} = props;
         const res: Partial<State> = {};
         const yson = settings.format === 'yson';
         if (prevSettings !== settings || yson !== prevYson) {
@@ -128,7 +125,6 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                     state.filter,
                     props.caseInsensitiveSearch,
                     settings,
-                    searchInCollapsed,
                 ),
             });
         }
@@ -177,7 +173,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         cb?: () => void,
     ) {
         const {value, settings} = this.state;
-        const {caseInsensitiveSearch, searchInCollapsed} = this.props;
+        const {caseInsensitiveSearch} = this.props;
         const {
             collapsedState = this.state.collapsedState,
             matchIndex = this.state.matchIndex,
@@ -189,14 +185,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                 collapsedState,
                 filter,
                 matchIndex,
-                ...calculateState(
-                    value,
-                    collapsedState,
-                    filter,
-                    caseInsensitiveSearch,
-                    settings,
-                    searchInCollapsed,
-                ),
+                ...calculateState(value, collapsedState, filter, caseInsensitiveSearch, settings),
             },
             cb,
         );
@@ -256,33 +245,6 @@ export class StructuredYson extends React.PureComponent<Props, State> {
     };
 
     onNextMatch = (_event: unknown, diff = 1) => {
-        const {searchInCollapsed} = this.props;
-        if (searchInCollapsed) {
-            return this.onNextMatchWithHidden(_event, diff);
-        }
-        return this.onNextMatchVisible(_event, diff);
-    };
-
-    onNextMatchVisible = (_event: unknown, diff: number) => {
-        const {matchIndex, matchedRows} = this.state;
-        if (isEmpty_(matchedRows)) {
-            return;
-        }
-
-        let index = (matchIndex + diff) % matchedRows.length;
-        if (index < 0) {
-            index = matchedRows.length + index;
-        }
-
-        if (index !== matchIndex) {
-            this.setState({matchIndex: index});
-        }
-
-        this.tableRef.current?.scrollToIndex(matchedRows[index]);
-        this.searchRef.current?.focus();
-    };
-
-    onNextMatchWithHidden = (_event: unknown, diff: number) => {
         const {matchIndex, matchedRows, allMatchPaths, collapsedState} = this.state;
 
         const totalMatches = allMatchPaths?.length || 0;
