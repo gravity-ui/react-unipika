@@ -2072,19 +2072,27 @@ describe('flattenUnipika', () => {
                         valueMatch: [1, 7, 13],
                     },
                 };
+                const allMatchPaths = [
+                    'auto_merge/chunk_size_size',
+                    'auto_merge/mode',
+                    'auto_merge/job_io/table_writer/desired_chunk_size',
+                    'auto_merge/job_io/table_writer/group_size',
+                    'auto_merge/job_io/table_writer/group_size',
+                ];
                 const result = flattenUnipika(converted, {
                     filter: 'size',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a string no matches', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {};
+                const allMatchPaths: string[] = [];
                 const result = flattenUnipika(converted, {
                     filter: 'Size',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a string case-insensitive', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2102,12 +2110,13 @@ describe('flattenUnipika', () => {
                         valueMatch: [1, 7, 13],
                     },
                 };
+                const allMatchPaths: string[] = [];
                 const result = flattenUnipika(converted, {
                     filter: 'Size',
                     settings: {format: 'yson'},
                     caseInsensitive: true,
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a number', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2115,11 +2124,12 @@ describe('flattenUnipika', () => {
                         valueMatch: [3],
                     },
                 };
+                const allMatchPaths = ['auto_merge/chunk_size_size'];
                 const result = flattenUnipika(converted, {
                     filter: '2177',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a boolean', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2127,11 +2137,12 @@ describe('flattenUnipika', () => {
                         valueMatch: [0],
                     },
                 };
+                const allMatchPaths = ['allow_aggressive'];
                 const result = flattenUnipika(converted, {
                     filter: '%true',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
         });
         describe('JSON', () => {
@@ -2234,12 +2245,19 @@ describe('flattenUnipika', () => {
                         valueMatch: [1, 7, 13],
                     },
                 };
+                const allMatchPaths = [
+                    'auto_merge/chunk_size_size',
+                    'auto_merge/mode',
+                    'auto_merge/job_io/table_writer/desired_chunk_size',
+                    'auto_merge/job_io/table_writer/group_size',
+                    'auto_merge/job_io/table_writer/group_size',
+                ];
                 const result = flattenUnipika(converted, {
                     filter: 'size',
                     isJson: true,
                     settings: {format: 'json'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a number', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2247,12 +2265,13 @@ describe('flattenUnipika', () => {
                         valueMatch: [3],
                     },
                 };
+                const allMatchPaths = ['auto_merge/chunk_size_size'];
                 const result = flattenUnipika(converted, {
                     filter: '2177',
                     isJson: true,
                     settings: {format: 'json'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a boolean', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2260,12 +2279,13 @@ describe('flattenUnipika', () => {
                         valueMatch: [1],
                     },
                 };
+                const allMatchPaths = ['allow_aggressive'];
                 const result = flattenUnipika(converted, {
                     filter: 'rue',
                     isJson: true,
                     settings: {format: 'json'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
         });
     });
