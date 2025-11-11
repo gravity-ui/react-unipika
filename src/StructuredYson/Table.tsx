@@ -20,6 +20,7 @@ export interface TableProps {
     onShowFullText: (index: number) => void;
     scrollToRef: React.RefObject<null | {scrollToIndex(index: number): void}>;
     collapseIconType?: CollapseIconType;
+    showContainerSize?: boolean;
 }
 
 export const Table: React.FC<TableProps> = ({
@@ -32,6 +33,7 @@ export const Table: React.FC<TableProps> = ({
     onShowFullText,
     scrollToRef,
     collapseIconType,
+    showContainerSize,
 }) => {
     const renderCell: ColumnDef<UnipikaFlattenTreeItem>['cell'] = ({row}) => {
         const {original, index} = row;
@@ -46,6 +48,7 @@ export const Table: React.FC<TableProps> = ({
                 showFullText={onShowFullText}
                 index={index}
                 collapseIconType={collapseIconType}
+                showContainerSize={showContainerSize}
             />
         );
     };

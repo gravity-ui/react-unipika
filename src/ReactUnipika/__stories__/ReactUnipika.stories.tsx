@@ -37,3 +37,26 @@ export const WithContentAbove: StoryObj<ReactUnipikaProps> = {
         );
     },
 };
+
+export const WithContainerSize: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        showContainerSize: true,
+    },
+};
+
+export const WithContainerSizeCollapsed: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        showContainerSize: true,
+        initiallyCollapsed: true,
+    },
+};
+
+export const WithContainerSizeYson: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        settings: {format: 'yson'},
+        showContainerSize: true,
+    },
+};

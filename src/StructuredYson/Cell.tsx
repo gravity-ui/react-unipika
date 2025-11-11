@@ -14,6 +14,8 @@ import {ClickableText} from '../ClickableText/ClickableText';
 
 import {cn} from '../utils/classname';
 
+import i18n from './i18n';
+
 import './Cell.scss';
 
 const block = cn('g-ru-cell');
@@ -29,6 +31,7 @@ export interface CellProps {
     index: number;
     showFullText: (index: number) => void;
     collapseIconType?: CollapseIconType;
+    showContainerSize?: boolean;
 }
 
 export const JSON_VALUE_KEY = {
@@ -62,7 +65,18 @@ function getLevelOffsetSpaces(level: number) {
 
 export function Cell(props: CellProps) {
     const {
-        row: {level, open, close, key, value, hasDelimiter, path, collapsed, isAfterAttributes},
+        row: {
+            level,
+            open,
+            close,
+            key,
+            value,
+            hasDelimiter,
+            path,
+            collapsed,
+            isAfterAttributes,
+            size,
+        },
         settings,
         yson,
         onToggleCollapse,
@@ -104,6 +118,9 @@ export function Cell(props: CellProps) {
                 isAfterAttributes={isAfterAttributes}
             />
             {open && <OpenClose type={open} yson={yson} settings={settings} />}
+            {props.showContainerSize && size !== undefined && (
+                <span className={'unipika'}>{i18n('context_items-count', {count: size})}</span>
+            )}
             {value !== undefined && (
                 <Value
                     text={value}
@@ -114,7 +131,7 @@ export function Cell(props: CellProps) {
                     showFullText={handleShowFullText}
                 />
             )}
-            {collapsed && <span className={'unipika'}>...</span>}
+            {collapsed && size === undefined && <span className={'unipika'}>...</span>}
             {close && <OpenClose type={close} yson={yson} settings={settings} close />}
             {hasDelimiter && <SlaveText text={yson ? ';' : ','} />}
         </div>

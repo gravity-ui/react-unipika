@@ -60,7 +60,7 @@ describe('flattenUnipika', () => {
             it('list', () => {
                 const converted = unipika.converters.raw([1, 2, 'three']);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 3},
                     {
                         level: 1,
                         value: {$type: 'number', $value: 1},
@@ -86,7 +86,7 @@ describe('flattenUnipika', () => {
                     c: 'C',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 3},
                     {
                         level: 1,
                         key: {$key: true, $value: 'a', $type: 'string'},
@@ -120,13 +120,13 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 2},
                     {
                         level: 1,
                         value: {$type: 'string', $value: 'a'},
                         hasDelimiter: true,
                     },
-                    {level: 1, open: 'object', path: '1'},
+                    {level: 1, open: 'object', path: '1', size: 2},
                     {
                         level: 2,
                         key: {$key: true, $value: 'b', $type: 'string'},
@@ -138,6 +138,7 @@ describe('flattenUnipika', () => {
                         key: {$key: true, $value: 'c', $type: 'string'},
                         open: 'array',
                         path: '1/c',
+                        size: 2,
                     },
                     {
                         level: 3,
@@ -157,19 +158,19 @@ describe('flattenUnipika', () => {
             it('list -> list -> list', () => {
                 const converted = unipika.converters.raw([1, [2, [3, 4], 5], 6]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 3},
                     {
                         level: 1,
                         value: makeRawValue(1, 'number'),
                         hasDelimiter: true,
                     },
-                    {level: 1, open: 'array', path: '1'},
+                    {level: 1, open: 'array', path: '1', size: 3},
                     {
                         level: 2,
                         value: makeRawValue(2, 'number'),
                         hasDelimiter: true,
                     },
-                    {level: 2, open: 'array', path: '1/1'},
+                    {level: 2, open: 'array', path: '1/1', size: 2},
                     {
                         level: 3,
                         value: makeRawValue(3, 'number'),
@@ -200,20 +201,20 @@ describe('flattenUnipika', () => {
                     g: 'G',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 3},
                     {
                         level: 1,
                         key: makeKey('a'),
                         value: makeValue('A', 'string'),
                         hasDelimiter: true,
                     },
-                    {level: 1, key: makeKey('b'), open: 'array', path: 'b'},
+                    {level: 1, key: makeKey('b'), open: 'array', path: 'b', size: 3},
                     {
                         level: 2,
                         value: makeValue('C', 'string'),
                         hasDelimiter: true,
                     },
-                    {level: 2, open: 'object', path: 'b/1'},
+                    {level: 2, open: 'object', path: 'b/1', size: 1},
                     {
                         level: 3,
                         key: makeKey('e'),
@@ -247,7 +248,7 @@ describe('flattenUnipika', () => {
                     g: 'G',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 3},
                     {
                         level: 1,
                         key: makeRawKey('a'),
@@ -259,6 +260,7 @@ describe('flattenUnipika', () => {
                         key: makeRawKey('b'),
                         open: 'object',
                         path: 'b',
+                        size: 3,
                     },
                     {
                         level: 2,
@@ -271,6 +273,7 @@ describe('flattenUnipika', () => {
                         key: makeRawKey('d'),
                         open: 'object',
                         path: 'b/d',
+                        size: 1,
                     },
                     {
                         level: 3,
@@ -305,7 +308,7 @@ describe('flattenUnipika', () => {
                     $attributes: {a: 'A'},
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 1, open: 'attributes', path: '@'},
+                    {level: 1, open: 'attributes', path: '@', size: 1},
                     {
                         level: 2,
                         key: makeKey('a'),
@@ -340,14 +343,15 @@ describe('flattenUnipika', () => {
                     $value: 123,
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 1, open: 'attributes', path: '@'},
-                    {level: 2, key: makeKey('schema'), path: '@/schema'},
-                    {level: 3, open: 'attributes', path: '@/schema/@'},
+                    {level: 1, open: 'attributes', path: '@', size: 2},
+                    {level: 2, key: makeKey('schema'), path: '@/schema', size: 2},
+                    {level: 3, open: 'attributes', path: '@/schema/@', size: 2},
                     {
                         level: 4,
                         open: 'array',
                         key: makeKey('columns'),
                         path: '@/schema/@/columns',
+                        size: 2,
                     },
                     {
                         level: 5,
@@ -367,6 +371,7 @@ describe('flattenUnipika', () => {
                         open: 'array',
                         isAfterAttributes: true,
                         path: '@/schema/$',
+                        size: 2,
                     },
                     {
                         level: 4,
@@ -405,7 +410,7 @@ describe('flattenUnipika', () => {
                 });
 
                 const expected: UnipikaFlattenTree = [
-                    {level: 1, open: 'attributes', path: '@'},
+                    {level: 1, open: 'attributes', path: '@', size: 2},
                     {
                         level: 2,
                         key: makeKey('attr1'),
@@ -417,8 +422,9 @@ describe('flattenUnipika', () => {
                         open: 'array',
                         isAfterAttributes: true,
                         path: '$',
+                        size: 2,
                     },
-                    {level: 2, open: 'attributes', path: '$/0/@'},
+                    {level: 2, open: 'attributes', path: '$/0/@', size: 2},
                     {
                         level: 3,
                         key: makeKey('attr2'),
@@ -430,13 +436,14 @@ describe('flattenUnipika', () => {
                         open: 'array',
                         isAfterAttributes: true,
                         path: '$/0/$',
+                        size: 2,
                     },
                     {
                         level: 3,
                         value: makeValue('test', 'string'),
                         hasDelimiter: true,
                     },
-                    {level: 3, open: 'array', path: '$/0/$/1'},
+                    {level: 3, open: 'array', path: '$/0/$/1', size: 2},
                     {
                         level: 4,
                         value: makeValue('result', 'string'),
@@ -461,9 +468,9 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 1},
                     {level: 1, key: makeKey('a'), path: 'a'},
-                    {level: 2, open: 'attributes', path: 'a/@'},
+                    {level: 2, open: 'attributes', path: 'a/@', size: 1},
                     {
                         level: 3,
                         key: makeKey('b'),
@@ -501,7 +508,7 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 1, open: 'attributes', path: '@'},
+                    {level: 1, open: 'attributes', path: '@', size: 2},
                     {
                         level: 2,
                         key: makeKey('attr2'),
@@ -519,6 +526,7 @@ describe('flattenUnipika', () => {
                         open: 'object',
                         isAfterAttributes: true,
                         path: '$',
+                        size: 2,
                     },
                     {
                         level: 2,
@@ -526,8 +534,8 @@ describe('flattenUnipika', () => {
                         value: makeValue('test', 'string'),
                         hasDelimiter: true,
                     },
-                    {level: 2, key: makeKey('b'), path: '$/b'},
-                    {level: 3, open: 'attributes', path: '$/b/@'},
+                    {level: 2, key: makeKey('b'), path: '$/b', size: 3},
+                    {level: 3, open: 'attributes', path: '$/b/@', size: 1},
                     {
                         level: 4,
                         key: makeKey('attr3'),
@@ -539,6 +547,7 @@ describe('flattenUnipika', () => {
                         open: 'object',
                         isAfterAttributes: true,
                         path: '$/b/$',
+                        size: 3,
                     },
                     {
                         level: 4,
@@ -546,8 +555,8 @@ describe('flattenUnipika', () => {
                         value: makeValue('C', 'string'),
                         hasDelimiter: true,
                     },
-                    {level: 4, key: makeKey('d'), path: '$/b/$/d'},
-                    {level: 5, open: 'attributes', path: '$/b/$/d/@'},
+                    {level: 4, key: makeKey('d'), path: '$/b/$/d', size: 2},
+                    {level: 5, open: 'attributes', path: '$/b/$/d/@', size: 1},
                     {
                         level: 6,
                         key: makeKey('attr4'),
@@ -559,6 +568,7 @@ describe('flattenUnipika', () => {
                         open: 'object',
                         isAfterAttributes: true,
                         path: '$/b/$/d/$',
+                        size: 2,
                     },
                     {
                         level: 6,
@@ -599,7 +609,7 @@ describe('flattenUnipika', () => {
             it('empty list -> empty list', () => {
                 const converted = unipika.converters.yson([[]]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 1},
                     {level: 1, open: 'array', close: 'array'},
                     {level: 0, close: 'array'},
                 ];
@@ -619,7 +629,7 @@ describe('flattenUnipika', () => {
             it('list -> empty map', () => {
                 const converted = unipika.converters.yson([{}]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 1},
                     {level: 1, open: 'object', close: 'object'},
                     {level: 0, close: 'array'},
                 ];
@@ -631,7 +641,7 @@ describe('flattenUnipika', () => {
             it('map -> empty list', () => {
                 const converted = unipika.converters.yson({a: []});
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 1},
                     {
                         level: 1,
                         key: makeKey('a'),
@@ -705,7 +715,7 @@ describe('flattenUnipika', () => {
             it('list', () => {
                 const converted = unipika.converters.raw([1, 2, 'three']);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 3},
                     {
                         level: 1,
                         value: {$type: 'number', $value: 1},
@@ -731,7 +741,7 @@ describe('flattenUnipika', () => {
                     c: 'C',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 3},
                     {
                         level: 1,
                         key: {$key: true, $value: 'a', $type: 'string'},
@@ -765,13 +775,13 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 2},
                     {
                         level: 1,
                         value: {$type: 'string', $value: 'a'},
                         hasDelimiter: true,
                     },
-                    {level: 1, open: 'object', path: '1'},
+                    {level: 1, open: 'object', path: '1', size: 2},
                     {
                         level: 2,
                         key: {$key: true, $value: 'b', $type: 'string'},
@@ -783,6 +793,7 @@ describe('flattenUnipika', () => {
                         key: {$key: true, $value: 'c', $type: 'string'},
                         open: 'array',
                         path: '1/c',
+                        size: 2,
                     },
                     {
                         level: 3,
@@ -802,19 +813,19 @@ describe('flattenUnipika', () => {
             it('list -> list -> list', () => {
                 const converted = unipika.converters.raw([1, [2, [3, 4], 5], 6]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 3},
                     {
                         level: 1,
                         value: makeRawValue(1, 'number'),
                         hasDelimiter: true,
                     },
-                    {level: 1, open: 'array', path: '1'},
+                    {level: 1, open: 'array', path: '1', size: 3},
                     {
                         level: 2,
                         value: makeRawValue(2, 'number'),
                         hasDelimiter: true,
                     },
-                    {level: 2, open: 'array', path: '1/1'},
+                    {level: 2, open: 'array', path: '1/1', size: 2},
                     {
                         level: 3,
                         value: makeRawValue(3, 'number'),
@@ -845,20 +856,20 @@ describe('flattenUnipika', () => {
                     g: 'G',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 3},
                     {
                         level: 1,
                         key: makeKey('a'),
                         value: makeValue('A', 'string'),
                         hasDelimiter: true,
                     },
-                    {level: 1, key: makeKey('b'), open: 'array', path: 'b'},
+                    {level: 1, key: makeKey('b'), open: 'array', path: 'b', size: 3},
                     {
                         level: 2,
                         value: makeValue('C', 'string'),
                         hasDelimiter: true,
                     },
-                    {level: 2, open: 'object', path: 'b/1'},
+                    {level: 2, open: 'object', path: 'b/1', size: 1},
                     {
                         level: 3,
                         key: makeKey('e'),
@@ -892,7 +903,7 @@ describe('flattenUnipika', () => {
                     g: 'G',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 3},
                     {
                         level: 1,
                         key: makeRawKey('a'),
@@ -904,6 +915,7 @@ describe('flattenUnipika', () => {
                         key: makeRawKey('b'),
                         open: 'object',
                         path: 'b',
+                        size: 3,
                     },
                     {
                         level: 2,
@@ -916,6 +928,7 @@ describe('flattenUnipika', () => {
                         key: makeRawKey('d'),
                         open: 'object',
                         path: 'b/d',
+                        size: 1,
                     },
                     {
                         level: 3,
@@ -951,7 +964,7 @@ describe('flattenUnipika', () => {
                 });
                 const expected: UnipikaFlattenTree = [
                     {level: 0, open: 'attributes-value'},
-                    {level: 1, open: 'attributes', path: '@'},
+                    {level: 1, open: 'attributes', path: '@', size: 1},
                     {
                         level: 2,
                         key: makeKey('a'),
@@ -988,19 +1001,21 @@ describe('flattenUnipika', () => {
                 });
                 const expected: UnipikaFlattenTree = [
                     {level: 0, open: 'attributes-value'},
-                    {level: 1, open: 'attributes', path: '@'},
+                    {level: 1, open: 'attributes', path: '@', size: 2},
                     {
                         level: 2,
                         key: makeKey('schema'),
                         open: 'attributes-value',
                         path: '@/schema',
+                        size: 2,
                     },
-                    {level: 3, open: 'attributes', path: '@/schema/@'},
+                    {level: 3, open: 'attributes', path: '@/schema/@', size: 2},
                     {
                         level: 4,
                         key: makeKey('columns'),
                         open: 'array',
                         path: '@/schema/@/columns',
+                        size: 2,
                     },
                     {
                         level: 5,
@@ -1020,6 +1035,7 @@ describe('flattenUnipika', () => {
                         open: 'array',
                         isAfterAttributes: true,
                         path: '@/schema/$',
+                        size: 2,
                     },
                     {
                         level: 4,
@@ -1072,8 +1088,8 @@ describe('flattenUnipika', () => {
                 });
 
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'attributes-value'},
-                    {level: 1, open: 'attributes', path: '@'},
+                    {level: 0, open: 'attributes-value', size: 1},
+                    {level: 1, open: 'attributes', path: '@', size: 3},
                     {
                         level: 2,
                         key: makeKey('attr1'),
@@ -1085,14 +1101,15 @@ describe('flattenUnipika', () => {
                         open: 'array',
                         key: makeKey('attr2'),
                         path: '@/attr2',
+                        size: 2,
                     },
                     {
                         level: 3,
                         value: makeValue(1, 'number'),
                         hasDelimiter: true,
                     },
-                    {level: 3, open: 'attributes-value', path: '@/attr2/1'},
-                    {level: 4, open: 'attributes', path: '@/attr2/1/@'},
+                    {level: 3, open: 'attributes-value', path: '@/attr2/1', size: 3},
+                    {level: 4, open: 'attributes', path: '@/attr2/1/@', size: 2},
                     {
                         level: 5,
                         key: makeKey('a'),
@@ -1110,6 +1127,7 @@ describe('flattenUnipika', () => {
                         open: 'array',
                         path: '@/attr2/1/$',
                         isAfterAttributes: true,
+                        size: 3,
                     },
                     {
                         level: 5,
@@ -1136,9 +1154,10 @@ describe('flattenUnipika', () => {
                         open: 'array',
                         isAfterAttributes: true,
                         path: '$',
+                        size: 1,
                     },
                     {level: 2, open: 'attributes-value', path: '$/0'},
-                    {level: 3, open: 'attributes', path: '$/0/@'},
+                    {level: 3, open: 'attributes', path: '$/0/@', size: 1},
                     {
                         level: 4,
                         key: makeKey('attr3'),
@@ -1185,8 +1204,8 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'attributes-value'},
-                    {level: 1, open: 'attributes', path: '@'},
+                    {level: 0, open: 'attributes-value', size: 3},
+                    {level: 1, open: 'attributes', path: '@', size: 3},
                     {
                         level: 2,
                         key: makeKey('attr2'),
@@ -1199,7 +1218,7 @@ describe('flattenUnipika', () => {
                         open: 'attributes-value',
                         path: '@/attr3',
                     },
-                    {level: 3, open: 'attributes', path: '@/attr3/@'},
+                    {level: 3, open: 'attributes', path: '@/attr3/@', size: 1},
                     {
                         level: 4,
                         key: makeKey('foo'),
@@ -1223,6 +1242,7 @@ describe('flattenUnipika', () => {
                         open: 'object',
                         isAfterAttributes: true,
                         path: '$',
+                        size: 3,
                     },
                     {
                         level: 2,
@@ -1235,8 +1255,9 @@ describe('flattenUnipika', () => {
                         key: makeKey('b'),
                         open: 'attributes-value',
                         path: '$/b',
+                        size: 1,
                     },
-                    {level: 3, open: 'attributes', path: '$/b/@'},
+                    {level: 3, open: 'attributes', path: '$/b/@', size: 1},
                     {
                         level: 4,
                         key: makeKey('attr3'),
@@ -1248,6 +1269,7 @@ describe('flattenUnipika', () => {
                         open: 'object',
                         isAfterAttributes: true,
                         path: '$/b/$',
+                        size: 1,
                     },
                     {
                         level: 4,
@@ -1277,14 +1299,14 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 1},
                     {
                         level: 1,
                         key: makeKey('a'),
                         open: 'attributes-value',
                         path: 'a',
                     },
-                    {level: 2, open: 'attributes', path: 'a/@'},
+                    {level: 2, open: 'attributes', path: 'a/@', size: 1},
                     {
                         level: 3,
                         key: makeKey('b'),
@@ -1318,7 +1340,7 @@ describe('flattenUnipika', () => {
             it('list -> empty list', () => {
                 const converted = unipika.converters.yson([[]]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 1},
                     {level: 1, open: 'array', close: 'array'},
                     {level: 0, close: 'array'},
                 ];
@@ -1338,7 +1360,7 @@ describe('flattenUnipika', () => {
             it('list -> empty map', () => {
                 const converted = unipika.converters.yson([{}]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 1},
                     {level: 1, open: 'object', close: 'object'},
                     {level: 0, close: 'array'},
                 ];
@@ -1350,7 +1372,7 @@ describe('flattenUnipika', () => {
             it('map -> empty list', () => {
                 const converted = unipika.converters.yson({a: []});
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 1},
                     {
                         level: 1,
                         key: makeKey('a'),
@@ -1380,13 +1402,13 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 4},
                     {
                         level: 1,
                         value: makeValue(1, 'number'),
                         hasDelimiter: true,
                     },
-                    {level: 1, open: 'array', path: '1'},
+                    {level: 1, open: 'array', path: '1', size: 3},
                     {
                         level: 2,
                         value: makeValue(2, 'number'),
@@ -1399,6 +1421,7 @@ describe('flattenUnipika', () => {
                         collapsed: true,
                         close: 'array',
                         hasDelimiter: true,
+                        size: 2,
                     },
                     {level: 2, value: makeValue(5, 'number')},
                     {level: 1, close: 'array', hasDelimiter: true},
@@ -1413,6 +1436,7 @@ describe('flattenUnipika', () => {
                         path: '3',
                         collapsed: true,
                         close: 'array',
+                        size: 3,
                     },
                     {level: 0, close: 'array'},
                 ];
@@ -1441,13 +1465,13 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 3},
                     {
                         level: 1,
                         value: makeValue('a', 'string'),
                         hasDelimiter: true,
                     },
-                    {level: 1, open: 'object', path: '1'},
+                    {level: 1, open: 'object', path: '1', size: 3},
                     {
                         level: 2,
                         key: makeKey('b'),
@@ -1462,6 +1486,7 @@ describe('flattenUnipika', () => {
                         collapsed: true,
                         close: 'array',
                         hasDelimiter: true,
+                        size: 2,
                     },
                     {
                         level: 2,
@@ -1475,6 +1500,7 @@ describe('flattenUnipika', () => {
                         path: '2',
                         collapsed: true,
                         close: 'object',
+                        size: 2,
                     },
                     {level: 0, close: 'array'},
                 ];
@@ -1496,7 +1522,7 @@ describe('flattenUnipika', () => {
                     1,
                 ]);
                 const expected = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 2},
                     {
                         level: 1,
                         open: 'attributes-value',
@@ -1531,13 +1557,13 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 4},
                     {
                         level: 1,
                         value: makeValue(1, 'number'),
                         hasDelimiter: true,
                     },
-                    {level: 1, open: 'array', path: '1'},
+                    {level: 1, open: 'array', path: '1', size: 3},
                     {
                         level: 2,
                         value: makeValue(2, 'number'),
@@ -1550,6 +1576,7 @@ describe('flattenUnipika', () => {
                         collapsed: true,
                         close: 'array',
                         hasDelimiter: true,
+                        size: 2,
                     },
                     {level: 2, value: makeValue(5, 'number')},
                     {level: 1, close: 'array', hasDelimiter: true},
@@ -1564,6 +1591,7 @@ describe('flattenUnipika', () => {
                         path: '3',
                         collapsed: true,
                         close: 'array',
+                        size: 3,
                     },
                     {level: 0, close: 'array'},
                 ];
@@ -1593,13 +1621,13 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 3},
                     {
                         level: 1,
                         value: {$type: 'string', $value: 'a'},
                         hasDelimiter: true,
                     },
-                    {level: 1, open: 'object', path: '1'},
+                    {level: 1, open: 'object', path: '1', size: 3},
                     {
                         level: 2,
                         key: {$key: true, $value: 'b', $type: 'string'},
@@ -1614,6 +1642,7 @@ describe('flattenUnipika', () => {
                         collapsed: true,
                         close: 'array',
                         hasDelimiter: true,
+                        size: 2,
                     },
                     {
                         level: 2,
@@ -1627,6 +1656,7 @@ describe('flattenUnipika', () => {
                         path: '2',
                         collapsed: true,
                         close: 'object',
+                        size: 2,
                     },
                     {level: 0, close: 'array'},
                 ];
@@ -1649,7 +1679,7 @@ describe('flattenUnipika', () => {
                     1,
                 ]);
                 const expected = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 2},
                     {
                         level: 1,
                         open: 'attributes-value',
@@ -1692,6 +1722,7 @@ describe('flattenUnipika', () => {
                         path: '@',
                         close: 'attributes',
                         hasDelimiter: true,
+                        size: 1,
                     },
                     {
                         level: 1,
@@ -1735,9 +1766,9 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array'},
+                    {level: 0, open: 'array', size: 2},
                     {level: 1, open: 'attributes-value', path: '0'},
-                    {level: 2, open: 'attributes', path: '0/@'},
+                    {level: 2, open: 'attributes', path: '0/@', size: 2},
                     {
                         level: 3,
                         open: 'array',
@@ -1746,12 +1777,14 @@ describe('flattenUnipika', () => {
                         path: '0/@/columns',
                         close: 'array',
                         hasDelimiter: true,
+                        size: 2,
                     },
                     {
                         level: 3,
                         open: 'object',
                         key: makeKey('data'),
                         path: '0/@/data',
+                        size: 3,
                     },
 
                     {
@@ -1767,6 +1800,7 @@ describe('flattenUnipika', () => {
                         collapsed: true,
                         close: 'attributes',
                         hasDelimiter: true,
+                        size: 1,
                     },
                     {
                         level: 5,
@@ -1783,6 +1817,7 @@ describe('flattenUnipika', () => {
                         path: '0/@/data/b',
                         close: 'object',
                         hasDelimiter: true,
+                        size: 1,
                     },
                     {
                         level: 4,
@@ -1791,6 +1826,7 @@ describe('flattenUnipika', () => {
                         collapsed: true,
                         path: '0/@/data/c',
                         close: 'array',
+                        size: 2,
                     },
                     {level: 3, close: 'object'},
                     {level: 2, close: 'attributes', hasDelimiter: true},
@@ -1809,6 +1845,7 @@ describe('flattenUnipika', () => {
                         collapsed: true,
                         close: 'attributes',
                         hasDelimiter: true,
+                        size: 1,
                     },
                     {
                         level: 2,
@@ -1853,15 +1890,16 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'attributes-value'},
-                    {level: 1, open: 'attributes', path: '@'},
+                    {level: 0, size: 2, open: 'attributes-value'},
+                    {level: 1, open: 'attributes', path: '@', size: 1},
                     {
                         level: 2,
+                        size: 3,
                         key: makeKey('a'),
                         open: 'attributes-value',
                         path: '@/a',
                     },
-                    {level: 3, open: 'attributes', path: '@/a/@'},
+                    {level: 3, open: 'attributes', path: '@/a/@', size: 1},
                     {
                         level: 4,
                         key: makeKey('test'),
@@ -1875,6 +1913,7 @@ describe('flattenUnipika', () => {
                         path: '@/a/$',
                         isAfterAttributes: true,
                         close: 'array',
+                        size: 3,
                     },
                     {level: 2, close: 'attributes-value'},
                     {level: 1, close: 'attributes', hasDelimiter: true},
@@ -1883,6 +1922,7 @@ describe('flattenUnipika', () => {
                         open: 'object',
                         isAfterAttributes: true,
                         path: '$',
+                        size: 2,
                     },
                     {
                         level: 2,
@@ -1892,12 +1932,14 @@ describe('flattenUnipika', () => {
                         collapsed: true,
                         close: 'array',
                         hasDelimiter: true,
+                        size: 3,
                     },
                     {
                         level: 2,
                         open: 'object',
                         key: makeKey('e'),
                         path: '$/e',
+                        size: 1,
                     },
                     {
                         level: 3,
@@ -1912,6 +1954,7 @@ describe('flattenUnipika', () => {
                         collapsed: true,
                         close: 'attributes',
                         hasDelimiter: true,
+                        size: 1,
                     },
                     {
                         level: 4,
@@ -1950,7 +1993,7 @@ describe('flattenUnipika', () => {
                 });
 
                 expected = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 2},
                     {
                         level: 1,
                         key: makeKey('allow_aggressive'),
@@ -1962,6 +2005,7 @@ describe('flattenUnipika', () => {
                         open: 'object',
                         key: makeKey('auto_merge'),
                         path: 'auto_merge',
+                        size: 3,
                     },
                     {
                         level: 2,
@@ -1980,12 +2024,14 @@ describe('flattenUnipika', () => {
                         open: 'object',
                         key: makeKey('job_io'),
                         path: 'auto_merge/job_io',
+                        size: 1,
                     },
                     {
                         level: 3,
                         open: 'object',
                         key: makeKey('table_writer'),
                         path: 'auto_merge/job_io/table_writer',
+                        size: 3,
                     },
                     {
                         level: 4,
@@ -2078,7 +2124,7 @@ describe('flattenUnipika', () => {
                 });
 
                 expected = [
-                    {level: 0, open: 'object'},
+                    {level: 0, open: 'object', size: 2},
                     {
                         level: 1,
                         key: makeKey('allow_aggressive'),
@@ -2090,6 +2136,7 @@ describe('flattenUnipika', () => {
                         open: 'object',
                         key: makeKey('auto_merge'),
                         path: 'auto_merge',
+                        size: 3,
                     },
                     {
                         level: 2,
@@ -2108,12 +2155,14 @@ describe('flattenUnipika', () => {
                         open: 'object',
                         key: makeKey('job_io'),
                         path: 'auto_merge/job_io',
+                        size: 1,
                     },
                     {
                         level: 3,
                         open: 'object',
                         key: makeKey('table_writer'),
                         path: 'auto_merge/job_io/table_writer',
+                        size: 3,
                     },
                     {
                         level: 4,

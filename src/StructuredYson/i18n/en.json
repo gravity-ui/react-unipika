@@ -1,0 +1,14 @@
+{
+  "action_collapse-all": "Collapse all",
+  "action_expand-all": "Expand all",
+  "action_next": "Next",
+  "action_back": "Back",
+  "description_search": "Search...",
+  "description_matched-rows": "Matched rows",
+  "context_items-count": [
+    " {{count}} item ",
+    " {{count}} items ",
+    " {{count}} items ",
+    " {{count}} items "
+  ]
+}
