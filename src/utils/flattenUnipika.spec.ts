@@ -2078,6 +2078,37 @@ describe('flattenUnipika', () => {
                 });
                 expect(result).toEqual({data: expected, searchIndex});
             });
+            it('find part of a string no matches', () => {
+                const searchIndex: FlattenUnipikaResult['searchIndex'] = {};
+                const result = flattenUnipika(converted, {
+                    filter: 'Size',
+                    settings: {format: 'yson'},
+                });
+                expect(result).toEqual({data: expected, searchIndex});
+            });
+            it('find part of a string case-insensitive', () => {
+                const searchIndex: FlattenUnipikaResult['searchIndex'] = {
+                    '3': {
+                        keyMatch: [6, 11],
+                    },
+                    '4': {
+                        valueMatch: [9],
+                    },
+                    '8': {
+                        keyMatch: [14],
+                    },
+                    '9': {
+                        keyMatch: [6],
+                        valueMatch: [1, 7, 13],
+                    },
+                };
+                const result = flattenUnipika(converted, {
+                    filter: 'Size',
+                    settings: {format: 'yson'},
+                    caseInsensitive: true,
+                });
+                expect(result).toEqual({data: expected, searchIndex});
+            });
             it('find part of a number', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
                     '3': {

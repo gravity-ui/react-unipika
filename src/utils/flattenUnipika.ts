@@ -52,6 +52,7 @@ interface FlattenUnipikaOptions {
     matchedState?: {};
     settings?: UnipikaSettings;
     filter?: string;
+    caseInsensitive?: boolean;
 }
 
 export interface FlattenUnipikaResult {
@@ -76,6 +77,7 @@ export function flattenUnipika(
     flattenUnipikaImpl(value, 0, ctx);
     const searchIndex = makeSearchIndex(ctx.dst, options?.filter, {
         settings: options?.settings,
+        caseInsensitive: options?.caseInsensitive,
     });
     return {data: ctx.dst, searchIndex};
 }
@@ -459,6 +461,7 @@ function fromUnipikaPrimitive(value: UnipikaPrimitive, level: number): UnipikaFl
 
 interface SearchParams {
     settings?: UnipikaSettings;
+    caseInsensitive?: boolean;
 }
 
 export interface SearchInfo {
@@ -484,8 +487,8 @@ export function makeSearchIndex(
     const res: SearchIndex = {};
     for (let i = 0; i < tree.length; ++i) {
         const {key, value} = tree[i];
-        const keyMatch = rowSearchInfo(key, filter, settings);
-        const valueMatch = rowSearchInfo(value, filter, settings);
+        const keyMatch = rowSearchInfo(key, filter, settings, options?.caseInsensitive);
+        const valueMatch = rowSearchInfo(value, filter, settings, options?.caseInsensitive);
         if (keyMatch || valueMatch) {
             res[i] = Object.assign({}, keyMatch && {keyMatch}, valueMatch && {valueMatch});
         }
@@ -499,6 +502,7 @@ function rowSearchInfo(
     v: SearchValue,
     filter: string,
     settings: UnipikaSettings,
+    caseInsensitive?: boolean,
 ): Array<number> | undefined {
     if (!v) {
         return undefined;
@@ -513,12 +517,17 @@ function rowSearchInfo(
         tmp = tmp.substring(1, tmp.length - 1); // skip quotes
     }
     let from = 0;
+    let normalizedFilter = filter;
+    if (caseInsensitive) {
+        tmp = tmp.toLowerCase();
+        normalizedFilter = filter.toLowerCase();
+    }
     while (from >= 0 && from < tmp.length) {
-        const index = tmp.indexOf(filter, from);
+        const index = tmp.indexOf(normalizedFilter, from);
         if (-1 === index) {
             break;
         }
-        from = index + filter.length;
+        from = index + normalizedFilter.length;
         res.push(index);
     }
     return res.length ? res : undefined;

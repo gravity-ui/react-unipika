@@ -91,3 +91,48 @@ test('ReactUnipika: json with container size collapsed initially', async ({
 
     await expectScreenshot({component: page});
 });
+
+test('ReactUnipika: with case insensitive search with matches', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithCaseInsensitiveSearch />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('Attr');
+
+    await expectScreenshot({component: page});
+});
+test('ReactUnipika: with case insensitive search with matches 2', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithCaseInsensitiveSearch />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('attr');
+
+    await expectScreenshot({component: page});
+});
+test('ReactUnipika: with case sensitive search no matches', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.Json />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('Attr');
+
+    await expectScreenshot({component: page});
+});
+test('ReactUnipika: with case sensitive search with matches', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.Json />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('attr');
+
+    await expectScreenshot({component: page});
+});

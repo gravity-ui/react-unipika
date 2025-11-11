@@ -1,10 +1,12 @@
 import React, {useRef} from 'react';
 
-import {Button, Icon, TextInput} from '@gravity-ui/uikit';
+import {Button, Icon, TextInput, ActionTooltip} from '@gravity-ui/uikit';
 import {ArrowDownToLine, ArrowUpToLine, ChevronDown, ChevronUp} from '@gravity-ui/icons';
 
 import {Toolbar} from '../Toolbar/Toolbar';
 import {cn} from '../utils/classname';
+
+import i18n from './i18n';
 
 import './StructuredYson.scss';
 
@@ -50,41 +52,43 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                     size="m"
                     type="text"
                     value={filter}
-                    placeholder="Search..."
+                    placeholder={i18n('description_search')}
                     onUpdate={onFilterChange}
                     autoFocus={false}
                     onKeyDown={onEnterKeyDown}
                     qa={'qa:structuredyson:search'}
                 />
-                <Button
-                    className={block('match-btn')}
-                    view="flat-secondary"
-                    title="Next"
-                    onClick={onNextMatch}
-                    disabled={!count}
-                    pin={'clear-clear'}
-                    qa={'qa:structuredyson:search:next'}
-                >
-                    <Icon data={ChevronDown} />
-                </Button>
-                <Button
-                    className={block('match-btn')}
-                    view="flat-secondary"
-                    title="Back"
-                    onClick={onPrevMatch}
-                    disabled={!count}
-                    pin={'brick-brick'}
-                    qa={'qa:structuredyson:search:prev'}
-                >
-                    <Icon data={ChevronUp} />
-                </Button>
-                <span className={block('match-counter')} title={'Matched rows'}>
+
+                <ActionTooltip title={i18n('action_next')}>
+                    <Button
+                        className={block('match-btn')}
+                        view="flat-secondary"
+                        onClick={onNextMatch}
+                        disabled={!count}
+                        pin={'clear-clear'}
+                        qa={'qa:structuredyson:search:next'}
+                    >
+                        <Icon data={ChevronDown} />
+                    </Button>
+                </ActionTooltip>
+                <ActionTooltip title={i18n('action_back')}>
+                    <Button
+                        className={block('match-btn')}
+                        view="flat-secondary"
+                        onClick={onPrevMatch}
+                        disabled={!count}
+                        pin={'brick-brick'}
+                        qa={'qa:structuredyson:search:prev'}
+                    >
+                        <Icon data={ChevronUp} />
+                    </Button>
+                </ActionTooltip>
+                <span className={block('match-counter')} title={i18n('description_matched-rows')}>
                     {matchPosition} / {count || 0}
                 </span>
             </React.Fragment>
         );
     };
-
     return (
         <Toolbar
             className={block('toolbar', className)}
@@ -93,13 +97,17 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                     name: 'buttons',
                     node: (
                         <span className={block('buttons')}>
-                            <Button title="Expand all" onClick={onExpandAll}>
-                                <Icon data={ArrowDownToLine} />
-                            </Button>
+                            <ActionTooltip title={i18n('action_expand-all')}>
+                                <Button onClick={onExpandAll}>
+                                    <Icon data={ArrowDownToLine} />
+                                </Button>
+                            </ActionTooltip>
                             &nbsp;&nbsp;
-                            <Button onClick={onCollapseAll} title="Collapse all">
-                                <Icon data={ArrowUpToLine} />
-                            </Button>
+                            <ActionTooltip title={i18n('action_collapse-all')}>
+                                <Button onClick={onCollapseAll}>
+                                    <Icon data={ArrowUpToLine} />
+                                </Button>
+                            </ActionTooltip>
                         </span>
                     ),
                 },

@@ -41,6 +41,7 @@ interface Props {
     collapseIconType?: CollapseIconType;
     showContainerSize?: boolean;
     initiallyCollapsed?: boolean;
+    caseInsensitiveSearch?: boolean;
 }
 
 interface State {
@@ -62,6 +63,7 @@ function calculateState(
     value: State['value'],
     collapsedState: CollapsedState,
     filter: string,
+    caseInsensitive: boolean | undefined,
     settings: UnipikaSettings,
 ) {
     const flattenResult = flattenUnipika(value, {
@@ -69,6 +71,7 @@ function calculateState(
         collapsedState: collapsedState,
         filter,
         settings: settings,
+        caseInsensitive,
     });
 
     return Object.assign(
@@ -95,7 +98,13 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         if (prevValue !== value || !isEmpty_(res)) {
             Object.assign<Partial<State>, Partial<State>>(res, {
                 value,
-                ...calculateState(value, state.collapsedState, state.filter, settings),
+                ...calculateState(
+                    value,
+                    state.collapsedState,
+                    state.filter,
+                    props.caseInsensitiveSearch,
+                    settings,
+                ),
             });
         }
         return isEmpty_(res) ? null : res;
@@ -142,6 +151,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         cb?: () => void,
     ) {
         const {value, settings} = this.state;
+        const {caseInsensitiveSearch} = this.props;
         const {
             collapsedState = this.state.collapsedState,
             matchIndex = this.state.matchIndex,
@@ -153,7 +163,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                 collapsedState,
                 filter,
                 matchIndex,
-                ...calculateState(value, collapsedState, filter, settings),
+                ...calculateState(value, collapsedState, filter, caseInsensitiveSearch, settings),
             },
             cb,
         );
