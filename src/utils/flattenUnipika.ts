@@ -52,7 +52,7 @@ interface FlattenUnipikaOptions {
     matchedState?: {};
     settings?: UnipikaSettings;
     filter?: string;
-    caseSensitive?: boolean;
+    caseInsensitive?: boolean;
 }
 
 export interface FlattenUnipikaResult {
@@ -77,7 +77,7 @@ export function flattenUnipika(
     flattenUnipikaImpl(value, 0, ctx);
     const searchIndex = makeSearchIndex(ctx.dst, options?.filter, {
         settings: options?.settings,
-        caseSensitive: options?.caseSensitive,
+        caseInsensitive: options?.caseInsensitive,
     });
     return {data: ctx.dst, searchIndex};
 }
@@ -461,7 +461,7 @@ function fromUnipikaPrimitive(value: UnipikaPrimitive, level: number): UnipikaFl
 
 interface SearchParams {
     settings?: UnipikaSettings;
-    caseSensitive?: boolean;
+    caseInsensitive?: boolean;
 }
 
 export interface SearchInfo {
@@ -487,8 +487,8 @@ export function makeSearchIndex(
     const res: SearchIndex = {};
     for (let i = 0; i < tree.length; ++i) {
         const {key, value} = tree[i];
-        const keyMatch = rowSearchInfo(key, filter, settings, options?.caseSensitive);
-        const valueMatch = rowSearchInfo(value, filter, settings, options?.caseSensitive);
+        const keyMatch = rowSearchInfo(key, filter, settings, options?.caseInsensitive);
+        const valueMatch = rowSearchInfo(value, filter, settings, options?.caseInsensitive);
         if (keyMatch || valueMatch) {
             res[i] = Object.assign({}, keyMatch && {keyMatch}, valueMatch && {valueMatch});
         }
@@ -502,7 +502,7 @@ function rowSearchInfo(
     v: SearchValue,
     filter: string,
     settings: UnipikaSettings,
-    caseSensitive?: boolean,
+    caseInsensitive?: boolean,
 ): Array<number> | undefined {
     if (!v) {
         return undefined;
@@ -518,7 +518,7 @@ function rowSearchInfo(
     }
     let from = 0;
     let normalizedFilter = filter;
-    if (!caseSensitive) {
+    if (caseInsensitive) {
         tmp = tmp.toLowerCase();
         normalizedFilter = filter.toLowerCase();
     }

@@ -41,7 +41,7 @@ interface Props {
     collapseIconType?: CollapseIconType;
     showContainerSize?: boolean;
     initiallyCollapsed?: boolean;
-    caseSensitiveSearch?: boolean;
+    caseInsensitiveSearch?: boolean;
 }
 
 interface State {
@@ -63,7 +63,7 @@ function calculateState(
     value: State['value'],
     collapsedState: CollapsedState,
     filter: string,
-    caseSensitive: boolean,
+    caseInsensitive: boolean | undefined,
     settings: UnipikaSettings,
 ) {
     const flattenResult = flattenUnipika(value, {
@@ -71,7 +71,7 @@ function calculateState(
         collapsedState: collapsedState,
         filter,
         settings: settings,
-        caseSensitive,
+        caseInsensitive,
     });
 
     return Object.assign(
@@ -102,7 +102,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                     value,
                     state.collapsedState,
                     state.filter,
-                    props.caseSensitiveSearch || false,
+                    props.caseInsensitiveSearch,
                     settings,
                 ),
             });
@@ -151,7 +151,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         cb?: () => void,
     ) {
         const {value, settings} = this.state;
-        const {caseSensitiveSearch} = this.props;
+        const {caseInsensitiveSearch} = this.props;
         const {
             collapsedState = this.state.collapsedState,
             matchIndex = this.state.matchIndex,
@@ -163,13 +163,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                 collapsedState,
                 filter,
                 matchIndex,
-                ...calculateState(
-                    value,
-                    collapsedState,
-                    filter,
-                    caseSensitiveSearch || false,
-                    settings,
-                ),
+                ...calculateState(value, collapsedState, filter, caseInsensitiveSearch, settings),
             },
             cb,
         );
