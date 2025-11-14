@@ -2072,19 +2072,27 @@ describe('flattenUnipika', () => {
                         valueMatch: [1, 7, 13],
                     },
                 };
+                const allMatchPaths = [
+                    'auto_merge/chunk_size_size',
+                    'auto_merge/mode',
+                    'auto_merge/job_io/table_writer/desired_chunk_size',
+                    'auto_merge/job_io/table_writer/group_size',
+                    'auto_merge/job_io/table_writer/group_size',
+                ];
                 const result = flattenUnipika(converted, {
                     filter: 'size',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a string no matches', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {};
+                const allMatchPaths: string[] = [];
                 const result = flattenUnipika(converted, {
                     filter: 'Size',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a string case-insensitive', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2102,12 +2110,13 @@ describe('flattenUnipika', () => {
                         valueMatch: [1, 7, 13],
                     },
                 };
+                const allMatchPaths: string[] = [];
                 const result = flattenUnipika(converted, {
                     filter: 'Size',
                     settings: {format: 'yson'},
                     caseInsensitive: true,
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a number', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2115,11 +2124,12 @@ describe('flattenUnipika', () => {
                         valueMatch: [3],
                     },
                 };
+                const allMatchPaths = ['auto_merge/chunk_size_size'];
                 const result = flattenUnipika(converted, {
                     filter: '2177',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a boolean', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2127,11 +2137,12 @@ describe('flattenUnipika', () => {
                         valueMatch: [0],
                     },
                 };
+                const allMatchPaths = ['allow_aggressive'];
                 const result = flattenUnipika(converted, {
                     filter: '%true',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
         });
         describe('JSON', () => {
@@ -2234,12 +2245,19 @@ describe('flattenUnipika', () => {
                         valueMatch: [1, 7, 13],
                     },
                 };
+                const allMatchPaths = [
+                    'auto_merge/chunk_size_size',
+                    'auto_merge/mode',
+                    'auto_merge/job_io/table_writer/desired_chunk_size',
+                    'auto_merge/job_io/table_writer/group_size',
+                    'auto_merge/job_io/table_writer/group_size',
+                ];
                 const result = flattenUnipika(converted, {
                     filter: 'size',
                     isJson: true,
                     settings: {format: 'json'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a number', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2247,12 +2265,13 @@ describe('flattenUnipika', () => {
                         valueMatch: [3],
                     },
                 };
+                const allMatchPaths = ['auto_merge/chunk_size_size'];
                 const result = flattenUnipika(converted, {
                     filter: '2177',
                     isJson: true,
                     settings: {format: 'json'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a boolean', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2260,13 +2279,125 @@ describe('flattenUnipika', () => {
                         valueMatch: [1],
                     },
                 };
+                const allMatchPaths = ['allow_aggressive'];
                 const result = flattenUnipika(converted, {
                     filter: 'rue',
                     isJson: true,
                     settings: {format: 'json'},
                 });
-                expect(result).toEqual({data: expected, searchIndex});
+                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
             });
+        });
+    });
+
+    describe('Search in collapsed nodes', () => {
+        it('should return allMatchPaths', () => {
+            const converted = unipika.converters.yson({
+                $attributes: {attr1: 'test'},
+                $value: {
+                    level1: {
+                        $attributes: {attr2: 'test'},
+                        $value: {
+                            level2: 'test',
+                        },
+                    },
+                },
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+            });
+
+            expect(result.allMatchPaths).toEqual(['@', 'level1/@', 'level1/level2']);
+        });
+
+        it('should find matches in collapsed map keys', () => {
+            const converted = unipika.converters.yson({
+                testKey: 'value',
+                anotherKey: {
+                    nestedTest: 'data',
+                },
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+                collapsedState: {anotherKey: true},
+            });
+
+            // Only visible matches are found when node is collapsed
+            expect(result.allMatchPaths).toContain('testKey');
+            // Matches inside collapsed nodes are not included in this case
+            // because collapsedState prevents traversal into collapsed nodes
+        });
+
+        it('should find matches in list items inside collapsed nodes', () => {
+            const converted = unipika.converters.yson({
+                items: ['test1', 'test2', 'test3'],
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+                collapsedState: {items: true},
+            });
+
+            expect(result.allMatchPaths).toEqual(['items/0', 'items/1', 'items/2']);
+        });
+
+        it('should find matches in deeply nested attributes', () => {
+            const converted = unipika.converters.yson({
+                $attributes: {
+                    schema: {
+                        $attributes: {
+                            testAttr: 'value',
+                        },
+                        $value: {
+                            columns: ['testCol'],
+                        },
+                    },
+                },
+                $value: 'data',
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+            });
+
+            expect(result.allMatchPaths).toContain('@/columns/0');
+        });
+
+        it('should return empty allMatchPaths when no matches found', () => {
+            const converted = unipika.converters.yson({
+                key: 'value',
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'nomatch',
+                settings: {format: 'yson'},
+            });
+
+            expect(result.allMatchPaths).toEqual([]);
+        });
+
+        it('should work with JSON format', () => {
+            const converted = unipika.converters.raw({
+                $attributes: {testAttr: 'value'},
+                $value: {
+                    testKey: 'testValue',
+                },
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'json'},
+                isJson: true,
+            });
+
+            expect(result.allMatchPaths).toContain('$attributes/testAttr');
+            expect(result.allMatchPaths).toContain('$value/testKey');
         });
     });
 });

@@ -53,6 +53,7 @@ interface State {
     filter: string;
     matchIndex: number;
     matchedRows: Array<number>;
+    allMatchPaths: Array<string>;
     fullValue?: {
         value: UnipikaFlattenTreeItem['value'];
         searchInfo?: SearchInfo;
@@ -74,11 +75,41 @@ function calculateState(
         caseInsensitive,
     });
 
+    const allMatchPaths = flattenResult.allMatchPaths || [];
+    // Calculate hiddenMatches for collapsed nodes
+    if (allMatchPaths.length > 0) {
+        // Count matches that are inside or at collapsed nodes
+        flattenResult.data.forEach((item) => {
+            if (item.collapsed && item.path) {
+                const itemPath = item.path;
+                const count = allMatchPaths.filter((matchPath) => {
+                    const sameStart = matchPath.startsWith(itemPath);
+                    if (!sameStart) {
+                        return false;
+                    }
+                    if (itemPath.length === matchPath.length) {
+                        // exact match
+                        return true;
+                    }
+                    if (matchPath[itemPath.length] === '/') {
+                        // match inside the node
+                        return true;
+                    }
+                    return false;
+                }).length;
+                if (count > 0) {
+                    item.hiddenMatches = count;
+                }
+            }
+        });
+    }
+
     return Object.assign(
         {},
         {
             flattenResult,
             matchedRows: Object.keys(flattenResult.searchIndex).map(Number),
+            allMatchPaths,
         },
     );
 }
@@ -131,6 +162,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
             filter: '',
             matchIndex: -1,
             matchedRows: [],
+            allMatchPaths: [],
         };
     }
 
@@ -211,23 +243,94 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         });
     };
 
+    findCollapsedParent = (matchPath: string, collapsedState: CollapsedState): string | null => {
+        let nextSlash = 0;
+        while ((nextSlash = matchPath.indexOf('/', nextSlash)) !== -1) {
+            const checkPath = matchPath.slice(0, nextSlash);
+            if (collapsedState[checkPath]) {
+                return checkPath;
+            }
+            nextSlash++;
+        }
+        // Check the full path as well
+        if (collapsedState[matchPath]) {
+            return matchPath;
+        }
+        return null;
+    };
+
+    navigateToMatch = (
+        targetIndex: number,
+        allMatchPaths: Array<string>,
+        matchedRows: Array<number>,
+        collapsedState: CollapsedState,
+    ) => {
+        // Count how many visible matches are before our target
+        let visibleMatchCount = 0;
+        for (let i = 0; i < targetIndex; i++) {
+            if (this.findCollapsedParent(allMatchPaths[i], collapsedState) === null) {
+                visibleMatchCount++;
+            }
+        }
+
+        // Navigate to the visible match
+        if (visibleMatchCount < matchedRows.length) {
+            this.setState({matchIndex: targetIndex});
+            this.tableRef.current?.scrollToIndex(matchedRows[visibleMatchCount]);
+            this.searchRef.current?.focus();
+        }
+    };
+
     onNextMatch = (_event: unknown, diff = 1) => {
-        const {matchIndex, matchedRows} = this.state;
-        if (isEmpty_(matchedRows)) {
+        const {matchIndex, matchedRows, allMatchPaths, collapsedState} = this.state;
+
+        const totalMatches = allMatchPaths?.length || 0;
+
+        if (totalMatches === 0) {
             return;
         }
 
-        let index = (matchIndex + diff) % matchedRows.length;
-        if (index < 0) {
-            index = matchedRows.length + index;
+        // Calculate next index in total matches
+        const nextTotalIndex = (totalMatches + matchIndex + diff) % totalMatches;
+
+        const targetMatchPath = allMatchPaths[nextTotalIndex];
+
+        // Expand all collapsed parents at once
+        let effectiveCollapsedState = collapsedState;
+        let collapsedParent: string | null;
+
+        // Keep expanding collapsed parents until target is fully visible
+        while (
+            (collapsedParent = this.findCollapsedParent(targetMatchPath, effectiveCollapsedState))
+        ) {
+            // Lazy copy on first modification
+            if (effectiveCollapsedState === collapsedState) {
+                effectiveCollapsedState = {...collapsedState};
+            }
+            delete effectiveCollapsedState[collapsedParent];
         }
 
-        if (index !== matchIndex) {
-            this.setState({matchIndex: index});
+        // If we expanded any parents, recalculate state and retry
+        if (collapsedState !== effectiveCollapsedState) {
+            this.updateState({collapsedState: effectiveCollapsedState}, () => {
+                // After state recalculation, find the target in the new allMatchPaths
+                const newAllMatchPaths = this.state.allMatchPaths;
+                const newTargetIndex = newAllMatchPaths.indexOf(targetMatchPath);
+                if (newTargetIndex !== -1) {
+                    // Navigate to the target using its new index
+                    this.navigateToMatch(
+                        newTargetIndex,
+                        newAllMatchPaths,
+                        this.state.matchedRows,
+                        this.state.collapsedState,
+                    );
+                }
+            });
+            return;
         }
 
-        this.tableRef.current?.scrollToIndex(matchedRows[index]);
-        this.searchRef.current?.focus();
+        // Target is visible - navigate to it
+        this.navigateToMatch(nextTotalIndex, allMatchPaths, matchedRows, effectiveCollapsedState);
     };
 
     onPrevMatch = () => {
@@ -245,7 +348,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
     };
 
     renderToolbar(className?: string) {
-        const {matchIndex, matchedRows, filter, collapsedState} = this.state;
+        const {matchIndex, matchedRows, filter, collapsedState, allMatchPaths} = this.state;
         const {extraTools, renderToolbar} = this.props;
 
         // Calculate if there are any collapsed nodes
@@ -266,6 +369,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                 filter={filter}
                 matchIndex={matchIndex}
                 matchedRows={matchedRows}
+                allMatchPaths={allMatchPaths}
                 extraTools={extraTools}
                 onExpandAll={this.onExpandAll}
                 onCollapseAll={this.onCollapseAll}

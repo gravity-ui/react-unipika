@@ -76,6 +76,7 @@ export function Cell(props: CellProps) {
             collapsed,
             isAfterAttributes,
             size,
+            hiddenMatches,
         },
         settings,
         yson,
@@ -119,7 +120,11 @@ export function Cell(props: CellProps) {
             />
             {open && <OpenClose type={open} yson={yson} settings={settings} />}
             {props.showContainerSize && size !== undefined && (
-                <span className={'unipika'}>{i18n('context_items-count', {count: size})}</span>
+                <span
+                    className={block('filtered', {highlighted: Boolean(hiddenMatches)}, 'unipika')}
+                >
+                    {i18n('context_items-count', {count: size})}
+                </span>
             )}
             {value !== undefined && (
                 <Value
@@ -131,9 +136,20 @@ export function Cell(props: CellProps) {
                     showFullText={handleShowFullText}
                 />
             )}
-            {collapsed && size === undefined && <span className={'unipika'}>...</span>}
+            {collapsed && (size === undefined || !props.showContainerSize) && (
+                <span
+                    className={block('filtered', {highlighted: Boolean(hiddenMatches)}, 'unipika')}
+                >
+                    ...
+                </span>
+            )}
             {close && <OpenClose type={close} yson={yson} settings={settings} close />}
             {hasDelimiter && <SlaveText text={yson ? ';' : ','} />}
+            {collapsed && hiddenMatches && (
+                <span className={block('hidden-matches')}>
+                    ({i18n('context_matches-count', {count: hiddenMatches})})
+                </span>
+            )}
         </div>
     );
 }

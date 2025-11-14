@@ -10,5 +10,12 @@
     " {{count}} items ",
     " {{count}} items ",
     " {{count}} items "
-  ]
+  ],
+  "context_matches-count": [
+    "{{count}} match",
+    "{{count}} matches",
+    "{{count}} matches",
+    "{{count}} matches"
+  ],
+  "label_matched-rows": "Matched rows"
 }

@@ -17,6 +17,7 @@ interface StructuredYsonToolbarProps {
     filter: string;
     matchIndex: number;
     matchedRows: Array<number>;
+    allMatchPaths?: Array<string>;
     extraTools?: React.ReactNode;
     onExpandAll: () => void;
     onCollapseAll: () => void;
@@ -31,6 +32,7 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
     filter,
     matchIndex,
     matchedRows,
+    allMatchPaths,
     extraTools,
     onExpandAll,
     onCollapseAll,
@@ -40,7 +42,10 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
     onEnterKeyDown,
 }) => {
     const searchRef = useRef<HTMLInputElement>(null);
-    const count = matchedRows.length;
+
+    // Use total matches (including hidden) if available, otherwise use visible matches
+    const totalMatches = allMatchPaths?.length || 0;
+    const count = totalMatches || matchedRows.length;
     const matchPosition = count ? 1 + (matchIndex % count) : 0;
     const renderFilter = () => {
         return (
@@ -83,7 +88,7 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                         <Icon data={ChevronUp} />
                     </Button>
                 </ActionTooltip>
-                <span className={block('match-counter')} title={i18n('description_matched-rows')}>
+                <span className={block('match-counter')} title={i18n('label_matched-rows')}>
                     {matchPosition} / {count || 0}
                 </span>
             </React.Fragment>
@@ -98,13 +103,13 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                     node: (
                         <span className={block('buttons')}>
                             <ActionTooltip title={i18n('action_expand-all')}>
-                                <Button onClick={onExpandAll}>
+                                <Button onClick={onExpandAll} qa="qa:structuredyson:expand-all">
                                     <Icon data={ArrowDownToLine} />
                                 </Button>
                             </ActionTooltip>
                             &nbsp;&nbsp;
                             <ActionTooltip title={i18n('action_collapse-all')}>
-                                <Button onClick={onCollapseAll}>
+                                <Button onClick={onCollapseAll} qa="qa:structuredyson:collapse-all">
                                     <Icon data={ArrowUpToLine} />
                                 </Button>
                             </ActionTooltip>

@@ -46,4 +46,11 @@
             padding-right: 2px;
         }
     }
+
+    &__hidden-matches {
+        margin-left: var(--g-spacing-1);
+        font-size: 0.85em;
+        color: var(--g-color-text-warning);
+        font-style: italic;
+    }
 }
