@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.0](https://github.com/gravity-ui/react-unipika/compare/v0.2.0...v0.3.0) (2025-11-14)
+
+
+### Features
+
+* add case-sensitive search ([#20](https://github.com/gravity-ui/react-unipika/issues/20)) ([c15e5c6](https://github.com/gravity-ui/react-unipika/commit/c15e5c6962e22ff5c8c0b52bd768d156fa52d469))
+* search in collapsed nodes ([#23](https://github.com/gravity-ui/react-unipika/issues/23)) ([ffaccbe](https://github.com/gravity-ui/react-unipika/commit/ffaccbe5735f7875bfdbec9edf18320dc4de2259))
+* show container size ([#21](https://github.com/gravity-ui/react-unipika/issues/21)) ([705eb95](https://github.com/gravity-ui/react-unipika/commit/705eb958fe2ed2dd549f5972747e32cfa153195d))
+
 ## [0.2.0](https://github.com/gravity-ui/react-unipika/compare/v0.1.3...v0.2.0) (2025-07-28)
 
 
