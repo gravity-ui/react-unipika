@@ -663,12 +663,6 @@ function collectAllMatchPaths(
         return dstPaths;
     }
 
-    // Check primitive values
-    const primitiveMatches = checkPrimitiveMatch(value, filter, settings, currentPath);
-    if (primitiveMatches.length > 0) {
-        dstPaths.push(...primitiveMatches);
-    }
-
     // Check attributes
     const attrMatches = collectAttributeMatches(value, filter, settings, isJson, currentPath);
     if (attrMatches.length > 0) {
@@ -689,6 +683,12 @@ function collectAllMatchPaths(
         const listMatches = collectListMatches(value.$value, filter, settings, isJson, valuePath);
         if (listMatches.length > 0) {
             dstPaths.push(...listMatches);
+        }
+    } else {
+        // Check primitive values
+        const primitiveMatches = checkPrimitiveMatch(value, filter, settings, currentPath);
+        if (primitiveMatches.length > 0) {
+            dstPaths.push(...primitiveMatches);
         }
     }
 
