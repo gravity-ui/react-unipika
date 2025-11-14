@@ -554,22 +554,6 @@ function rowSearchInfo(
 }
 
 /**
- * Check if primitive value matches filter
- */
-function checkPrimitiveMatch(
-    value: UnipikaValue,
-    filter: string,
-    settings: UnipikaSettings,
-    currentPath: string,
-): Array<string> {
-    if (value.$type === 'map' || value.$type === 'list') {
-        return [];
-    }
-    const valueMatch = rowSearchInfo(value, filter, settings);
-    return valueMatch && currentPath ? [currentPath] : [];
-}
-
-/**
  * Collect matches from attributes
  */
 function collectAttributeMatches(
@@ -670,14 +654,14 @@ function collectAllMatchPaths(
     }
 
     // Process nested structures
-    if (value.$type === 'map' && value.$value) {
+    if (value.$type === 'map') {
         // Get value path with JSON $ prefix if needed for structures
         const valuePath = getJsonValuePath(value, isJson, currentPath);
         const mapMatches = collectMapMatches(value.$value, filter, settings, isJson, valuePath);
         if (mapMatches.length > 0) {
             dstPaths.push(...mapMatches);
         }
-    } else if (value.$type === 'list' && value.$value) {
+    } else if (value.$type === 'list') {
         // Get value path with JSON $ prefix if needed for structures
         const valuePath = getJsonValuePath(value, isJson, currentPath);
         const listMatches = collectListMatches(value.$value, filter, settings, isJson, valuePath);
@@ -685,8 +669,8 @@ function collectAllMatchPaths(
             dstPaths.push(...listMatches);
         }
     } else {
-        // Check primitive values
-        const primitiveMatches = checkPrimitiveMatch(value, filter, settings, currentPath);
+        const valueMatch = rowSearchInfo(value, filter, settings);
+        const primitiveMatches = valueMatch && currentPath ? [currentPath] : [];
         if (primitiveMatches.length > 0) {
             dstPaths.push(...primitiveMatches);
         }
