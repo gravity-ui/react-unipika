@@ -291,8 +291,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         }
 
         // Calculate next index in total matches
-        let nextTotalIndex = matchIndex + diff;
-        nextTotalIndex = ((nextTotalIndex % totalMatches) + totalMatches) % totalMatches;
+        const nextTotalIndex = (totalMatches + matchIndex + diff) % totalMatches;
 
         const targetMatchPath = allMatchPaths[nextTotalIndex];
 
