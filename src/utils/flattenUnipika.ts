@@ -89,7 +89,9 @@ export function flattenUnipika(
     // Collect all match paths
     let allMatchPaths: Array<string> | undefined;
     if (options?.filter && options?.settings) {
-        allMatchPaths = collectAllMatchPaths(
+        allMatchPaths = [];
+        collectAllMatchPaths(
+            allMatchPaths,
             value,
             options.filter,
             options.settings,
@@ -581,8 +583,7 @@ function collectAttributeMatches(
     if (value.$attributes && value.$attributes.length > 0) {
         for (const [_key, attrValue] of value.$attributes) {
             const attrPath = currentPath ? `${currentPath}/@` : '@';
-            const attrPaths = collectAllMatchPaths(attrValue, filter, settings, isJson, attrPath);
-            paths.push(...attrPaths);
+            collectAllMatchPaths(paths, attrValue, filter, settings, isJson, attrPath);
         }
     }
     return paths;
@@ -624,8 +625,7 @@ function collectMapMatches(
         }
 
         // Recursively collect from value
-        const childPaths = collectAllMatchPaths(childValue, filter, settings, isJson, childPath);
-        paths.push(...childPaths);
+        collectAllMatchPaths(paths, childValue, filter, settings, isJson, childPath);
     }
     return paths;
 }
@@ -643,8 +643,7 @@ function collectListMatches(
     const paths: Array<string> = [];
     for (let i = 0; i < listValue.length; i++) {
         const childPath = valuePath ? `${valuePath}/${i}` : String(i);
-        const childPaths = collectAllMatchPaths(listValue[i], filter, settings, isJson, childPath);
-        paths.push(...childPaths);
+        collectAllMatchPaths(paths, listValue[i], filter, settings, isJson, childPath);
     }
     return paths;
 }
@@ -653,6 +652,7 @@ function collectListMatches(
  * Collect all paths that contain search matches (including in collapsed nodes)
  */
 function collectAllMatchPaths(
+    dstPaths: Array<string>,
     value: UnipikaValue,
     filter: string,
     settings: UnipikaSettings,
@@ -660,26 +660,37 @@ function collectAllMatchPaths(
     currentPath = '',
 ): Array<string> {
     if (!filter) {
-        return [];
+        return dstPaths;
     }
 
-    const paths: Array<string> = [];
-
     // Check primitive values
-    paths.push(...checkPrimitiveMatch(value, filter, settings, currentPath));
+    const primitiveMatches = checkPrimitiveMatch(value, filter, settings, currentPath);
+    if (primitiveMatches.length > 0) {
+        dstPaths.push(...primitiveMatches);
+    }
 
     // Check attributes
-    paths.push(...collectAttributeMatches(value, filter, settings, isJson, currentPath));
-
-    // Get value path with JSON $ prefix if needed
-    const valuePath = getJsonValuePath(value, isJson, currentPath);
+    const attrMatches = collectAttributeMatches(value, filter, settings, isJson, currentPath);
+    if (attrMatches.length > 0) {
+        dstPaths.push(...attrMatches);
+    }
 
     // Process nested structures
     if (value.$type === 'map' && value.$value) {
-        paths.push(...collectMapMatches(value.$value, filter, settings, isJson, valuePath));
+        // Get value path with JSON $ prefix if needed for structures
+        const valuePath = getJsonValuePath(value, isJson, currentPath);
+        const mapMatches = collectMapMatches(value.$value, filter, settings, isJson, valuePath);
+        if (mapMatches.length > 0) {
+            dstPaths.push(...mapMatches);
+        }
     } else if (value.$type === 'list' && value.$value) {
-        paths.push(...collectListMatches(value.$value, filter, settings, isJson, valuePath));
+        // Get value path with JSON $ prefix if needed for structures
+        const valuePath = getJsonValuePath(value, isJson, currentPath);
+        const listMatches = collectListMatches(value.$value, filter, settings, isJson, valuePath);
+        if (listMatches.length > 0) {
+            dstPaths.push(...listMatches);
+        }
     }
 
-    return paths;
+    return dstPaths;
 }

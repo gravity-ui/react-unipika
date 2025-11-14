@@ -105,8 +105,26 @@ test('ReactUnipika: search in collapsed - collapsed tree with search', async ({
     // Enter search term
     await page.getByTestId('qa:structuredyson:search').locator('input').fill('attr');
 
-    // Wait for search to complete
-    await page.waitForTimeout(300);
+    // Wait for search to complete by checking match counter is updated
+    await page.locator('.g-ru-structured-yson__match-counter').waitFor({state: 'visible'});
+    await page.locator('.g-ru-structured-yson__match-counter:has-text("1 / 9")').waitFor();
+
+    // Wait for the first match to be automatically expanded and highlighted text to be visible
+    await page
+        .locator('.g-ru-cell__filtered_highlighted:has-text("attr")')
+        .first()
+        .waitFor({state: 'visible'});
+
+    // Verify that only one highlighted element with "attr" is visible on screen
+    const visibleHighlightedElements = await page
+        .locator('.g-ru-cell__filtered_highlighted:has-text("attr")')
+        .filter({hasText: 'attr'})
+        .count();
+    if (visibleHighlightedElements !== 1) {
+        throw new Error(
+            `Expected 1 visible highlighted element with "attr", but found ${visibleHighlightedElements}`,
+        );
+    }
 
     await expectScreenshot({component: page});
 });
@@ -124,14 +142,32 @@ test('ReactUnipika: search in collapsed - navigate forward', async ({
     // Enter search term
     await page.getByTestId('qa:structuredyson:search').locator('input').fill('attr');
 
-    // Wait for search to complete
-    await page.waitForTimeout(300);
+    // Wait for search to complete by checking match counter is updated
+    await page.locator('.g-ru-structured-yson__match-counter').waitFor({state: 'visible'});
+    await page.locator('.g-ru-structured-yson__match-counter:has-text("1 / 9")').waitFor();
 
     // Navigate forward (should expand first collapsed node with match)
     await page.getByTestId('qa:structuredyson:search:next').click();
 
-    // Wait for expansion and navigation
-    await page.waitForTimeout(300);
+    // Wait for expansion and navigation by checking the match counter updates to show position
+    await page.locator('.g-ru-structured-yson__match-counter:has-text("2 / 9")').waitFor();
+
+    // Wait for the second match to be visible
+    await page
+        .locator('.g-ru-cell__filtered_highlighted:has-text("attr")')
+        .nth(1)
+        .waitFor({state: 'visible'});
+
+    // Verify that exactly 2 highlighted elements with "attr" are visible on screen
+    const visibleHighlightedElements = await page
+        .locator('.g-ru-cell__filtered_highlighted:has-text("attr")')
+        .filter({hasText: 'attr'})
+        .count();
+    if (visibleHighlightedElements !== 2) {
+        throw new Error(
+            `Expected 2 visible highlighted elements with "attr", but found ${visibleHighlightedElements}`,
+        );
+    }
 
     await expectScreenshot({component: page});
 });

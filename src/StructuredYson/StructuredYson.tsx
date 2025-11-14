@@ -81,11 +81,21 @@ function calculateState(
         // Count matches that are inside or at collapsed nodes
         flattenResult.data.forEach((item) => {
             if (item.collapsed && item.path) {
-                const prefix = item.path + '/';
+                const itemPath = item.path;
                 const count = allMatchPaths.filter((matchPath) => {
-                    // Match if path is exactly the item path (match at the node itself)
-                    // or starts with prefix (match inside the node)
-                    return matchPath === item.path || matchPath.startsWith(prefix);
+                    const sameStart = matchPath.startsWith(itemPath);
+                    if (!sameStart) {
+                        return false;
+                    }
+                    if (itemPath.length === matchPath.length) {
+                        // exact match
+                        return true;
+                    }
+                    if (matchPath[itemPath.length] === '/') {
+                        // match inside the node
+                        return true;
+                    }
+                    return false;
                 }).length;
                 if (count > 0) {
                     item.hiddenMatches = count;
@@ -234,12 +244,17 @@ export class StructuredYson extends React.PureComponent<Props, State> {
     };
 
     findCollapsedParent = (matchPath: string, collapsedState: CollapsedState): string | null => {
-        const pathParts = matchPath.split('/');
-        for (let i = 1; i <= pathParts.length; i++) {
-            const checkPath = pathParts.slice(0, i).join('/');
+        let nextSlash = 0;
+        while ((nextSlash = matchPath.indexOf('/', nextSlash)) !== -1) {
+            const checkPath = matchPath.slice(0, nextSlash);
             if (collapsedState[checkPath]) {
                 return checkPath;
             }
+            nextSlash++;
+        }
+        // Check the full path as well
+        if (collapsedState[matchPath]) {
+            return matchPath;
         }
         return null;
     };
@@ -259,36 +274,76 @@ export class StructuredYson extends React.PureComponent<Props, State> {
 
         const targetMatchPath = allMatchPaths[nextTotalIndex];
 
-        const collapsedParent = this.findCollapsedParent(targetMatchPath, collapsedState);
+        // Expand all collapsed parents at once
+        let effectiveCollapsedState = collapsedState;
+        let hasCollapsedParents = false;
 
-        // If target is not hidden, it's visible - navigate to it
-        if (collapsedParent === null) {
-            // Count how many visible matches are before our target
-            let visibleMatchCount = 0;
-            for (let i = 0; i < nextTotalIndex; i++) {
-                if (this.findCollapsedParent(allMatchPaths[i], collapsedState) === null) {
-                    visibleMatchCount++;
+        let nextSlash = 0;
+        while ((nextSlash = targetMatchPath.indexOf('/', nextSlash)) !== -1) {
+            const checkPath = targetMatchPath.slice(0, nextSlash);
+            if (collapsedState[checkPath]) {
+                if (!hasCollapsedParents) {
+                    effectiveCollapsedState = {...collapsedState};
+                    hasCollapsedParents = true;
                 }
+                delete effectiveCollapsedState[checkPath];
             }
+            nextSlash++;
+        }
+        // Check the full path as well
+        if (collapsedState[targetMatchPath]) {
+            if (!hasCollapsedParents) {
+                effectiveCollapsedState = {...collapsedState};
+                hasCollapsedParents = true;
+            }
+            delete effectiveCollapsedState[targetMatchPath];
+        }
 
-            // Navigate to the visible match
-            if (visibleMatchCount < matchedRows.length) {
-                this.setState({matchIndex: nextTotalIndex});
-                this.tableRef.current?.scrollToIndex(matchedRows[visibleMatchCount]);
-                this.searchRef.current?.focus();
-            }
+        // If we expanded any parents, recalculate state and retry
+        if (hasCollapsedParents) {
+            this.updateState({collapsedState: effectiveCollapsedState}, () => {
+                // After state recalculation, find the target in the new allMatchPaths
+                const newAllMatchPaths = this.state.allMatchPaths;
+                const newTargetIndex = newAllMatchPaths.indexOf(targetMatchPath);
+                if (newTargetIndex !== -1) {
+                    // Navigate to the target using its new index
+                    const newMatchedRows = this.state.matchedRows;
+                    let visibleMatchCount = 0;
+                    for (let i = 0; i < newTargetIndex; i++) {
+                        if (
+                            this.findCollapsedParent(
+                                newAllMatchPaths[i],
+                                this.state.collapsedState,
+                            ) === null
+                        ) {
+                            visibleMatchCount++;
+                        }
+                    }
+                    if (visibleMatchCount < newMatchedRows.length) {
+                        this.setState({matchIndex: newTargetIndex});
+                        this.tableRef.current?.scrollToIndex(newMatchedRows[visibleMatchCount]);
+                        this.searchRef.current?.focus();
+                    }
+                }
+            });
             return;
         }
 
-        // Target is hidden - expand the collapsed parent
-        const newCollapsedState = {...collapsedState};
-        delete newCollapsedState[collapsedParent];
+        // Target is visible - navigate to it
+        // Count how many visible matches are before our target
+        let visibleMatchCount = 0;
+        for (let i = 0; i < nextTotalIndex; i++) {
+            if (this.findCollapsedParent(allMatchPaths[i], effectiveCollapsedState) === null) {
+                visibleMatchCount++;
+            }
+        }
 
-        // Recalculate state with new collapsed state
-        this.updateState({collapsedState: newCollapsedState, matchIndex: nextTotalIndex}, () => {
-            // Retry navigation to the same target
-            this.onNextMatch(null, 0);
-        });
+        // Navigate to the visible match
+        if (visibleMatchCount < matchedRows.length) {
+            this.setState({matchIndex: nextTotalIndex});
+            this.tableRef.current?.scrollToIndex(matchedRows[visibleMatchCount]);
+            this.searchRef.current?.focus();
+        }
     };
 
     onPrevMatch = () => {
