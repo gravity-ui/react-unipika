@@ -22,9 +22,16 @@ export type UnipikaSettings = {
 export type CollapseIconType = 'chevron';
 
 export interface ToolbarProps {
-    onFilterChange: (filter: string) => void;
+    filter: string;
+    matchIndex: number;
+    matchedRows: Array<number>;
+    allMatchPaths: Array<string>;
     onExpandAll: () => void;
     onCollapseAll: () => void;
+    onFilterChange: (filter: string) => void;
+    onNextMatch: (event: unknown, diff?: number) => void;
+    onPrevMatch: () => void;
+    onEnterKeyDown: (e: React.KeyboardEvent) => void;
     isCollapsed: boolean;
 }
 
