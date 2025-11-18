@@ -356,9 +356,16 @@ export class StructuredYson extends React.PureComponent<Props, State> {
 
         if (renderToolbar) {
             return renderToolbar({
-                onFilterChange: this.onFilterChange,
+                filter,
+                matchIndex: matchIndex,
+                matchedRows: matchedRows,
+                allMatchPaths: allMatchPaths,
                 onExpandAll: this.onExpandAll,
                 onCollapseAll: this.onCollapseAll,
+                onFilterChange: this.onFilterChange,
+                onNextMatch: this.onNextMatch,
+                onPrevMatch: this.onPrevMatch,
+                onEnterKeyDown: this.onEnterKeyDown,
                 isCollapsed,
             });
         }
