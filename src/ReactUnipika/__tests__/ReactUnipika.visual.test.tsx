@@ -171,3 +171,9 @@ test('ReactUnipika: search in collapsed - navigate forward', async ({
 
     await expectScreenshot({component: page});
 });
+
+test('ReactUnipika: with error', async ({mount, expectScreenshot, page}) => {
+    await mount(<Stories.WithError />, {width: 1280});
+
+    await expectScreenshot({component: page});
+});

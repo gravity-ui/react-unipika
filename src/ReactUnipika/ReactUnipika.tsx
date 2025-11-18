@@ -25,6 +25,7 @@ export interface ReactUnipikaProps {
     showContainerSize?: boolean;
     initiallyCollapsed?: boolean;
     caseInsensitiveSearch?: boolean;
+    renderError?: (error: unknown) => React.ReactNode;
 }
 
 const defaultUnipikaSettings = {
@@ -51,26 +52,31 @@ export function ReactUnipika({
     showContainerSize,
     initiallyCollapsed,
     caseInsensitiveSearch,
+    renderError,
 }: ReactUnipikaProps) {
     const convertedValue = React.useMemo(() => {
-        // TODO: fix me later
-        // The call is required because unipika.format() applies default values to a passed settings inplace.
-        // We have to leave this call without it the behaviour will be broken.
-        if (settings.format === 'raw-json') {
-            unipika.formatRaw(value, settings);
-        } else {
-            unipika.formatFromYSON(value, settings);
-        }
+        try {
+            // TODO: fix me later
+            // The call is required because unipika.format() applies default values to a passed settings inplace.
+            // We have to leave this call without it the behaviour will be broken.
+            if (settings.format === 'raw-json') {
+                unipika.formatRaw(value, settings);
+            } else {
+                unipika.formatFromYSON(value, settings);
+            }
 
-        if (value === undefined) {
-            return '';
-        }
+            if (value === undefined) {
+                return '';
+            }
 
-        if (settings.format === 'raw-json') {
-            return unipika.converters.raw(value, settings);
-        }
+            if (settings.format === 'raw-json') {
+                return unipika.converters.raw(value, settings);
+            }
 
-        return unipika.converters.yson(value, settings);
+            return unipika.converters.yson(value, settings);
+        } catch (error) {
+            return {_error: error};
+        }
     }, [value, settings]);
 
     const classes = block(
@@ -79,6 +85,10 @@ export function ReactUnipika({
         },
         className,
     );
+
+    if (convertedValue._error) {
+        return renderError?.(convertedValue._error);
+    }
 
     function getFormattedTitle() {
         if (!inline) {
