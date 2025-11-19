@@ -54,7 +54,7 @@ export function ReactUnipika({
     caseInsensitiveSearch,
     renderError,
 }: ReactUnipikaProps) {
-    const convertedValue = React.useMemo(() => {
+    const {convertedValue, error} = React.useMemo(() => {
         try {
             // TODO: fix me later
             // The call is required because unipika.format() applies default values to a passed settings inplace.
@@ -73,9 +73,9 @@ export function ReactUnipika({
                 return unipika.converters.raw(value, settings);
             }
 
-            return unipika.converters.yson(value, settings);
+            return {convertedValue: unipika.converters.yson(value, settings)};
         } catch (error) {
-            return {_error: error};
+            return {error};
         }
     }, [value, settings]);
 
@@ -86,8 +86,8 @@ export function ReactUnipika({
         className,
     );
 
-    if (convertedValue._error) {
-        return renderError?.(convertedValue._error);
+    if (error) {
+        return renderError?.(error);
     }
 
     function getFormattedTitle() {
