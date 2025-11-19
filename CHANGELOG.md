@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0](https://github.com/gravity-ui/react-unipika/compare/v0.3.0...v0.4.0) (2025-11-19)
+
+
+### Features
+
+* render custom error ([#27](https://github.com/gravity-ui/react-unipika/issues/27)) ([23519c9](https://github.com/gravity-ui/react-unipika/commit/23519c920db0028514b10fdd18e9b59d3061cf54))
+
+
+### Bug Fixes
+
+* pass all needed props to renderToolbar ([#26](https://github.com/gravity-ui/react-unipika/issues/26)) ([b0bbea4](https://github.com/gravity-ui/react-unipika/commit/b0bbea4f44ea82aa6a0086173b4c19e406907372))
+
 ## [0.3.0](https://github.com/gravity-ui/react-unipika/compare/v0.2.0...v0.3.0) (2025-11-14)
 
 
