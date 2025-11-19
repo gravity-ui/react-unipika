@@ -67,3 +67,15 @@ export const WithContainerSizeYson: StoryObj<ReactUnipikaProps> = {
         showContainerSize: true,
     },
 };
+
+export const WithError: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: {val: Infinity},
+        renderError: (error: unknown) => {
+            if (error instanceof Error) {
+                return <div>{error.message}</div>;
+            }
+            return 'Unknown error while parsing data';
+        },
+    },
+};
