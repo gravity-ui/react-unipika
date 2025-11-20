@@ -49,6 +49,7 @@ interface State {
     value: Props['value'];
     settings: Props['settings'];
     yson: boolean;
+    caseInsensitiveSearch?: boolean;
     collapsedState: CollapsedState;
     filter: string;
     matchIndex: number;
@@ -116,14 +117,24 @@ function calculateState(
 
 export class StructuredYson extends React.PureComponent<Props, State> {
     static getDerivedStateFromProps(props: Props, state: State) {
-        const {value: prevValue, settings: prevSettings, yson: prevYson} = state;
-        const {value, settings} = props;
+        const {
+            value: prevValue,
+            settings: prevSettings,
+            yson: prevYson,
+            caseInsensitiveSearch: prevCaseInsensitiveSearch,
+        } = state;
+        const {value, settings, caseInsensitiveSearch} = props;
         const res: Partial<State> = {};
         const yson = settings.format === 'yson';
-        if (prevSettings !== settings || yson !== prevYson) {
+        if (
+            prevSettings !== settings ||
+            yson !== prevYson ||
+            caseInsensitiveSearch !== prevCaseInsensitiveSearch
+        ) {
             Object.assign<Partial<State>, Partial<State>>(res, {
                 settings,
                 yson,
+                caseInsensitiveSearch,
             });
         }
         if (prevValue !== value || !isEmpty_(res)) {
@@ -133,7 +144,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                     value,
                     state.collapsedState,
                     state.filter,
-                    props.caseInsensitiveSearch,
+                    caseInsensitiveSearch,
                     settings,
                 ),
             });
@@ -147,7 +158,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
     searchRef = React.createRef<HTMLInputElement>();
 
     getInitialState(): State {
-        const {initiallyCollapsed, value, settings} = this.props;
+        const {initiallyCollapsed, value, settings, caseInsensitiveSearch} = this.props;
         const collapsedState = initiallyCollapsed
             ? this.getFullyCollapsedState(value, settings.format !== 'yson')
             : {};
@@ -163,6 +174,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
             matchIndex: -1,
             matchedRows: [],
             allMatchPaths: [],
+            caseInsensitiveSearch,
         };
     }
 
@@ -182,8 +194,7 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         changedState: Partial<Pick<State, 'collapsedState' | 'filter' | 'matchIndex'>>,
         cb?: () => void,
     ) {
-        const {value, settings} = this.state;
-        const {caseInsensitiveSearch} = this.props;
+        const {value, settings, caseInsensitiveSearch} = this.state;
         const {
             collapsedState = this.state.collapsedState,
             matchIndex = this.state.matchIndex,

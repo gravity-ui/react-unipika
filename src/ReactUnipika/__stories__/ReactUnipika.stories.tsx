@@ -5,6 +5,7 @@ import {Meta, StoryObj} from '@storybook/react';
 import {ReactUnipika, ReactUnipikaProps} from '../../index';
 
 import data from './data.json';
+import {Button} from '@gravity-ui/uikit';
 
 const meta: Meta<ReactUnipikaProps> = {
     title: 'ReactUnipika',
@@ -25,10 +26,27 @@ export const Yson: StoryObj<ReactUnipikaProps> = {
     },
 };
 
+function WithCaseInsensitiveSearchComponent() {
+    const [caseInsensitiveSearch, setCaseInsensitiveSearch] = React.useState(true);
+    return (
+        <>
+            <Button
+                selected={!caseInsensitiveSearch}
+                onClick={() => {
+                    setCaseInsensitiveSearch((prev) => !prev);
+                }}
+                qa="qa:case-sensitive-button"
+            >
+                {caseInsensitiveSearch ? 'Case insensitive' : 'Case sensitive'}
+            </Button>
+            <ReactUnipika value={data} caseInsensitiveSearch={caseInsensitiveSearch} />
+        </>
+    );
+}
+
 export const WithCaseInsensitiveSearch: StoryObj<ReactUnipikaProps> = {
-    args: {
-        value: data,
-        caseInsensitiveSearch: true,
+    render() {
+        return <WithCaseInsensitiveSearchComponent />;
     },
 };
 
