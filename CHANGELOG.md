@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/gravity-ui/react-unipika/compare/v0.4.0...v0.4.1) (2025-11-20)
+
+
+### Bug Fixes
+
+* recalc state if caseInsensitiveSearch changes ([#29](https://github.com/gravity-ui/react-unipika/issues/29)) ([d7fd3f3](https://github.com/gravity-ui/react-unipika/commit/d7fd3f3d35c30ee06014f92c06bc1fab7c970a7c))
+
 ## [0.4.0](https://github.com/gravity-ui/react-unipika/compare/v0.3.0...v0.4.0) (2025-11-19)
 
 
