@@ -26,6 +26,8 @@ export interface ReactUnipikaProps {
     initiallyCollapsed?: boolean;
     caseInsensitiveSearch?: boolean;
     renderError?: (error: unknown) => React.ReactNode;
+    scrollContainerRef?: React.RefObject<Element | null>;
+    withScrollElement?: boolean;
 }
 
 const defaultUnipikaSettings = {
@@ -53,6 +55,8 @@ export function ReactUnipika({
     initiallyCollapsed,
     caseInsensitiveSearch,
     renderError,
+    scrollContainerRef,
+    withScrollElement,
 }: ReactUnipikaProps) {
     const {convertedValue, error} = React.useMemo(() => {
         try {
@@ -117,6 +121,8 @@ export function ReactUnipika({
                     showContainerSize={showContainerSize}
                     initiallyCollapsed={initiallyCollapsed}
                     caseInsensitiveSearch={caseInsensitiveSearch}
+                    scrollContainerRef={scrollContainerRef}
+                    withScrollElement={withScrollElement}
                 />
             ) : (
                 <pre

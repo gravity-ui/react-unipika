@@ -42,6 +42,8 @@ interface Props {
     showContainerSize?: boolean;
     initiallyCollapsed?: boolean;
     caseInsensitiveSearch?: boolean;
+    scrollContainerRef?: React.RefObject<Element | null>;
+    withScrollElement?: boolean;
 }
 
 interface State {
@@ -219,7 +221,8 @@ export class StructuredYson extends React.PureComponent<Props, State> {
             settings,
             filter,
         } = this.state;
-        const {collapseIconType, showContainerSize} = this.props;
+        const {collapseIconType, showContainerSize, scrollContainerRef, withScrollElement} =
+            this.props;
 
         return (
             <Table
@@ -231,6 +234,8 @@ export class StructuredYson extends React.PureComponent<Props, State> {
                 onToggleCollapse={this.onTogglePathCollapse}
                 onShowFullText={this.onShowFullText}
                 scrollToRef={this.tableRef}
+                scrollContainerRef={scrollContainerRef}
+                withScrollElement={withScrollElement}
                 collapseIconType={collapseIconType}
                 showContainerSize={showContainerSize}
             />

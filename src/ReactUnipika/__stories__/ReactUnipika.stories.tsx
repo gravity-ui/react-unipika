@@ -97,3 +97,21 @@ export const WithError: StoryObj<ReactUnipikaProps> = {
         },
     },
 };
+
+function WithScrollContainerComponent() {
+    const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+    return (
+        <div
+            style={{height: 300, overflow: 'auto', border: '1px solid var(--g-color-line-generic)'}}
+            ref={scrollContainerRef}
+        >
+            <ReactUnipika value={data} scrollContainerRef={scrollContainerRef} withScrollElement />
+        </div>
+    );
+}
+
+export const WithScrollContainer: StoryObj<ReactUnipikaProps> = {
+    render() {
+        return <WithScrollContainerComponent />;
+    },
+};
