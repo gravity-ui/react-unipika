@@ -23,7 +23,7 @@ import {
 import {StickyContainer} from '../StickyContainer/StickyContainer';
 import {StructuredYsonToolbar} from './StructuredYsonToolbar';
 import {FullValueDialog} from './FullValueDialog';
-import {Table, TableProps} from './Table';
+import {TableProps} from './Table/types';
 
 import {cn} from '../utils/classname';
 
@@ -31,7 +31,7 @@ import './StructuredYson.scss';
 
 const block = cn('g-ru-structured-yson');
 
-interface Props {
+export interface StructuredYsonBaseProps {
     value: UnipikaValue;
     settings: UnipikaSettings;
     extraTools?: React.ReactNode;
@@ -42,14 +42,12 @@ interface Props {
     showContainerSize?: boolean;
     initiallyCollapsed?: boolean;
     caseInsensitiveSearch?: boolean;
-    scrollContainerRef?: React.RefObject<Element | null>;
-    withScrollElement?: boolean;
 }
 
 interface State {
     flattenResult: FlattenUnipikaResult;
-    value: Props['value'];
-    settings: Props['settings'];
+    value: StructuredYsonBaseProps['value'];
+    settings: StructuredYsonBaseProps['settings'];
     yson: boolean;
     caseInsensitiveSearch?: boolean;
     collapsedState: CollapsedState;
@@ -117,15 +115,12 @@ function calculateState(
     );
 }
 
-export class StructuredYson extends React.PureComponent<Props, State> {
-    static getDerivedStateFromProps(props: Props, state: State) {
-        const {
-            value: prevValue,
-            settings: prevSettings,
-            yson: prevYson,
-            caseInsensitiveSearch: prevCaseInsensitiveSearch,
-        } = state;
-        const {value, settings, caseInsensitiveSearch} = props;
+export abstract class StructuredYsonBase<
+    P extends StructuredYsonBaseProps = StructuredYsonBaseProps,
+> extends React.PureComponent<P, State> {
+    static getDerivedStateFromProps(props: StructuredYsonBaseProps, state: State) {
+        const {value: prevValue, settings: prevSettings, yson: prevYson} = state;
+        const {value, settings} = props;
         const res: Partial<State> = {};
         const yson = settings.format === 'yson';
         if (
@@ -214,33 +209,8 @@ export class StructuredYson extends React.PureComponent<Props, State> {
         );
     }
 
-    renderTable() {
-        const {
-            flattenResult: {data, searchIndex},
-            yson,
-            settings,
-            filter,
-        } = this.state;
-        const {collapseIconType, showContainerSize, scrollContainerRef, withScrollElement} =
-            this.props;
+    abstract renderTable(): React.ReactNode;
 
-        return (
-            <Table
-                data={data}
-                searchIndex={searchIndex}
-                unipikaSettings={settings}
-                yson={yson}
-                filter={filter}
-                onToggleCollapse={this.onTogglePathCollapse}
-                onShowFullText={this.onShowFullText}
-                scrollToRef={this.tableRef}
-                scrollContainerRef={scrollContainerRef}
-                withScrollElement={withScrollElement}
-                collapseIconType={collapseIconType}
-                showContainerSize={showContainerSize}
-            />
-        );
-    }
     onExpandAll = () => {
         this.updateState({collapsedState: {}}, () => {
             this.onNextMatch(null, 0);

@@ -2,13 +2,12 @@ import React from 'react';
 
 import {Meta, StoryObj} from '@storybook/react';
 
-import {ReactUnipika, ReactUnipikaProps} from '../../index';
+import {ReactUnipika, ReactUnipikaProps} from '../../window-scroll';
 
 import data from './data.json';
-import {Button} from '@gravity-ui/uikit';
 
 const meta: Meta<ReactUnipikaProps> = {
-    title: 'ReactUnipika',
+    title: 'ReactUnipika/Window Scroll',
     component: ReactUnipika,
 };
 export default meta;
@@ -26,27 +25,10 @@ export const Yson: StoryObj<ReactUnipikaProps> = {
     },
 };
 
-function WithCaseInsensitiveSearchComponent() {
-    const [caseInsensitiveSearch, setCaseInsensitiveSearch] = React.useState(true);
-    return (
-        <>
-            <Button
-                selected={!caseInsensitiveSearch}
-                onClick={() => {
-                    setCaseInsensitiveSearch((prev) => !prev);
-                }}
-                qa="qa:case-sensitive-button"
-            >
-                {caseInsensitiveSearch ? 'Case insensitive' : 'Case sensitive'}
-            </Button>
-            <ReactUnipika value={data} caseInsensitiveSearch={caseInsensitiveSearch} />
-        </>
-    );
-}
-
 export const WithCaseInsensitiveSearch: StoryObj<ReactUnipikaProps> = {
-    render() {
-        return <WithCaseInsensitiveSearchComponent />;
+    args: {
+        value: data,
+        caseInsensitiveSearch: true,
     },
 };
 
@@ -95,23 +77,5 @@ export const WithError: StoryObj<ReactUnipikaProps> = {
             }
             return 'Unknown error while parsing data';
         },
-    },
-};
-
-function WithScrollContainerComponent() {
-    const scrollContainerRef = React.useRef<HTMLDivElement>(null);
-    return (
-        <div
-            style={{height: 300, overflow: 'auto', border: '1px solid var(--g-color-line-generic)'}}
-            ref={scrollContainerRef}
-        >
-            <ReactUnipika value={data} scrollContainerRef={scrollContainerRef} withScrollElement />
-        </div>
-    );
-}
-
-export const WithScrollContainer: StoryObj<ReactUnipikaProps> = {
-    render() {
-        return <WithScrollContainerComponent />;
     },
 };
