@@ -177,3 +177,78 @@ test('ReactUnipika: with error', async ({mount, expectScreenshot, page}) => {
 
     await expectScreenshot({component: page});
 });
+
+test('ReactUnipika: with case insensitive search with matches', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithCaseInsensitiveSearch />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('Attr');
+
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with case insensitive search with matches 2', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithCaseInsensitiveSearch />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('attr');
+
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with case insensitive search toggle', async ({mount, page}) => {
+    await mount(<Stories.WithCaseInsensitiveSearch />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('Type_1');
+
+    const visibleHighlightedElements = await page
+        .locator('.g-ru-cell__filtered_highlighted:has-text("type_1")')
+        .filter({hasText: 'Type_1'})
+        .count();
+    if (visibleHighlightedElements !== 1) {
+        throw new Error(
+            `Expected 1 visible highlighted elements with "Type_1", but found ${visibleHighlightedElements}`,
+        );
+    }
+
+    await page.getByTestId('qa:case-sensitive-button').click();
+    const newVisibleHighlightedElements = await page
+        .locator('.g-ru-cell__filtered_highlighted:has-text("type_1")')
+        .filter({hasText: 'Type_1'})
+        .count();
+    if (newVisibleHighlightedElements !== 0) {
+        throw new Error(
+            `Expected 0 visible highlighted elements with "Type_1", but found ${visibleHighlightedElements}`,
+        );
+    }
+});
+
+test('ReactUnipika: with case sensitive search no matches', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.Json />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('Attr');
+
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with case sensitive search with matches', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.Json />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('attr');
+
+    await expectScreenshot({component: page});
+});

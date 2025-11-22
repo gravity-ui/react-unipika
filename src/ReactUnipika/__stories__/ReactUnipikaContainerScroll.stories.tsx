@@ -1,11 +1,11 @@
 import React from 'react';
+import {Button} from '@gravity-ui/uikit';
 
 import {Meta, StoryObj} from '@storybook/react';
 
 import {ReactUnipika, ReactUnipikaProps} from '../../container-scroll';
 
 import data from './data.json';
-import {Button} from '@gravity-ui/uikit';
 
 function WithScrollContainerComponent(props: Omit<ReactUnipikaProps, 'scrollContainerRef'>) {
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
@@ -52,7 +52,10 @@ function WithCaseInsensitiveSearchComponent() {
             >
                 {caseInsensitiveSearch ? 'Case insensitive' : 'Case sensitive'}
             </Button>
-            <ReactUnipika value={data} caseInsensitiveSearch={caseInsensitiveSearch} />
+            <WithScrollContainerComponent
+                value={data}
+                caseInsensitiveSearch={caseInsensitiveSearch}
+            />
         </>
     );
 }

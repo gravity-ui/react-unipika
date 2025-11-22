@@ -59,6 +59,7 @@ interface State {
         value: UnipikaFlattenTreeItem['value'];
         searchInfo?: SearchInfo;
     };
+    caseInsensitiveSearch?: boolean;
 }
 
 function calculateState(
@@ -119,8 +120,13 @@ export abstract class StructuredYsonBase<
     P extends StructuredYsonBaseProps = StructuredYsonBaseProps,
 > extends React.PureComponent<P, State> {
     static getDerivedStateFromProps(props: StructuredYsonBaseProps, state: State) {
-        const {value: prevValue, settings: prevSettings, yson: prevYson} = state;
-        const {value, settings} = props;
+        const {
+            value: prevValue,
+            settings: prevSettings,
+            yson: prevYson,
+            caseInsensitiveSearch: prevCaseInsensitiveSearch,
+        } = state;
+        const {value, settings, caseInsensitiveSearch} = props;
         const res: Partial<State> = {};
         const yson = settings.format === 'yson';
         if (

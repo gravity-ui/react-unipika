@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {Button} from '@gravity-ui/uikit';
+
 import {Meta, StoryObj} from '@storybook/react';
 
 import {ReactUnipika, ReactUnipikaProps} from '../../window-scroll';
@@ -25,10 +27,27 @@ export const Yson: StoryObj<ReactUnipikaProps> = {
     },
 };
 
+function WithCaseInsensitiveSearchComponent() {
+    const [caseInsensitiveSearch, setCaseInsensitiveSearch] = React.useState(true);
+    return (
+        <>
+            <Button
+                selected={!caseInsensitiveSearch}
+                onClick={() => {
+                    setCaseInsensitiveSearch((prev) => !prev);
+                }}
+                qa="qa:case-sensitive-button"
+            >
+                {caseInsensitiveSearch ? 'Case insensitive' : 'Case sensitive'}
+            </Button>
+            <ReactUnipika value={data} caseInsensitiveSearch={caseInsensitiveSearch} />
+        </>
+    );
+}
+
 export const WithCaseInsensitiveSearch: StoryObj<ReactUnipikaProps> = {
-    args: {
-        value: data,
-        caseInsensitiveSearch: true,
+    render() {
+        return <WithCaseInsensitiveSearchComponent />;
     },
 };
 
