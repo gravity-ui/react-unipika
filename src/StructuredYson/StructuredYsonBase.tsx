@@ -59,7 +59,6 @@ interface State {
         value: UnipikaFlattenTreeItem['value'];
         searchInfo?: SearchInfo;
     };
-    caseInsensitiveSearch?: boolean;
 }
 
 function calculateState(
