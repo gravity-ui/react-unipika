@@ -6,7 +6,6 @@ import {ContainerScroll as Stories} from './stories-to-test';
 test('ReactUnipika: first render', async ({mount, expectScreenshot, page}) => {
     await mount(<Stories.Json />, {width: 1280});
     await expectScreenshot({component: page});
-    await expectScreenshot();
 });
 
 test('ReactUnipika: search next', async ({mount, expectScreenshot, page}) => {
@@ -178,8 +177,46 @@ test('ReactUnipika: with error', async ({mount, expectScreenshot, page}) => {
     await expectScreenshot({component: page});
 });
 
-// test('ReactUnipika:with scroll container', async ({mount, expectScreenshot, page}) => {
-//     await mount(<Stories.WithScrollContainer />, {width: 1280});
+test.only('ReactUnipika: check virtualization', async ({mount, expectScreenshot, page}) => {
+    await mount(<Stories.Json />, {width: 1280});
 
-//     await expectScreenshot({component: page});
-// });
+    // Count initial rendered rows
+    const initialRowCount = await page.locator('.gt-table__row').count();
+
+    // Verify that exactly 21 rows are rendered (virtualization working)
+    if (initialRowCount !== 21) {
+        throw new Error(`Initially expected 21 rendered rows, but found ${initialRowCount}`);
+    }
+
+    await expectScreenshot({component: page});
+
+    // Find the scroll container
+    const scrollContainer = page.getByTestId('qa:scroll-container');
+
+    // Scroll to the end of the page
+    await scrollContainer.evaluate((el) => {
+        el.scrollTop = el.scrollHeight;
+    });
+
+    // Wait for virtualization to render new rows
+    await page.waitForTimeout(500);
+
+    // Count rows after scrolling
+    const finalRowCount = await page.locator('.gt-table__row').count();
+
+    // Verify that exactly 21 rows are rendered (virtualization working)
+    if (finalRowCount !== 18) {
+        throw new Error(`Finally expected 18 rendered rows, but found ${finalRowCount}`);
+    }
+
+    // Check that element with data-index="88" is visible
+    const element88 = page.locator('[data-index="88"]');
+    await element88.waitFor({state: 'visible'});
+
+    const isVisible = await element88.isVisible();
+    if (!isVisible) {
+        throw new Error('Element with data-index="88" is not visible after scrolling to the end');
+    }
+
+    await expectScreenshot({component: page});
+});

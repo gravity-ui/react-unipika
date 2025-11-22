@@ -13,6 +13,7 @@ function WithScrollContainerComponent(props: Omit<ReactUnipikaProps, 'scrollCont
         <div
             style={{height: 300, overflow: 'auto', border: '1px solid var(--g-color-line-generic)'}}
             ref={scrollContainerRef}
+            data-qa={'qa:scroll-container'}
         >
             <ReactUnipika {...props} scrollContainerRef={scrollContainerRef} />
         </div>

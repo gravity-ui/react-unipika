@@ -177,9 +177,3 @@ test('ReactUnipika: with error', async ({mount, expectScreenshot, page}) => {
 
     await expectScreenshot({component: page});
 });
-
-// test('ReactUnipika:with scroll container', async ({mount, expectScreenshot, page}) => {
-//     await mount(<Stories.WithScrollContainer />, {width: 1280});
-
-//     await expectScreenshot({component: page});
-// });
