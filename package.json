@@ -11,10 +11,15 @@
   "module": "build/esm/index.js",
   "types": "types/src/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./types/src/index.d.ts",
-      "require": "./build/cjs/index.js",
-      "import": "./build/esm/index.js"
+    "./window-scroll": {
+      "types": "./types/src/window-scroll.d.ts",
+      "require": "./build/cjs/window-scroll.js",
+      "import": "./build/esm/window-scroll.js"
+    },
+    "./container-scroll": {
+      "types": "./types/src/container-scroll.d.ts",
+      "require": "./build/cjs/container-scroll.js",
+      "import": "./build/esm/container-scroll.js"
     }
   },
   "files": [

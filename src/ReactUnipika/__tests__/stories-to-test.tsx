@@ -1,5 +1,7 @@
 import {composeStories} from '@storybook/react';
 
-import * as DefaultStories from '../__stories__/ReactUnipika.stories';
+import * as WindowScrollStories from '../__stories__/ReactUnipikaWindowScroll.stories';
+import * as ContainerScrollStories from '../__stories__/ReactUnipikaContainerScroll.stories';
 
-export const Stories = composeStories(DefaultStories);
+export const WindowScroll = composeStories(WindowScrollStories);
+export const ContainerScroll = composeStories(ContainerScrollStories);
