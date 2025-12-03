@@ -6,8 +6,9 @@ The library uses [`@gravity-ui/unipika`](https://github.com/gravity-ui/unipika) 
 ### Features
 
 - virtualization
+- two scroll modes: window scroll and container scroll
 - collaps/expand objects/arrays
-- search substring of key/value
+- search substring of key/value (case-sensitive and case-insensitive)
 - render one literal per line
   - long strings are truncated by ellipsis
     - full value might be seen in dialog
@@ -22,14 +23,41 @@ Depending on your package manager you may need to install `peerDependencies` man
 
 ## Usage
 
+The library provides two entry points depending on your scrolling needs:
+
+### Window Scroll (default)
+
+Use this when you want the component to scroll with the browser window:
+
 ```ts
 import '@gravity-ui/uikit/styles/styles.scss';
 import '@gravity-ui/unipika/styles/unipika.scss';
 
-import {ReactUnipika} from '@gravity-ui/react-unipika';
+import {ReactUnipika} from '@gravity-ui/react-unipika/window-scroll';
 
 function renderJson(data: any) {
   return <ReactUnipika value={data} />;
+}
+```
+
+### Container Scroll
+
+Use this when you want the component to scroll within a specific container. You must provide a ref to the scroll container:
+
+```ts
+import '@gravity-ui/uikit/styles/styles.scss';
+import '@gravity-ui/unipika/styles/unipika.scss';
+
+import {ReactUnipika} from '@gravity-ui/react-unipika/container-scroll';
+
+function renderJson(data: any) {
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  return (
+    <div ref={scrollContainerRef} style={{height: '500px', overflow: 'auto'}}>
+      <ReactUnipika value={data} scrollContainerRef={scrollContainerRef} />
+    </div>
+  );
 }
 ```
 
@@ -44,17 +72,24 @@ See more examples in [storybook](https://preview.yandexcloud.dev/react-unipika).
 
 ### ReactUnipika Component Props
 
-| Prop               | Type                                                                              | Default   | Description                                                  |
-| ------------------ | --------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------ |
-| `value`            | `any`                                                                             | required  | The data to be rendered                                      |
-| `settings`         | `UnipikaSettings`                                                                 | See below | Settings for Unipika formatting                              |
-| `inline`           | `boolean`                                                                         | `false`   | Render in inline mode                                        |
-| `children`         | `React.ReactNode`                                                                 | -         | React nodes to render as children                            |
-| `extraTools`       | `React.ReactNode`                                                                 | -         | Additional React nodes for tools                             |
-| `virtualized`      | `boolean`                                                                         | `true`    | Enable virtualization for better performance with large data |
-| `className`        | `string`                                                                          | -         | Custom CSS class name                                        |
-| `customLayout`     | `(args: {toolbar: React.ReactNode; content: React.ReactNode}) => React.ReactNode` | -         | Function to customize the layout                             |
-| `toolbarStickyTop` | `number`                                                                          | `0`       | Top position in pixels for sticky toolbar                    |
+| Prop                    | Type                                                                              | Default   | Description                                                                       |
+| ----------------------- | --------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------- |
+| `value`                 | `any`                                                                             | required  | The data to be rendered                                                           |
+| `settings`              | `UnipikaSettings`                                                                 | See below | Settings for Unipika formatting                                                   |
+| `inline`                | `boolean`                                                                         | `false`   | Render in inline mode                                                             |
+| `children`              | `React.ReactNode`                                                                 | -         | React nodes to render as children                                                 |
+| `extraTools`            | `React.ReactNode`                                                                 | -         | Additional React nodes for tools                                                  |
+| `virtualized`           | `boolean`                                                                         | `true`    | Enable virtualization for better performance with large data                      |
+| `className`             | `string`                                                                          | -         | Custom CSS class name                                                             |
+| `customLayout`          | `(args: {toolbar: React.ReactNode; content: React.ReactNode}) => React.ReactNode` | -         | Function to customize the layout                                                  |
+| `toolbarStickyTop`      | `number`                                                                          | `0`       | Top position in pixels for sticky toolbar                                         |
+| `renderToolbar`         | `(props: ToolbarProps) => React.ReactNode`                                        | -         | Custom toolbar renderer function                                                  |
+| `collapseIconType`      | `CollapseIconType`                                                                | -         | Type of collapse/expand icon to use                                               |
+| `showContainerSize`     | `boolean`                                                                         | -         | Show the size of containers (objects/arrays)                                      |
+| `initiallyCollapsed`    | `boolean`                                                                         | -         | Whether to render the tree initially collapsed                                    |
+| `caseInsensitiveSearch` | `boolean`                                                                         | -         | Enable case-insensitive search                                                    |
+| `renderError`           | `(error: unknown) => React.ReactNode`                                             | -         | Custom error renderer function                                                    |
+| `scrollContainerRef`    | `React.RefObject<Element \| null>`                                                | -         | **Required for container-scroll only**. Reference to the scroll container element |
 
 ### UnipikaSettings
 
