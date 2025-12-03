@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/gravity-ui/react-unipika/compare/v0.4.0...v0.5.0) (2025-12-03)
+
+
+### Features
+
+* support custom scroll container ([#30](https://github.com/gravity-ui/react-unipika/issues/30)) ([27e0583](https://github.com/gravity-ui/react-unipika/commit/27e0583f4c971d1fb11fc72ccf8fdf6879063a65))
+
+
+### Bug Fixes
+
+* recalc state if caseInsensitiveSearch changes ([#29](https://github.com/gravity-ui/react-unipika/issues/29)) ([d7fd3f3](https://github.com/gravity-ui/react-unipika/commit/d7fd3f3d35c30ee06014f92c06bc1fab7c970a7c))
+
 ## [0.4.0](https://github.com/gravity-ui/react-unipika/compare/v0.3.0...v0.4.0) (2025-11-19)
 
 
