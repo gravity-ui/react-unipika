@@ -46,8 +46,8 @@ interface WithReactUnipikaBaseProps<P extends ReactUnipikaCommonProps> {
 
 export function withReactUnipikaBase<P extends ReactUnipikaCommonProps>(
     config: WithReactUnipikaBaseProps<P>,
-) {
-    return function ReactUnipikaBaseComponent(props: P) {
+): React.FC<P> {
+    return function ReactUnipikaBaseComponent(props: P): React.ReactNode {
         const {
             value,
             settings = defaultUnipikaSettings,
