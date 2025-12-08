@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/gravity-ui/react-unipika/compare/v0.5.0...v0.5.1) (2025-12-08)
+
+
+### Bug Fixes
+
+* types ([#33](https://github.com/gravity-ui/react-unipika/issues/33)) ([50bb58e](https://github.com/gravity-ui/react-unipika/commit/50bb58e481fa07382261e08bc790309ee5a13920))
+
 ## [0.5.0](https://github.com/gravity-ui/react-unipika/compare/v0.4.0...v0.5.0) (2025-12-03)
 
 
