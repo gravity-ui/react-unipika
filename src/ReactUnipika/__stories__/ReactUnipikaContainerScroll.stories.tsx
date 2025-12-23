@@ -113,3 +113,18 @@ export const WithError: StoryObj<ReactUnipikaProps> = {
         },
     },
 };
+
+export const WithChevronCollapseIcon: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        collapseIconType: 'chevron',
+    },
+};
+
+export const WithChevronCollapseIconInitiallyCollapsed: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        collapseIconType: 'chevron',
+        initiallyCollapsed: true,
+    },
+};

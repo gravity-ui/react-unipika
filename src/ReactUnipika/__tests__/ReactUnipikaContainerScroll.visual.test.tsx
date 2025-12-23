@@ -295,3 +295,34 @@ test('ReactUnipika: with case sensitive search with matches', async ({
 
     await expectScreenshot({component: page});
 });
+
+test('ReactUnipika: with chevron collapse icon', async ({mount, expectScreenshot, page}) => {
+    await mount(<Stories.WithChevronCollapseIcon />, {width: 1280});
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with chevron collapse icon - collapse', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithChevronCollapseIcon />, {width: 1280});
+
+    // Click the first chevron button to collapse (chevron should change from Up to Right)
+    await page.locator('.g-ru-cell__collapse button').first().click();
+
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with chevron collapse icon - expand', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithChevronCollapseIconInitiallyCollapsed />, {width: 1280});
+
+    // Click the first chevron button to expand (chevron should change from Right to Up)
+    await page.locator('.g-ru-cell__collapse button').first().click();
+
+    await expectScreenshot({component: page});
+});
