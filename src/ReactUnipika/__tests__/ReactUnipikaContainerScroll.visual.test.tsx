@@ -326,3 +326,34 @@ test('ReactUnipika: with chevron collapse icon - expand', async ({
 
     await expectScreenshot({component: page});
 });
+
+test('ReactUnipika: with custom toolbar', async ({mount, expectScreenshot, page}) => {
+    await mount(<Stories.WithCustomToolbar />, {width: 1280});
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with custom toolbar - search interaction', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithCustomToolbar />, {width: 1280});
+
+    // Type in the custom search input
+    await page.locator('[data-qa="custom-toolbar-search"]').fill('level8_item4');
+
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with custom toolbar - collapse all', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithCustomToolbar />, {width: 1280});
+
+    // Click the toggle button to collapse all
+    await page.locator('[data-qa="custom-toolbar-toggle"]').click();
+
+    await expectScreenshot({component: page});
+});

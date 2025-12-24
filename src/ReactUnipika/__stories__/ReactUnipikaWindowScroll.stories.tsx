@@ -7,6 +7,7 @@ import {Meta, StoryObj} from '@storybook/react';
 import {ReactUnipika, ReactUnipikaProps} from '../../window-scroll';
 
 import data from './data.json';
+import {CustomToolbarExample} from './CustomToolbarExample';
 
 const meta: Meta<ReactUnipikaProps> = {
     title: 'ReactUnipika/Window Scroll',
@@ -111,5 +112,12 @@ export const WithChevronCollapseIconInitiallyCollapsed: StoryObj<ReactUnipikaPro
         value: data,
         collapseIconType: 'chevron',
         initiallyCollapsed: true,
+    },
+};
+
+export const WithCustomToolbar: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        renderToolbar: CustomToolbarExample,
     },
 };
