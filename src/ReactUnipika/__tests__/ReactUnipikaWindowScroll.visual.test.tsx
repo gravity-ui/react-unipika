@@ -252,3 +252,65 @@ test('ReactUnipika: with case sensitive search with matches', async ({
 
     await expectScreenshot({component: page});
 });
+
+test('ReactUnipika: with chevron collapse icon', async ({mount, expectScreenshot, page}) => {
+    await mount(<Stories.WithChevronCollapseIcon />, {width: 1280});
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with chevron collapse icon - collapse', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithChevronCollapseIcon />, {width: 1280});
+
+    // Click the first chevron button to collapse (chevron should change from Up to Right)
+    await page.locator('.g-ru-cell__collapse button').first().click();
+
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with chevron collapse icon - expand', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithChevronCollapseIconInitiallyCollapsed />, {width: 1280});
+
+    // Click the first chevron button to expand (chevron should change from Right to Up)
+    await page.locator('.g-ru-cell__collapse button').first().click();
+
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with custom toolbar', async ({mount, expectScreenshot, page}) => {
+    await mount(<Stories.WithCustomToolbar />, {width: 1280});
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with custom toolbar - search interaction', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithCustomToolbar />, {width: 1280});
+
+    // Type in the custom search input
+    await page.locator('[data-qa="custom-toolbar-search"]').fill('level8_item4');
+
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: with custom toolbar - collapse all', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.WithCustomToolbar />, {width: 1280});
+
+    // Click the toggle button to collapse all
+    await page.locator('[data-qa="custom-toolbar-toggle"]').click();
+
+    await expectScreenshot({component: page});
+});

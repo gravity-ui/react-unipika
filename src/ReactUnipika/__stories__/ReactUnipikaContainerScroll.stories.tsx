@@ -6,6 +6,7 @@ import {Meta, StoryObj} from '@storybook/react';
 import {ReactUnipika, ReactUnipikaProps} from '../../container-scroll';
 
 import data from './data.json';
+import {CustomToolbarExample} from './CustomToolbarExample';
 
 function WithScrollContainerComponent(props: Omit<ReactUnipikaProps, 'scrollContainerRef'>) {
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
@@ -111,5 +112,27 @@ export const WithError: StoryObj<ReactUnipikaProps> = {
             }
             return 'Unknown error while parsing data';
         },
+    },
+};
+
+export const WithChevronCollapseIcon: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        collapseIconType: 'chevron',
+    },
+};
+
+export const WithChevronCollapseIconInitiallyCollapsed: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        collapseIconType: 'chevron',
+        initiallyCollapsed: true,
+    },
+};
+
+export const WithCustomToolbar: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        renderToolbar: CustomToolbarExample,
     },
 };
