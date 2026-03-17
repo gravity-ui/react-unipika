@@ -10,7 +10,7 @@ const toaster = new Toaster();
 
 beforeMount(async ({App}) => {
     return (
-        <ThemeProvider>
+        <ThemeProvider theme="system">
             <MobileProvider>
                 <ToasterProvider toaster={toaster}>
                     <App />
