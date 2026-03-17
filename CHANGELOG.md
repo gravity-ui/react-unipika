@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/gravity-ui/react-unipika/compare/v0.5.1...v0.5.2) (2026-03-17)
+
+
+### Bug Fixes
+
+* case sensitive search ([#36](https://github.com/gravity-ui/react-unipika/issues/36)) ([8ad9360](https://github.com/gravity-ui/react-unipika/commit/8ad93600d68e2322f579a163dee20ba6b7829199))
+
 ## [0.5.1](https://github.com/gravity-ui/react-unipika/compare/v0.5.0...v0.5.1) (2025-12-08)
 
 
