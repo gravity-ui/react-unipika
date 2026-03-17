@@ -2110,7 +2110,13 @@ describe('flattenUnipika', () => {
                         valueMatch: [1, 7, 13],
                     },
                 };
-                const allMatchPaths: string[] = [];
+                const allMatchPaths = [
+                    'auto_merge/chunk_size_size',
+                    'auto_merge/mode',
+                    'auto_merge/job_io/table_writer/desired_chunk_size',
+                    'auto_merge/job_io/table_writer/group_size',
+                    'auto_merge/job_io/table_writer/group_size',
+                ];
                 const result = flattenUnipika(converted, {
                     filter: 'Size',
                     settings: {format: 'yson'},
