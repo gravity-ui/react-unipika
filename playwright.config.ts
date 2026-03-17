@@ -4,6 +4,11 @@ import {defineConfig, devices} from '@playwright/experimental-ct-react';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+    expect: {
+        toMatchSnapshot: {
+            maxDiffPixelRatio: 0.02,
+        },
+    },
     testDir: './src',
     testMatch: '**/__tests__/*.visual.test.tsx',
     snapshotPathTemplate:

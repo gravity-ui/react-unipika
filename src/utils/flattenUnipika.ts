@@ -96,6 +96,8 @@ export function flattenUnipika(
             options.filter,
             options.settings,
             Boolean(options?.isJson),
+            '',
+            options?.caseInsensitive,
         );
     }
 
@@ -562,12 +564,21 @@ function collectAttributeMatches(
     settings: UnipikaSettings,
     isJson: boolean,
     currentPath: string,
+    caseInsensitive?: boolean,
 ): Array<string> {
     const paths: Array<string> = [];
     if (value.$attributes && value.$attributes.length > 0) {
         for (const [_key, attrValue] of value.$attributes) {
             const attrPath = currentPath ? `${currentPath}/@` : '@';
-            collectAllMatchPaths(paths, attrValue, filter, settings, isJson, attrPath);
+            collectAllMatchPaths(
+                paths,
+                attrValue,
+                filter,
+                settings,
+                isJson,
+                attrPath,
+                caseInsensitive,
+            );
         }
     }
     return paths;
@@ -597,19 +608,28 @@ function collectMapMatches(
     settings: UnipikaSettings,
     isJson: boolean,
     valuePath: string,
+    caseInsensitive?: boolean,
 ): Array<string> {
     const paths: Array<string> = [];
     for (const [key, childValue] of mapValue) {
         const childPath = valuePath ? `${valuePath}/${key.$value}` : key.$value;
 
         // Check if key matches
-        const keyMatch = rowSearchInfo(key, filter, settings);
+        const keyMatch = rowSearchInfo(key, filter, settings, caseInsensitive);
         if (keyMatch) {
             paths.push(childPath);
         }
 
         // Recursively collect from value
-        collectAllMatchPaths(paths, childValue, filter, settings, isJson, childPath);
+        collectAllMatchPaths(
+            paths,
+            childValue,
+            filter,
+            settings,
+            isJson,
+            childPath,
+            caseInsensitive,
+        );
     }
     return paths;
 }
@@ -623,11 +643,20 @@ function collectListMatches(
     settings: UnipikaSettings,
     isJson: boolean,
     valuePath: string,
+    caseInsensitive?: boolean,
 ): Array<string> {
     const paths: Array<string> = [];
     for (let i = 0; i < listValue.length; i++) {
         const childPath = valuePath ? `${valuePath}/${i}` : String(i);
-        collectAllMatchPaths(paths, listValue[i], filter, settings, isJson, childPath);
+        collectAllMatchPaths(
+            paths,
+            listValue[i],
+            filter,
+            settings,
+            isJson,
+            childPath,
+            caseInsensitive,
+        );
     }
     return paths;
 }
@@ -642,13 +671,21 @@ function collectAllMatchPaths(
     settings: UnipikaSettings,
     isJson: boolean,
     currentPath = '',
+    caseInsensitive?: boolean,
 ): Array<string> {
     if (!filter) {
         return dstPaths;
     }
 
     // Check attributes
-    const attrMatches = collectAttributeMatches(value, filter, settings, isJson, currentPath);
+    const attrMatches = collectAttributeMatches(
+        value,
+        filter,
+        settings,
+        isJson,
+        currentPath,
+        caseInsensitive,
+    );
     if (attrMatches.length > 0) {
         dstPaths.push(...attrMatches);
     }
@@ -657,19 +694,33 @@ function collectAllMatchPaths(
     if (value.$type === 'map') {
         // Get value path with JSON $ prefix if needed for structures
         const valuePath = getJsonValuePath(value, isJson, currentPath);
-        const mapMatches = collectMapMatches(value.$value, filter, settings, isJson, valuePath);
+        const mapMatches = collectMapMatches(
+            value.$value,
+            filter,
+            settings,
+            isJson,
+            valuePath,
+            caseInsensitive,
+        );
         if (mapMatches.length > 0) {
             dstPaths.push(...mapMatches);
         }
     } else if (value.$type === 'list') {
         // Get value path with JSON $ prefix if needed for structures
         const valuePath = getJsonValuePath(value, isJson, currentPath);
-        const listMatches = collectListMatches(value.$value, filter, settings, isJson, valuePath);
+        const listMatches = collectListMatches(
+            value.$value,
+            filter,
+            settings,
+            isJson,
+            valuePath,
+            caseInsensitive,
+        );
         if (listMatches.length > 0) {
             dstPaths.push(...listMatches);
         }
     } else {
-        const valueMatch = rowSearchInfo(value, filter, settings);
+        const valueMatch = rowSearchInfo(value, filter, settings, caseInsensitive);
         const primitiveMatches = valueMatch && currentPath ? [currentPath] : [];
         if (primitiveMatches.length > 0) {
             dstPaths.push(...primitiveMatches);

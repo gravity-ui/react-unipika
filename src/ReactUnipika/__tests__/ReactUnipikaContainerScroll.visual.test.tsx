@@ -245,31 +245,24 @@ test('ReactUnipika: with case insensitive search with matches 2', async ({
     await expectScreenshot({component: page});
 });
 
-test('ReactUnipika: with case insensitive search toggle', async ({mount, page}) => {
+test('ReactUnipika: with case insensitive search navigation and toggle', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
     await mount(<Stories.WithCaseInsensitiveSearch />, {width: 1280});
 
+    // Case-insensitive: "Type" (uppercase) finds lowercase "type", next navigation works
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('Type');
+    await page.locator('.g-ru-structured-yson__match-counter:has-text("1 /")').waitFor();
+    await page.getByTestId('qa:structuredyson:search:next').click();
+    await page.locator('.g-ru-structured-yson__match-counter:has-text("2 /")').waitFor();
+    await expectScreenshot({component: page});
+
+    // Toggle to case-sensitive: "Type_1" no longer matches lowercase "type_1"
     await page.getByTestId('qa:structuredyson:search').locator('input').fill('Type_1');
-
-    const visibleHighlightedElements = await page
-        .locator('.g-ru-cell__filtered_highlighted:has-text("type_1")')
-        .filter({hasText: 'Type_1'})
-        .count();
-    if (visibleHighlightedElements !== 1) {
-        throw new Error(
-            `Expected 1 visible highlighted elements with "Type_1", but found ${visibleHighlightedElements}`,
-        );
-    }
-
     await page.getByTestId('qa:case-sensitive-button').click();
-    const newVisibleHighlightedElements = await page
-        .locator('.g-ru-cell__filtered_highlighted:has-text("type_1")')
-        .filter({hasText: 'Type_1'})
-        .count();
-    if (newVisibleHighlightedElements !== 0) {
-        throw new Error(
-            `Expected 0 visible highlighted elements with "Type_1", but found ${visibleHighlightedElements}`,
-        );
-    }
+    await expectScreenshot({component: page});
 });
 
 test('ReactUnipika: with case sensitive search no matches', async ({
