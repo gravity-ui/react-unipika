@@ -20,6 +20,11 @@
       "types": "./types/src/container-scroll.d.ts",
       "require": "./build/cjs/container-scroll.js",
       "import": "./build/esm/container-scroll.js"
+    },
+    "./configure": {
+      "types": "./types/src/configure.d.ts",
+      "require": "./build/cjs/configure.js",
+      "import": "./build/esm/configure.js"
     }
   },
   "files": [
