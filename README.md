@@ -7,7 +7,7 @@ The library uses [`@gravity-ui/unipika`](https://github.com/gravity-ui/unipika) 
 
 - virtualization
 - two scroll modes: window scroll and container scroll
-- collaps/expand objects/arrays
+- collapse/expand objects/arrays
 - search substring of key/value (case-sensitive and case-insensitive)
 - render one literal per line
   - long strings are truncated by ellipsis
@@ -64,7 +64,7 @@ function renderJson(data: any) {
 ## YSON notice
 
 The library does not support YSON-format "as is", i.e. it is impossible to use/parse YSON data.
-But it provides the way to render JSON-objects as YSON, such JSON-objects has reserver field names like `$attributes`, `$value`.
+But it provides the way to render JSON-objects as YSON, such JSON-objects has reserved field names like `$attributes`, `$value`.
 
 See more examples in [storybook](https://preview.yandexcloud.dev/react-unipika).
 
