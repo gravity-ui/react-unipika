@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.7.0](https://github.com/gravity-ui/react-unipika/compare/v0.6.0...v0.7.0) (2026-05-05)
+
+
+### Features
+
+* add case-sensitive search ([#20](https://github.com/gravity-ui/react-unipika/issues/20)) ([c15e5c6](https://github.com/gravity-ui/react-unipika/commit/c15e5c6962e22ff5c8c0b52bd768d156fa52d469))
+* add configure export ([#38](https://github.com/gravity-ui/react-unipika/issues/38)) ([1653f46](https://github.com/gravity-ui/react-unipika/commit/1653f46b229e35b598a8c954a413ce27cd051ea5))
+* first release ([b2ff3df](https://github.com/gravity-ui/react-unipika/commit/b2ff3dff9d590a24b139caf36d868c23f712a02f))
+* **ReactUnipika:** add renderToolbar property ([eb55175](https://github.com/gravity-ui/react-unipika/commit/eb55175c60ab060b7b414c2b0091df40e65102a6))
+* render custom error ([#27](https://github.com/gravity-ui/react-unipika/issues/27)) ([23519c9](https://github.com/gravity-ui/react-unipika/commit/23519c920db0028514b10fdd18e9b59d3061cf54))
+* search in collapsed nodes ([#23](https://github.com/gravity-ui/react-unipika/issues/23)) ([ffaccbe](https://github.com/gravity-ui/react-unipika/commit/ffaccbe5735f7875bfdbec9edf18320dc4de2259))
+* show container size ([#21](https://github.com/gravity-ui/react-unipika/issues/21)) ([705eb95](https://github.com/gravity-ui/react-unipika/commit/705eb958fe2ed2dd549f5972747e32cfa153195d))
+* **StructuredYson/Cell:** add configurable collapse indicators ([1106e05](https://github.com/gravity-ui/react-unipika/commit/1106e05c52a744cccad8dee1c7b574806b2c1aac))
+* support custom scroll container ([#30](https://github.com/gravity-ui/react-unipika/issues/30)) ([27e0583](https://github.com/gravity-ui/react-unipika/commit/27e0583f4c971d1fb11fc72ccf8fdf6879063a65))
+
+
+### Bug Fixes
+
+* case sensitive search ([#36](https://github.com/gravity-ui/react-unipika/issues/36)) ([8ad9360](https://github.com/gravity-ui/react-unipika/commit/8ad93600d68e2322f579a163dee20ba6b7829199))
+* pass all needed props to renderToolbar ([#26](https://github.com/gravity-ui/react-unipika/issues/26)) ([b0bbea4](https://github.com/gravity-ui/react-unipika/commit/b0bbea4f44ea82aa6a0086173b4c19e406907372))
+* recalc state if caseInsensitiveSearch changes ([#29](https://github.com/gravity-ui/react-unipika/issues/29)) ([d7fd3f3](https://github.com/gravity-ui/react-unipika/commit/d7fd3f3d35c30ee06014f92c06bc1fab7c970a7c))
+* **Talbe:** fix for scrolling with content above ([05a5951](https://github.com/gravity-ui/react-unipika/commit/05a5951d0a77e82d9328b07a854628c875303def))
+* types ([#33](https://github.com/gravity-ui/react-unipika/issues/33)) ([50bb58e](https://github.com/gravity-ui/react-unipika/commit/50bb58e481fa07382261e08bc790309ee5a13920))
+* types declaration path in package.json ([b7226a2](https://github.com/gravity-ui/react-unipika/commit/b7226a23d312efd77f02028532525619502bbbce))
+* types declaration path in package.json 2 ([fc2db5a](https://github.com/gravity-ui/react-unipika/commit/fc2db5af74d9e4c0fd0306afa6500e355f28acdc))
+
 ## [0.6.0](https://github.com/gravity-ui/react-unipika/compare/v0.5.2...v0.6.0) (2026-05-05)
 
 
