@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/gravity-ui/react-unipika/compare/v0.5.2...v0.6.0) (2026-05-05)
+
+
+### Features
+
+* add configure export ([#38](https://github.com/gravity-ui/react-unipika/issues/38)) ([1653f46](https://github.com/gravity-ui/react-unipika/commit/1653f46b229e35b598a8c954a413ce27cd051ea5))
+
 ## [0.5.2](https://github.com/gravity-ui/react-unipika/compare/v0.5.1...v0.5.2) (2026-03-17)
 
 
