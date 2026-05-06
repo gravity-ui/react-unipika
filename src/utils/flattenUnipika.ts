@@ -140,7 +140,7 @@ function flattenUnipikaJsonImpl(value: UnipikaValue, level = 0, ctx: FlatContext
     const itemPathIndex = isObjectLike(type) ? beforeAttrs - 1 : ctx.dst.length;
 
     const isCollapsed = isPathCollapsed(ctx);
-    const isContainerType = isValueContainenrType(value);
+    const isContainerType = isValueContainerType(value);
 
     let containerSize = 0;
 
@@ -269,7 +269,7 @@ function flattenUnipikaYsonImpl(value: UnipikaValue, level = 0, ctx: FlatContext
     let hasAttributes = false;
     let valueLevel = level;
 
-    const isContainerType = isValueContainenrType(value);
+    const isContainerType = isValueContainerType(value);
     let containerSize = 0;
 
     const isCollapsed = isPathCollapsed(ctx);
@@ -350,7 +350,7 @@ function popPath(ctx: FlatContext) {
     }
 }
 
-function isValueContainenrType(value: UnipikaValue) {
+function isValueContainerType(value: UnipikaValue) {
     return value.$type === 'map' || value.$type === 'list';
 }
 
