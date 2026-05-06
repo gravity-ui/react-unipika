@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/gravity-ui/react-unipika/compare/v0.6.0...v0.6.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* code and readme typos ([#42](https://github.com/gravity-ui/react-unipika/issues/42)) ([f404198](https://github.com/gravity-ui/react-unipika/commit/f404198c9aba6cb8df94f8a68aaae5477931f84f))
+
 ## [0.6.0](https://github.com/gravity-ui/react-unipika/compare/v0.5.2...v0.6.0) (2026-05-05)
 
 
