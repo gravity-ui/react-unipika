@@ -19,7 +19,7 @@ function convertValue(value: any, settings: UnipikaSettings): ConvertedValue {
     try {
         // TODO: fix me later
         // The call is required because unipika.format() applies default values to a passed settings inplace.
-        // We have to leave this call without it the behaviour will be broken.
+        // We have to leave this call. Without it the behaviour will be broken.
         if (settings.format === 'raw-json') {
             unipika.formatRaw(value, settings);
         } else {
