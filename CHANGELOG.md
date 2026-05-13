@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.3](https://github.com/gravity-ui/react-unipika/compare/v0.6.2...v0.6.3) (2026-05-13)
+
+
+### Bug Fixes
+
+* **StructuredYson/Cell:** styles priority ([#39](https://github.com/gravity-ui/react-unipika/issues/39)) ([0e68efe](https://github.com/gravity-ui/react-unipika/commit/0e68efe4023abc2a7697480bb56a1ec0faba78bb))
+
 ## [0.6.2](https://github.com/gravity-ui/react-unipika/compare/v0.6.1...v0.6.2) (2026-05-07)
 
 
