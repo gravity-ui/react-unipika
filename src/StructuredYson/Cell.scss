@@ -1,10 +1,18 @@
-.g-ru-cell {
-    position: relative;
+/*
+ * Increase selector specificity since the load order of styles from
+ * `@gravity-ui/unipika/styles/unipika.scss` cannot be guaranteed.
+ */
 
+.g-ru-cell.unipika {
     white-space: nowrap;
+
     * {
         white-space: nowrap;
     }
+}
+
+.g-ru-cell {
+    position: relative;
 
     &__key {
         color: var(--color-unipika-key);
@@ -15,15 +23,19 @@
             &_string {
                 color: var(--color-unipika-string);
             }
+
             &_boolean {
                 color: var(--color-unipika-bool);
             }
+
             &_null {
                 color: var(--color-unipika-null);
             }
+
             &_int64 {
                 color: var(--color-unipika-int);
             }
+
             &_double {
                 color: var(--color-unipika-float);
             }
