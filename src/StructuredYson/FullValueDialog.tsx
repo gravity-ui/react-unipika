@@ -1,7 +1,7 @@
 import React from 'react';
 import {Dialog, Flex} from '@gravity-ui/uikit';
 import {cn} from '../utils/classname';
-import {FilteredText} from './Cell';
+import {FilteredText} from './FilteredText';
 
 import './FullValueDialog.scss';
 

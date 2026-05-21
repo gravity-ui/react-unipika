@@ -3,11 +3,15 @@ import {useRowVirtualizer, useTable, useWindowRowVirtualizer} from '@gravity-ui/
 import type {ColumnDef, Row} from '@gravity-ui/table/tanstack';
 import {UnipikaFlattenTreeItem} from '../../utils/flattenUnipika';
 
-import {asModifier, Cell} from '../Cell';
+import {Cell} from '../Cell';
 import {cn} from '../../utils/classname';
 import {TableProps} from './types';
 
 export const block = cn('g-ru-table');
+
+function asModifier(path = '') {
+    return path.replace(/[^-\w\d]/g, '_');
+}
 
 export function rowClassName(row?: Row<UnipikaFlattenTreeItem>) {
     const {key} = row?.original ?? {};
