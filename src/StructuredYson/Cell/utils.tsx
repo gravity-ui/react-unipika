@@ -6,8 +6,8 @@ import unipika from '@gravity-ui/unipika/lib/unipika';
 
 import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
 
-import {UnipikaSettings} from '../types';
-import {UnipikaFlattenTreeItem} from '../../utils/flattenUnipika';
+import type {UnipikaSettings} from '../types';
+import type {UnipikaFlattenTreeItem} from '../../utils/flattenUnipika';
 
 import {ClickableText} from '../../ClickableText/ClickableText';
 

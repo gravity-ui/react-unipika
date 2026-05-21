@@ -3,8 +3,8 @@ import {Button, Icon} from '@gravity-ui/uikit';
 
 import {ChevronUp, ChevronRight} from '@gravity-ui/icons';
 
-import {CollapseIconType} from '../types';
-import {UnipikaFlattenTreeItem} from '../../utils/flattenUnipika';
+import type {CollapseIconType} from '../types';
+import type {UnipikaFlattenTreeItem} from '../../utils/flattenUnipika';
 
 import {block} from './utils';
 
@@ -30,7 +30,7 @@ export function ToggleCollapseButton(props: Props) {
     };
 
     return (
-        <span title={path} className={block('collapse')}>
+        <span title={path?.join('/')} className={block('collapse')}>
             <Button onClick={onToggle} view="flat-secondary" size={'s'}>
                 {renderCollapseIndicator()}
             </Button>

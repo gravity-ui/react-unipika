@@ -17,6 +17,7 @@ export const ReactUnipikaWindowScroll = withReactUnipikaBase<ReactUnipikaCommonP
             showContainerSize,
             initiallyCollapsed,
             caseInsensitiveSearch,
+            renderRowExtraTools,
         } = props;
 
         return (
@@ -31,6 +32,7 @@ export const ReactUnipikaWindowScroll = withReactUnipikaBase<ReactUnipikaCommonP
                 showContainerSize={showContainerSize}
                 initiallyCollapsed={initiallyCollapsed}
                 caseInsensitiveSearch={caseInsensitiveSearch}
+                renderRowExtraTools={renderRowExtraTools}
             />
         );
     },

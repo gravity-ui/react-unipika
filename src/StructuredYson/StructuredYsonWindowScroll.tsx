@@ -11,7 +11,7 @@ export class StructuredYsonWindowScroll extends StructuredYsonBase<StructuredYso
             settings,
             filter,
         } = this.state;
-        const {collapseIconType, showContainerSize} = this.props;
+        const {collapseIconType, showContainerSize, renderRowExtraTools} = this.props;
 
         return (
             <Table
@@ -25,6 +25,7 @@ export class StructuredYsonWindowScroll extends StructuredYsonBase<StructuredYso
                 scrollToRef={this.tableRef}
                 collapseIconType={collapseIconType}
                 showContainerSize={showContainerSize}
+                renderRowExtraTools={renderRowExtraTools}
             />
         );
     }

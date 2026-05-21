@@ -1,7 +1,11 @@
 import React from 'react';
 
-import {CollapseIconType, UnipikaSettings} from '../types';
-import {SearchInfo, UnipikaFlattenTreeItem} from '../../utils/flattenUnipika';
+import {CollapseIconType, RenderRowExtraTools, UnipikaSettings} from '../types';
+import {
+    SearchInfo,
+    UnipikaFlattenTreeItem,
+    UnipikaFlattenTreePath,
+} from '../../utils/flattenUnipika';
 
 import i18n from '../i18n';
 
@@ -20,12 +24,13 @@ type Props = {
     yson: boolean;
     settings: UnipikaSettings;
     collapsedState?: {readonly [key: string]: boolean};
-    onToggleCollapse: (path: string) => void;
+    onToggleCollapse: (path: UnipikaFlattenTreePath) => void;
     filter?: string;
     index: number;
     showFullText: (index: number) => void;
     collapseIconType?: CollapseIconType;
     showContainerSize?: boolean;
+    renderRowExtraTools?: RenderRowExtraTools;
 };
 
 const OFFSETS_BY_LEVEL: {[key: number]: React.ReactNode} = {};
@@ -43,19 +48,7 @@ function getLevelOffsetSpaces(level: number) {
 
 export function Cell(props: Props) {
     const {
-        row: {
-            level,
-            open,
-            close,
-            key,
-            value,
-            hasDelimiter,
-            path,
-            collapsed,
-            isAfterAttributes,
-            size,
-            hiddenMatches,
-        },
+        row,
         settings,
         yson,
         onToggleCollapse,
@@ -66,8 +59,23 @@ export function Cell(props: Props) {
         collapseIconType,
     } = props;
 
+    const {
+        level,
+        open,
+        close,
+        key,
+        value,
+        hasDelimiter,
+        path,
+        collapsable,
+        collapsed,
+        isAfterAttributes,
+        size,
+        hiddenMatches,
+    } = row;
+
     const handleToggleCollapse = React.useCallback(() => {
-        if (!path) {
+        if (!path?.length) {
             return;
         }
         onToggleCollapse(path);
@@ -77,10 +85,12 @@ export function Cell(props: Props) {
         showFullText(index);
     }, [showFullText, index]);
 
+    const rowExtraTools = props.renderRowExtraTools?.(row);
+
     return (
         <div className={block(null, 'unipika')}>
             {getLevelOffsetSpaces(level)}
-            {path && (
+            {collapsable && (
                 <ToggleCollapseButton
                     collapsed={collapsed}
                     path={path}
@@ -128,6 +138,7 @@ export function Cell(props: Props) {
                     ({i18n('context_matches-count', {count: hiddenMatches})})
                 </span>
             )}
+            {rowExtraTools && <span className={block('row-extra-tools')}>{rowExtraTools}</span>}
         </div>
     );
 }
