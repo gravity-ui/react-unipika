@@ -6,15 +6,18 @@ import unipika from '@gravity-ui/unipika/lib/unipika';
 
 import {ArrowUpRightFromSquare, ChevronUp, ChevronRight} from '@gravity-ui/icons';
 
-import {CollapseIconType, UnipikaSettings} from './types';
-import {BlockType, SearchInfo, UnipikaFlattenTreeItem} from '../utils/flattenUnipika';
+import {CollapseIconType, UnipikaSettings} from '../types';
+import {BlockType, SearchInfo, UnipikaFlattenTreeItem} from '../../utils/flattenUnipika';
 
-import {MultiHighlightedText, MultiHighlightedTextProps} from '../HighlightedText/HighlightedText';
-import {ClickableText} from '../ClickableText/ClickableText';
+import {
+    MultiHighlightedText,
+    MultiHighlightedTextProps,
+} from '../../HighlightedText/HighlightedText';
+import {ClickableText} from '../../ClickableText/ClickableText';
 
-import {cn} from '../utils/classname';
+import {cn} from '../../utils/classname';
 
-import i18n from './i18n';
+import i18n from '../i18n';
 
 import './Cell.scss';
 
