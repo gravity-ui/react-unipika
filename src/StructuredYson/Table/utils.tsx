@@ -42,8 +42,6 @@ export function useGetTable({
     collapseIconType,
     showContainerSize,
 }: Omit<TableProps, 'scrollToRef'>) {
-    const bodyRef = React.useRef<HTMLTableSectionElement>(null);
-
     const renderCell: ColumnDef<UnipikaFlattenTreeItem>['cell'] = ({row}) => {
         const {original, index} = row;
         return (
@@ -66,10 +64,5 @@ export function useGetTable({
         {accessorKey: '', cell: renderCell, id: 'content'},
     ];
 
-    const table = useTable({
-        columns,
-        data,
-    });
-
-    return {table, bodyRef};
+    return useTable({columns, data});
 }

@@ -10,7 +10,7 @@ export const Table: React.FC<TablePropsWithScrollContainer> = ({
     scrollContainerRef,
     ...props
 }) => {
-    const {table, bodyRef} = useGetTable(props);
+    const table = useGetTable(props);
 
     const rowVirtualizer = useRowVirtualizer({
         count: table.getRowModel().rows.length,
@@ -29,7 +29,6 @@ export const Table: React.FC<TablePropsWithScrollContainer> = ({
                 rowClassName={rowClassName}
                 cellClassName={block('cell')}
                 headerCellClassName={block('header-cell')}
-                bodyRef={bodyRef}
             />
         </div>
     );
