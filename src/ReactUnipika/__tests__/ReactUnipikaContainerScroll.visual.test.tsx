@@ -110,13 +110,13 @@ test('ReactUnipika: search in collapsed - collapsed tree with search', async ({
 
     // Wait for the first match to be automatically expanded and highlighted text to be visible
     await page
-        .locator('.g-ru-cell__filtered_highlighted:has-text("attr")')
+        .locator('.g-ru-filtered-text_highlighted:has-text("attr")')
         .first()
         .waitFor({state: 'visible'});
 
     // Verify that only one highlighted element with "attr" is visible on screen
     const visibleHighlightedElements = await page
-        .locator('.g-ru-cell__filtered_highlighted:has-text("attr")')
+        .locator('.g-ru-filtered-text_highlighted:has-text("attr")')
         .filter({hasText: 'attr'})
         .count();
     if (visibleHighlightedElements !== 1) {
@@ -153,13 +153,13 @@ test('ReactUnipika: search in collapsed - navigate forward', async ({
 
     // Wait for the second match to be visible
     await page
-        .locator('.g-ru-cell__filtered_highlighted:has-text("attr")')
+        .locator('.g-ru-filtered-text_highlighted:has-text("attr")')
         .nth(1)
         .waitFor({state: 'visible'});
 
     // Verify that exactly 2 highlighted elements with "attr" are visible on screen
     const visibleHighlightedElements = await page
-        .locator('.g-ru-cell__filtered_highlighted:has-text("attr")')
+        .locator('.g-ru-filtered-text_highlighted:has-text("attr")')
         .filter({hasText: 'attr'})
         .count();
     if (visibleHighlightedElements !== 2) {

@@ -4,7 +4,9 @@ import {MultiHighlightedText, MultiHighlightedTextProps} from '../HighlightedTex
 
 import {cn} from '../utils/classname';
 
-const block = cn('g-ru-cell');
+import './FilteredText.scss';
+
+const block = cn('g-ru-filtered-text');
 
 export function FilteredText({
     className,
@@ -13,8 +15,8 @@ export function FilteredText({
     return (
         <MultiHighlightedText
             {...props}
-            className={block('filtered', className)}
-            classNameHighlighted={block('filtered', {highlighted: true}, className)}
+            className={block(null, className)}
+            classNameHighlighted={block({highlighted: true}, className)}
         />
     );
 }
