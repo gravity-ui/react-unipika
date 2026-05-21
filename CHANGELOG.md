@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.4](https://github.com/gravity-ui/react-unipika/compare/v0.6.3...v0.6.4) (2026-05-21)
+
+
+### Bug Fixes
+
+* calculate scroll margin based on element position ([8c951aa](https://github.com/gravity-ui/react-unipika/commit/8c951aa7218be8cffcdfc837458ff98ce9eb18a9))
+
 ## [0.6.3](https://github.com/gravity-ui/react-unipika/compare/v0.6.2...v0.6.3) (2026-05-13)
 
 
