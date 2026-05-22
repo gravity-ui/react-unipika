@@ -5,6 +5,7 @@ import {ChevronUp, ChevronRight} from '@gravity-ui/icons';
 
 import type {CollapseIconType} from '../types';
 import type {UnipikaFlattenTreeItem} from '../../utils/flattenUnipika';
+import {nodePathToYPath} from '../../utils/nodePathToYPath';
 
 import {block} from './utils';
 
@@ -18,6 +19,8 @@ type Props = {
 export function ToggleCollapseButton(props: Props) {
     const {collapsed, onToggle, path, collapseIconType} = props;
 
+    const title = path ? nodePathToYPath(path) : undefined;
+
     // Function to render the appropriate collapse indicator based on type
     const renderCollapseIndicator = () => {
         switch (collapseIconType) {
@@ -30,7 +33,7 @@ export function ToggleCollapseButton(props: Props) {
     };
 
     return (
-        <span title={path?.join('/')} className={block('collapse')}>
+        <span title={title} className={block('collapse')}>
             <Button onClick={onToggle} view="flat-secondary" size={'s'}>
                 {renderCollapseIndicator()}
             </Button>
