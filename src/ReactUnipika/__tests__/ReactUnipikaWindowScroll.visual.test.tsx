@@ -307,3 +307,9 @@ test('ReactUnipika: with custom toolbar - collapse all', async ({
 
     await expectScreenshot({component: page});
 });
+
+test('ReactUnipika: with row extra tools', async ({mount, expectScreenshot, page}) => {
+    await mount(<Stories.WithRowExtraTools />, {width: 1280});
+
+    await expectScreenshot({component: page});
+});
