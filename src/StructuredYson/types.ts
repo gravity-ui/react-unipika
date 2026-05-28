@@ -1,3 +1,7 @@
+import type {ReactNode} from 'react';
+
+import type {UnipikaFlattenTreeJoinedPath, UnipikaFlattenTreeItem} from '../utils/flattenUnipika';
+
 export type UnipikaSettings = {
     nonBreakingIndent?: boolean;
     escapeWhitespace?: boolean;
@@ -25,7 +29,7 @@ export interface ToolbarProps {
     filter: string;
     matchIndex: number;
     matchedRows: Array<number>;
-    allMatchPaths: Array<string>;
+    allMatchPaths: Array<UnipikaFlattenTreeJoinedPath>;
     onExpandAll: () => void;
     onCollapseAll: () => void;
     onFilterChange: (filter: string) => void;
@@ -76,3 +80,7 @@ export type UnipikaPrimitive = UnipikaType<
     'null' | 'boolean' | 'number' | 'double' | 'int64',
     string | number | boolean | null
 >;
+
+export type RenderRowExtraToolsParams = Pick<UnipikaFlattenTreeItem, 'path' | 'value'>;
+
+export type RenderRowExtraTools = (params: RenderRowExtraToolsParams) => ReactNode;

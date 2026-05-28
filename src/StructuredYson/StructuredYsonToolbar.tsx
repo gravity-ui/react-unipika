@@ -5,6 +5,7 @@ import {ArrowDownToLine, ArrowUpToLine, ChevronDown, ChevronUp} from '@gravity-u
 
 import {Toolbar} from '../Toolbar/Toolbar';
 import {cn} from '../utils/classname';
+import type {UnipikaFlattenTreeJoinedPath} from '../utils/flattenUnipika';
 
 import i18n from './i18n';
 
@@ -17,7 +18,7 @@ interface StructuredYsonToolbarProps {
     filter: string;
     matchIndex: number;
     matchedRows: Array<number>;
-    allMatchPaths?: Array<string>;
+    allMatchPaths?: Array<UnipikaFlattenTreeJoinedPath>;
     extraTools?: React.ReactNode;
     onExpandAll: () => void;
     onCollapseAll: () => void;

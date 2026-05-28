@@ -1,5 +1,9 @@
 {
-  "$attributes": {"id": "attr_1_OmdOY", "type": "type_1", "timestamp": "2025-05-06T21:04:35.115Z"},
+  "$attributes": {
+    "id": "attr_1_OmdOY",
+    "type": "type_1",
+    "timestamp": "2025-05-06T21:04:35.115Z"
+  },
   "$value": {
     "level2_item0": {
       "$attributes": {

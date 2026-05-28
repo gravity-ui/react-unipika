@@ -18,6 +18,7 @@ export const ReactUnipikaContainerScroll = withReactUnipikaBase<ReactUnipikaWith
             initiallyCollapsed,
             caseInsensitiveSearch,
             scrollContainerRef,
+            renderRowExtraTools,
         } = props;
 
         return (
@@ -33,6 +34,7 @@ export const ReactUnipikaContainerScroll = withReactUnipikaBase<ReactUnipikaWith
                 initiallyCollapsed={initiallyCollapsed}
                 caseInsensitiveSearch={caseInsensitiveSearch}
                 scrollContainerRef={scrollContainerRef}
+                renderRowExtraTools={renderRowExtraTools}
             />
         );
     },

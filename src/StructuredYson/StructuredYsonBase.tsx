@@ -7,16 +7,12 @@ import reduce_ from 'lodash/reduce';
 import unipika from '@gravity-ui/unipika/lib/unipika';
 
 import {
-    CollapseIconType,
-    ToolbarProps,
-    UnipikaSettings,
-    UnipikaValue,
-} from '../StructuredYson/types';
-import {
     CollapsedState,
     FlattenUnipikaResult,
     SearchInfo,
     UnipikaFlattenTreeItem,
+    UnipikaFlattenTreeJoinedPath,
+    UnipikaFlattenTreePath,
     flattenUnipika,
 } from '../utils/flattenUnipika';
 
@@ -26,6 +22,14 @@ import {FullValueDialog} from './FullValueDialog';
 import {TableProps} from './Table/types';
 
 import {cn} from '../utils/classname';
+import {getFlattenTreeJoinedPath} from '../utils/getFlattenTreeJoinedPath';
+import {
+    CollapseIconType,
+    ToolbarProps,
+    UnipikaSettings,
+    UnipikaValue,
+    RenderRowExtraTools,
+} from './types';
 
 import './StructuredYson.scss';
 
@@ -42,6 +46,7 @@ export interface StructuredYsonBaseProps {
     showContainerSize?: boolean;
     initiallyCollapsed?: boolean;
     caseInsensitiveSearch?: boolean;
+    renderRowExtraTools?: RenderRowExtraTools;
 }
 
 interface State {
@@ -54,7 +59,7 @@ interface State {
     filter: string;
     matchIndex: number;
     matchedRows: Array<number>;
-    allMatchPaths: Array<string>;
+    allMatchPaths: Array<UnipikaFlattenTreeJoinedPath>;
     fullValue?: {
         value: UnipikaFlattenTreeItem['value'];
         searchInfo?: SearchInfo;
@@ -81,8 +86,8 @@ function calculateState(
     if (allMatchPaths.length > 0) {
         // Count matches that are inside or at collapsed nodes
         flattenResult.data.forEach((item) => {
-            if (item.collapsed && item.path) {
-                const itemPath = item.path;
+            if (item.collapsed && item.path?.length) {
+                const itemPath = getFlattenTreeJoinedPath(item.path);
                 const count = allMatchPaths.filter((matchPath) => {
                     const sameStart = matchPath.startsWith(itemPath);
                     if (!sameStart) {
@@ -180,13 +185,15 @@ export abstract class StructuredYsonBase<
         };
     }
 
-    onTogglePathCollapse = (path: string) => {
+    onTogglePathCollapse = (path: UnipikaFlattenTreePath) => {
         const {collapsedState: oldState} = this.state;
         const collapsedState = {...oldState};
-        if (collapsedState[path]) {
-            delete collapsedState[path];
+        const key = getFlattenTreeJoinedPath(path);
+
+        if (collapsedState[key]) {
+            delete collapsedState[key];
         } else {
-            collapsedState[path] = true;
+            collapsedState[key] = true;
         }
 
         this.updateState({collapsedState});
@@ -234,7 +241,10 @@ export abstract class StructuredYsonBase<
         });
     };
 
-    findCollapsedParent = (matchPath: string, collapsedState: CollapsedState): string | null => {
+    findCollapsedParent = (
+        matchPath: UnipikaFlattenTreeJoinedPath,
+        collapsedState: CollapsedState,
+    ): UnipikaFlattenTreeJoinedPath | null => {
         let nextSlash = 0;
         while ((nextSlash = matchPath.indexOf('/', nextSlash)) !== -1) {
             const checkPath = matchPath.slice(0, nextSlash);
@@ -252,7 +262,7 @@ export abstract class StructuredYsonBase<
 
     navigateToMatch = (
         targetIndex: number,
-        allMatchPaths: Array<string>,
+        allMatchPaths: Array<UnipikaFlattenTreeJoinedPath>,
         matchedRows: Array<number>,
         collapsedState: CollapsedState,
     ) => {
@@ -443,9 +453,9 @@ export abstract class StructuredYsonBase<
         const {data} = flattenUnipika(value, {isJson});
         return reduce_<UnipikaFlattenTreeItem, CollapsedState>(
             data,
-            (acc, {path}) => {
-                if (path) {
-                    acc[path] = true;
+            (acc, {path, collapsable}) => {
+                if (collapsable && path?.length) {
+                    acc[getFlattenTreeJoinedPath(path)] = true;
                 }
                 return acc;
             },

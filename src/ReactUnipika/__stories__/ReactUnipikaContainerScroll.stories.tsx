@@ -7,6 +7,7 @@ import {ReactUnipika, ReactUnipikaProps} from '../../container-scroll';
 
 import data from './data.json';
 import {CustomToolbarExample} from './CustomToolbarExample';
+import {renderRowExtraToolsExample} from './renderRowExtraToolsExample';
 
 function WithScrollContainerComponent(props: Omit<ReactUnipikaProps, 'scrollContainerRef'>) {
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
@@ -134,5 +135,12 @@ export const WithCustomToolbar: StoryObj<ReactUnipikaProps> = {
     args: {
         value: data,
         renderToolbar: CustomToolbarExample,
+    },
+};
+
+export const WithRowExtraTools: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        renderRowExtraTools: renderRowExtraToolsExample,
     },
 };

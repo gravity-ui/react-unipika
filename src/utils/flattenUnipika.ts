@@ -8,10 +8,44 @@ import {
     UnipikaValue,
 } from '../StructuredYson/types';
 
+import pickBy_ from 'lodash/pickBy';
+
 // @ts-ignore
 import unipika from '@gravity-ui/unipika/lib/unipika';
+import {getFlattenTreeJoinedPath} from './getFlattenTreeJoinedPath';
 
 export type BlockType = 'object' | 'array' | 'attributes' | 'attributes-value';
+
+/**
+ * Internal markup for locating a node inside the flattened tree.
+ *
+ * NOT a ypath — this is an in-memory addressing scheme used to drive
+ * collapse state, search navigation, and item identity.
+ * Use `nodePathToYpath` util for conversion to a real ypath.
+ *
+ * Segment kinds:
+ * - `'foo'` — map key
+ * - `'0'`, `'1'`, … — list index (as strings)
+ * - `'@'` — entering the `$attributes` container of the current node.
+ *   When it is the last segment, it means the attributes container itself
+ * - `'$'` — entering the `$value` of a node that has attributes
+ *
+ * Examples:
+ * - `[]` — root node
+ * - `['foo', '0', 'bar']` — `foo[0].bar` node
+ * - `['@']` — all attributes of the root node
+ * - `['@', 'foo']` — attribute `foo` of the root node
+ * - `['@', 'foo', 'bar']` — `bar` field inside attribute `foo`
+ * - `['$', 'foo']` — field `foo` of the root value, when the root has attributes
+ * - `['foo', '0', '@']` — all attributes of `foo[0]` node
+ * - `['foo', '0', '@', 'bar']` — attribute `bar` of `foo[0]` node
+ */
+export type UnipikaFlattenTreePath = Array<string>;
+
+/**
+ * Joined form of `UnipikaFlattenTreePath` — segments concatenated with `/`.
+ */
+export type UnipikaFlattenTreeJoinedPath = string;
 
 export interface UnipikaFlattenTreeItem {
     level: number;
@@ -19,7 +53,7 @@ export interface UnipikaFlattenTreeItem {
     close?: BlockType;
     size?: number;
 
-    path?: string; // if present the block is collapsible/expandable
+    path?: UnipikaFlattenTreePath;
 
     /**
      * Should not be used to render $attributes and $value keys cause such keys require specific visualization
@@ -40,6 +74,8 @@ export interface UnipikaFlattenTreeItem {
      * We don't need isAttributes cause we can check blockType === 'attributes'
      */
     //isAttributes?: boolean // to determine is it required to write '"$value": ' for JSON view
+
+    collapsable?: boolean; // if true the block is collapsible/expandable
 
     collapsed?: boolean;
 
@@ -63,7 +99,7 @@ interface FlattenUnipikaOptions {
 export interface FlattenUnipikaResult {
     data: UnipikaFlattenTree;
     searchIndex: {[index: number]: SearchInfo};
-    allMatchPaths?: Array<string>;
+    allMatchPaths?: Array<UnipikaFlattenTreeJoinedPath>;
 }
 
 export function flattenUnipika(
@@ -78,7 +114,6 @@ export function flattenUnipika(
         isJson: Boolean(options?.isJson),
         collapsedState,
         matchedPath: '',
-        collapsedPath: '',
     };
     flattenUnipikaImpl(value, 0, ctx);
     const searchIndex = makeSearchIndex(ctx.dst, options?.filter, {
@@ -87,7 +122,7 @@ export function flattenUnipika(
     });
 
     // Collect all match paths
-    let allMatchPaths: Array<string> | undefined;
+    let allMatchPaths: Array<UnipikaFlattenTreeJoinedPath> | undefined;
     if (options?.filter && options?.settings) {
         allMatchPaths = [];
         collectAllMatchPaths(
@@ -101,7 +136,7 @@ export function flattenUnipika(
         );
     }
 
-    return {data: ctx.dst, searchIndex, allMatchPaths};
+    return compactObj({data: ctx.dst, searchIndex, allMatchPaths});
 }
 
 interface LevelInfo {
@@ -116,11 +151,14 @@ interface FlatContext {
 
     dst: UnipikaFlattenTree;
     levels: Array<LevelInfo>;
-    path: Array<string>;
-    collapsedPath: string;
+    path: UnipikaFlattenTreePath;
 }
 
-export type CollapsedState = {[path: string]: boolean};
+export type CollapsedState = {[path: UnipikaFlattenTreeJoinedPath]: boolean};
+
+function compactObj<T extends object>(obj: T): T {
+    return pickBy_(obj, (value) => value !== undefined) as T;
+}
 
 function isObjectLike(type: BlockType) {
     return type === 'object' || type === 'attributes-value' || type === 'attributes';
@@ -334,20 +372,16 @@ function handleCollapsedBlock(type: BlockType, level: number, ctx: FlatContext, 
 }
 
 function handlePath(ctx: FlatContext, index: number) {
-    if (ctx.collapsedPath.length) {
-        ctx.dst[index].path = ctx.collapsedPath;
+    if (ctx.path.length) {
+        ctx.dst[index].collapsable = true;
     }
 }
 
 function pushPath(path: string, ctx: FlatContext) {
     ctx.path.push(path);
-    ctx.collapsedPath = ctx.collapsedPath.length ? ctx.collapsedPath + '/' + path : path;
 }
 function popPath(ctx: FlatContext) {
-    const last = ctx.path.pop();
-    if (last !== undefined) {
-        ctx.collapsedPath = ctx.collapsedPath.substr(0, ctx.collapsedPath.length - last.length - 1);
-    }
+    ctx.path.pop();
 }
 
 function isValueContainerType(value: UnipikaValue) {
@@ -355,7 +389,9 @@ function isValueContainerType(value: UnipikaValue) {
 }
 
 function isPathCollapsed(ctx: FlatContext) {
-    return Boolean(ctx.collapsedState[ctx.collapsedPath]);
+    const path = getFlattenTreeJoinedPath(ctx.path);
+
+    return Boolean(ctx.collapsedState[path]);
 }
 
 function openBlock(type: BlockType, level: number, ctx: FlatContext, length: number): LevelInfo {
@@ -368,7 +404,7 @@ function openBlock(type: BlockType, level: number, ctx: FlatContext, length: num
             last.size = length;
         }
     } else {
-        const item: UnipikaFlattenTreeItem = {level, open: type};
+        const item: UnipikaFlattenTreeItem = {level, open: type, path: [...ctx.path]};
         if (length > 0) {
             item.size = length;
         }
@@ -396,6 +432,7 @@ function closeBlock(type: BlockType, level: number, ctx: FlatContext) {
         : {
               level,
               close: type,
+              path: [...ctx.path],
           };
 
     const isAttributesBlock = type === 'attributes';
@@ -420,7 +457,7 @@ function handleElement(value: UnipikaFlattenTreeItem, ctx: FlatContext) {
     if (lastAsKey && !lastAsKey.open) {
         Object.assign(lastAsKey, value, {level: lastAsKey.level});
     } else {
-        ctx.dst.push(value);
+        ctx.dst.push({...value, path: [...ctx.path]});
     }
 
     const last = ctx.dst[ctx.dst.length - 1];
@@ -448,7 +485,11 @@ function handleUnipikaMapImpl(
 ) {
     for (let i = 0; i < items.length; ++i) {
         const [key, value] = items[i];
-        const keyItem: UnipikaFlattenTreeItem = {key, level: level};
+        const keyItem: UnipikaFlattenTreeItem = {
+            key,
+            level,
+            path: [...ctx.path, key.$value],
+        };
         ctx.dst.push(keyItem);
         pushPath(key.$value, ctx);
         flattenUnipikaImpl(value, level, ctx);
@@ -563,10 +604,10 @@ function collectAttributeMatches(
     filter: string,
     settings: UnipikaSettings,
     isJson: boolean,
-    currentPath: string,
+    currentPath: UnipikaFlattenTreeJoinedPath,
     caseInsensitive?: boolean,
-): Array<string> {
-    const paths: Array<string> = [];
+): Array<UnipikaFlattenTreeJoinedPath> {
+    const paths: Array<UnipikaFlattenTreeJoinedPath> = [];
     if (value.$attributes && value.$attributes.length > 0) {
         for (const [_key, attrValue] of value.$attributes) {
             const attrPath = currentPath ? `${currentPath}/@` : '@';
@@ -587,7 +628,11 @@ function collectAttributeMatches(
 /**
  * Get value path with JSON $ prefix if needed
  */
-function getJsonValuePath(value: UnipikaValue, isJson: boolean, currentPath: string): string {
+function getJsonValuePath(
+    value: UnipikaValue,
+    isJson: boolean,
+    currentPath: UnipikaFlattenTreeJoinedPath,
+): UnipikaFlattenTreeJoinedPath {
     if (
         isJson &&
         value.$attributes &&
@@ -607,10 +652,10 @@ function collectMapMatches(
     filter: string,
     settings: UnipikaSettings,
     isJson: boolean,
-    valuePath: string,
+    valuePath: UnipikaFlattenTreeJoinedPath,
     caseInsensitive?: boolean,
-): Array<string> {
-    const paths: Array<string> = [];
+): Array<UnipikaFlattenTreeJoinedPath> {
+    const paths: Array<UnipikaFlattenTreeJoinedPath> = [];
     for (const [key, childValue] of mapValue) {
         const childPath = valuePath ? `${valuePath}/${key.$value}` : key.$value;
 
@@ -642,10 +687,10 @@ function collectListMatches(
     filter: string,
     settings: UnipikaSettings,
     isJson: boolean,
-    valuePath: string,
+    valuePath: UnipikaFlattenTreeJoinedPath,
     caseInsensitive?: boolean,
-): Array<string> {
-    const paths: Array<string> = [];
+): Array<UnipikaFlattenTreeJoinedPath> {
+    const paths: Array<UnipikaFlattenTreeJoinedPath> = [];
     for (let i = 0; i < listValue.length; i++) {
         const childPath = valuePath ? `${valuePath}/${i}` : String(i);
         collectAllMatchPaths(
@@ -665,14 +710,14 @@ function collectListMatches(
  * Collect all paths that contain search matches (including in collapsed nodes)
  */
 function collectAllMatchPaths(
-    dstPaths: Array<string>,
+    dstPaths: Array<UnipikaFlattenTreeJoinedPath>,
     value: UnipikaValue,
     filter: string,
     settings: UnipikaSettings,
     isJson: boolean,
-    currentPath = '',
+    currentPath: UnipikaFlattenTreeJoinedPath = '',
     caseInsensitive?: boolean,
-): Array<string> {
+): Array<UnipikaFlattenTreeJoinedPath> {
     if (!filter) {
         return dstPaths;
     }

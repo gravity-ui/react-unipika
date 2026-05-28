@@ -11,9 +11,10 @@ describe('flattenUnipika', () => {
                     {
                         level: 0,
                         value: {$value: null, $type: 'null'},
+                        path: [],
                     },
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -24,9 +25,10 @@ describe('flattenUnipika', () => {
                     {
                         level: 0,
                         value: {$type: 'number', $value: 123},
+                        path: [],
                     },
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -37,9 +39,10 @@ describe('flattenUnipika', () => {
                     {
                         level: 0,
                         value: {$value: 'hello', $type: 'string'},
+                        path: [],
                     },
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -50,9 +53,10 @@ describe('flattenUnipika', () => {
                     {
                         level: 0,
                         value: {$value: true, $type: 'boolean'},
+                        path: [],
                     },
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -60,21 +64,23 @@ describe('flattenUnipika', () => {
             it('list', () => {
                 const converted = unipika.converters.raw([1, 2, 'three']);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 3},
+                    {level: 0, open: 'array', size: 3, path: []},
                     {
                         level: 1,
                         value: {$type: 'number', $value: 1},
                         hasDelimiter: true,
+                        path: ['0'],
                     },
                     {
                         level: 1,
                         value: {$type: 'number', $value: 2},
                         hasDelimiter: true,
+                        path: ['1'],
                     },
-                    {level: 1, value: {$type: 'string', $value: 'three'}},
-                    {level: 0, close: 'array'},
+                    {level: 1, value: {$type: 'string', $value: 'three'}, path: ['2']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -86,27 +92,30 @@ describe('flattenUnipika', () => {
                     c: 'C',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object', size: 3},
+                    {level: 0, open: 'object', size: 3, path: []},
                     {
                         level: 1,
                         key: {$key: true, $value: 'a', $type: 'string'},
                         value: {$value: 'A', $type: 'string'},
                         hasDelimiter: true,
+                        path: ['a'],
                     },
                     {
                         level: 1,
                         key: {$key: true, $value: 'b', $type: 'string'},
                         value: {$value: 'B', $type: 'string'},
                         hasDelimiter: true,
+                        path: ['b'],
                     },
                     {
                         level: 1,
                         key: {$key: true, $value: 'c', $type: 'string'},
                         value: {$value: 'C', $type: 'string'},
+                        path: ['c'],
                     },
-                    {level: 0, close: 'object'},
+                    {level: 0, close: 'object', path: []},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -120,37 +129,41 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 2},
+                    {level: 0, open: 'array', size: 2, path: []},
                     {
                         level: 1,
                         value: {$type: 'string', $value: 'a'},
                         hasDelimiter: true,
+                        path: ['0'],
                     },
-                    {level: 1, open: 'object', path: '1', size: 2},
+                    {level: 1, open: 'object', path: ['1'], size: 2, collapsable: true},
                     {
                         level: 2,
                         key: {$key: true, $value: 'b', $type: 'string'},
                         value: {$type: 'string', $value: 'B'},
                         hasDelimiter: true,
+                        path: ['1', 'b'],
                     },
                     {
                         level: 2,
                         key: {$key: true, $value: 'c', $type: 'string'},
                         open: 'array',
-                        path: '1/c',
+                        path: ['1', 'c'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 3,
                         value: {$type: 'number', $value: 1},
                         hasDelimiter: true,
+                        path: ['1', 'c', '0'],
                     },
-                    {level: 3, value: {$type: 'number', $value: 2}},
-                    {level: 2, close: 'array'},
-                    {level: 1, close: 'object'},
-                    {level: 0, close: 'array'},
+                    {level: 3, value: {$type: 'number', $value: 2}, path: ['1', 'c', '1']},
+                    {level: 2, close: 'array', path: ['1', 'c']},
+                    {level: 1, close: 'object', path: ['1']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -158,32 +171,35 @@ describe('flattenUnipika', () => {
             it('list -> list -> list', () => {
                 const converted = unipika.converters.raw([1, [2, [3, 4], 5], 6]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 3},
+                    {level: 0, open: 'array', size: 3, path: []},
                     {
                         level: 1,
                         value: makeRawValue(1, 'number'),
                         hasDelimiter: true,
+                        path: ['0'],
                     },
-                    {level: 1, open: 'array', path: '1', size: 3},
+                    {level: 1, open: 'array', path: ['1'], size: 3, collapsable: true},
                     {
                         level: 2,
                         value: makeRawValue(2, 'number'),
                         hasDelimiter: true,
+                        path: ['1', '0'],
                     },
-                    {level: 2, open: 'array', path: '1/1', size: 2},
+                    {level: 2, open: 'array', path: ['1', '1'], size: 2, collapsable: true},
                     {
                         level: 3,
                         value: makeRawValue(3, 'number'),
                         hasDelimiter: true,
+                        path: ['1', '1', '0'],
                     },
-                    {level: 3, value: makeRawValue(4, 'number')},
-                    {level: 2, close: 'array', hasDelimiter: true},
-                    {level: 2, value: makeRawValue(5, 'number')},
-                    {level: 1, close: 'array', hasDelimiter: true},
-                    {level: 1, value: makeRawValue(6, 'number')},
-                    {level: 0, close: 'array'},
+                    {level: 3, value: makeRawValue(4, 'number'), path: ['1', '1', '1']},
+                    {level: 2, close: 'array', hasDelimiter: true, path: ['1', '1']},
+                    {level: 2, value: makeRawValue(5, 'number'), path: ['1', '2']},
+                    {level: 1, close: 'array', hasDelimiter: true, path: ['1']},
+                    {level: 1, value: makeRawValue(6, 'number'), path: ['2']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -201,36 +217,47 @@ describe('flattenUnipika', () => {
                     g: 'G',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object', size: 3},
+                    {level: 0, open: 'object', size: 3, path: []},
                     {
                         level: 1,
                         key: makeKey('a'),
                         value: makeValue('A', 'string'),
                         hasDelimiter: true,
+                        path: ['a'],
                     },
-                    {level: 1, key: makeKey('b'), open: 'array', path: 'b', size: 3},
+                    {
+                        level: 1,
+                        key: makeKey('b'),
+                        open: 'array',
+                        path: ['b'],
+                        size: 3,
+                        collapsable: true,
+                    },
                     {
                         level: 2,
                         value: makeValue('C', 'string'),
                         hasDelimiter: true,
+                        path: ['b', '0'],
                     },
-                    {level: 2, open: 'object', path: 'b/1', size: 1},
+                    {level: 2, open: 'object', path: ['b', '1'], size: 1, collapsable: true},
                     {
                         level: 3,
                         key: makeKey('e'),
                         value: makeValue('E', 'string'),
+                        path: ['b', '1', 'e'],
                     },
-                    {level: 2, close: 'object', hasDelimiter: true},
-                    {level: 2, value: makeValue('F', 'string')},
-                    {level: 1, close: 'array', hasDelimiter: true},
+                    {level: 2, close: 'object', hasDelimiter: true, path: ['b', '1']},
+                    {level: 2, value: makeValue('F', 'string'), path: ['b', '2']},
+                    {level: 1, close: 'array', hasDelimiter: true, path: ['b']},
                     {
                         level: 1,
                         key: makeKey('g'),
                         value: makeValue('G', 'string'),
+                        path: ['g'],
                     },
-                    {level: 0, close: 'object'},
+                    {level: 0, close: 'object', path: []},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -248,53 +275,60 @@ describe('flattenUnipika', () => {
                     g: 'G',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object', size: 3},
+                    {level: 0, open: 'object', size: 3, path: []},
                     {
                         level: 1,
                         key: makeRawKey('a'),
                         value: makeRawValue('A', 'string'),
                         hasDelimiter: true,
+                        path: ['a'],
                     },
                     {
                         level: 1,
                         key: makeRawKey('b'),
                         open: 'object',
-                        path: 'b',
+                        path: ['b'],
                         size: 3,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         key: makeRawKey('c'),
                         value: makeRawValue('C', 'string'),
                         hasDelimiter: true,
+                        path: ['b', 'c'],
                     },
                     {
                         level: 2,
                         key: makeRawKey('d'),
                         open: 'object',
-                        path: 'b/d',
+                        path: ['b', 'd'],
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 3,
                         key: makeRawKey('e'),
                         value: makeRawValue('E', 'string'),
+                        path: ['b', 'd', 'e'],
                     },
-                    {level: 2, close: 'object', hasDelimiter: true},
+                    {level: 2, close: 'object', hasDelimiter: true, path: ['b', 'd']},
                     {
                         level: 2,
                         key: makeRawKey('f'),
                         value: makeRawValue('F', 'string'),
+                        path: ['b', 'f'],
                     },
-                    {level: 1, close: 'object', hasDelimiter: true},
+                    {level: 1, close: 'object', hasDelimiter: true, path: ['b']},
                     {
                         level: 1,
                         key: makeRawKey('g'),
                         value: makeRawValue('G', 'string'),
+                        path: ['g'],
                     },
-                    {level: 0, close: 'object'},
+                    {level: 0, close: 'object', path: []},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -308,20 +342,22 @@ describe('flattenUnipika', () => {
                     $attributes: {a: 'A'},
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 1, open: 'attributes', path: '@', size: 1},
+                    {level: 1, open: 'attributes', path: ['@'], size: 1, collapsable: true},
                     {
                         level: 2,
                         key: makeKey('a'),
                         value: makeValue('A', 'string'),
+                        path: ['@', 'a'],
                     },
-                    {level: 1, close: 'attributes'},
+                    {level: 1, close: 'attributes', path: ['@']},
                     {
                         level: 1,
                         value: makeValue(null, 'null'),
                         isAfterAttributes: true,
+                        path: [],
                     },
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -343,56 +379,84 @@ describe('flattenUnipika', () => {
                     $value: 123,
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 1, open: 'attributes', path: '@', size: 2},
-                    {level: 2, key: makeKey('schema'), path: '@/schema', size: 2},
-                    {level: 3, open: 'attributes', path: '@/schema/@', size: 2},
+                    {level: 1, open: 'attributes', path: ['@'], size: 2, collapsable: true},
+                    {
+                        level: 2,
+                        key: makeKey('schema'),
+                        path: ['@', 'schema'],
+                        size: 2,
+                        collapsable: true,
+                    },
+                    {
+                        level: 3,
+                        open: 'attributes',
+                        path: ['@', 'schema', '@'],
+                        size: 2,
+                        collapsable: true,
+                    },
                     {
                         level: 4,
                         open: 'array',
                         key: makeKey('columns'),
-                        path: '@/schema/@/columns',
+                        path: ['@', 'schema', '@', 'columns'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 5,
                         value: makeValue('a', 'string'),
                         hasDelimiter: true,
+                        path: ['@', 'schema', '@', 'columns', '0'],
                     },
-                    {level: 5, value: makeValue('b', 'string')},
-                    {level: 4, close: 'array', hasDelimiter: true},
+                    {
+                        level: 5,
+                        value: makeValue('b', 'string'),
+                        path: ['@', 'schema', '@', 'columns', '1'],
+                    },
+                    {
+                        level: 4,
+                        close: 'array',
+                        hasDelimiter: true,
+                        path: ['@', 'schema', '@', 'columns'],
+                    },
                     {
                         level: 4,
                         key: makeKey('writeable'),
                         value: makeValue(false, 'boolean'),
+                        path: ['@', 'schema', '@', 'writeable'],
                     },
-                    {level: 3, close: 'attributes'},
+                    {level: 3, close: 'attributes', path: ['@', 'schema', '@']},
                     {
                         level: 3,
                         open: 'array',
                         isAfterAttributes: true,
-                        path: '@/schema/$',
+                        path: ['@', 'schema', '$'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 4,
                         value: makeValue(1, 'number'),
                         hasDelimiter: true,
+                        path: ['@', 'schema', '$', '0'],
                     },
-                    {level: 4, value: makeValue(2, 'number')},
-                    {level: 3, close: 'array', hasDelimiter: true},
+                    {level: 4, value: makeValue(2, 'number'), path: ['@', 'schema', '$', '1']},
+                    {level: 3, close: 'array', hasDelimiter: true, path: ['@', 'schema', '$']},
                     {
                         level: 2,
                         key: makeKey('rowCount'),
                         value: makeValue(22, 'number'),
+                        path: ['@', 'rowCount'],
                     },
-                    {level: 1, close: 'attributes'},
+                    {level: 1, close: 'attributes', path: ['@']},
                     {
                         level: 1,
                         value: makeValue(123, 'number'),
                         isAfterAttributes: true,
+                        path: [],
                     },
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -410,52 +474,70 @@ describe('flattenUnipika', () => {
                 });
 
                 const expected: UnipikaFlattenTree = [
-                    {level: 1, open: 'attributes', path: '@', size: 2},
+                    {level: 1, open: 'attributes', path: ['@'], size: 2, collapsable: true},
                     {
                         level: 2,
                         key: makeKey('attr1'),
                         value: makeValue('Attr1', 'string'),
+                        path: ['@', 'attr1'],
                     },
-                    {level: 1, close: 'attributes'},
+                    {level: 1, close: 'attributes', path: ['@']},
                     {
                         level: 1,
                         open: 'array',
                         isAfterAttributes: true,
-                        path: '$',
+                        path: ['$'],
                         size: 2,
+                        collapsable: true,
                     },
-                    {level: 2, open: 'attributes', path: '$/0/@', size: 2},
+                    {
+                        level: 2,
+                        open: 'attributes',
+                        path: ['$', '0', '@'],
+                        size: 2,
+                        collapsable: true,
+                    },
                     {
                         level: 3,
                         key: makeKey('attr2'),
                         value: makeValue('Attr2', 'string'),
+                        path: ['$', '0', '@', 'attr2'],
                     },
-                    {level: 2, close: 'attributes'},
+                    {level: 2, close: 'attributes', path: ['$', '0', '@']},
                     {
                         level: 2,
                         open: 'array',
                         isAfterAttributes: true,
-                        path: '$/0/$',
+                        path: ['$', '0', '$'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 3,
                         value: makeValue('test', 'string'),
                         hasDelimiter: true,
+                        path: ['$', '0', '$', '0'],
                     },
-                    {level: 3, open: 'array', path: '$/0/$/1', size: 2},
+                    {
+                        level: 3,
+                        open: 'array',
+                        path: ['$', '0', '$', '1'],
+                        size: 2,
+                        collapsable: true,
+                    },
                     {
                         level: 4,
                         value: makeValue('result', 'string'),
                         hasDelimiter: true,
+                        path: ['$', '0', '$', '1', '0'],
                     },
-                    {level: 4, value: makeValue(42, 'number')},
-                    {level: 3, close: 'array'},
-                    {level: 2, close: 'array', hasDelimiter: true},
-                    {level: 2, value: makeValue('foo', 'string')},
-                    {level: 1, close: 'array'},
+                    {level: 4, value: makeValue(42, 'number'), path: ['$', '0', '$', '1', '1']},
+                    {level: 3, close: 'array', path: ['$', '0', '$', '1']},
+                    {level: 2, close: 'array', hasDelimiter: true, path: ['$', '0', '$']},
+                    {level: 2, value: makeValue('foo', 'string'), path: ['$', '1']},
+                    {level: 1, close: 'array', path: ['$']},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -468,23 +550,25 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object', size: 1},
-                    {level: 1, key: makeKey('a'), path: 'a'},
-                    {level: 2, open: 'attributes', path: 'a/@', size: 1},
+                    {level: 0, open: 'object', size: 1, path: []},
+                    {level: 1, key: makeKey('a'), path: ['a'], collapsable: true},
+                    {level: 2, open: 'attributes', path: ['a', '@'], size: 1, collapsable: true},
                     {
                         level: 3,
                         key: makeKey('b'),
                         value: makeValue('B', 'string'),
+                        path: ['a', '@', 'b'],
                     },
-                    {level: 2, close: 'attributes'},
+                    {level: 2, close: 'attributes', path: ['a', '@']},
                     {
                         level: 2,
                         value: makeValue('C', 'string'),
                         isAfterAttributes: true,
+                        path: ['a'],
                     },
-                    {level: 0, close: 'object'},
+                    {level: 0, close: 'object', path: []},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -508,89 +592,124 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 1, open: 'attributes', path: '@', size: 2},
+                    {level: 1, open: 'attributes', path: ['@'], size: 2, collapsable: true},
                     {
                         level: 2,
                         key: makeKey('attr2'),
                         value: makeValue(false, 'boolean'),
                         hasDelimiter: true,
+                        path: ['@', 'attr2'],
                     },
                     {
                         level: 2,
                         key: makeKey('attr3'),
                         value: makeValue('Attr3', 'string'),
+                        path: ['@', 'attr3'],
                     },
-                    {level: 1, close: 'attributes'},
+                    {level: 1, close: 'attributes', path: ['@']},
                     {
                         level: 1,
                         open: 'object',
                         isAfterAttributes: true,
-                        path: '$',
+                        path: ['$'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         key: makeKey('a'),
                         value: makeValue('test', 'string'),
                         hasDelimiter: true,
+                        path: ['$', 'a'],
                     },
-                    {level: 2, key: makeKey('b'), path: '$/b', size: 3},
-                    {level: 3, open: 'attributes', path: '$/b/@', size: 1},
+                    {level: 2, key: makeKey('b'), path: ['$', 'b'], size: 3, collapsable: true},
+                    {
+                        level: 3,
+                        open: 'attributes',
+                        path: ['$', 'b', '@'],
+                        size: 1,
+                        collapsable: true,
+                    },
                     {
                         level: 4,
                         key: makeKey('attr3'),
                         value: makeValue('Attr3', 'string'),
+                        path: ['$', 'b', '@', 'attr3'],
                     },
-                    {level: 3, close: 'attributes'},
+                    {level: 3, close: 'attributes', path: ['$', 'b', '@']},
                     {
                         level: 3,
                         open: 'object',
                         isAfterAttributes: true,
-                        path: '$/b/$',
+                        path: ['$', 'b', '$'],
                         size: 3,
+                        collapsable: true,
                     },
                     {
                         level: 4,
                         key: makeKey('c'),
                         value: makeValue('C', 'string'),
                         hasDelimiter: true,
+                        path: ['$', 'b', '$', 'c'],
                     },
-                    {level: 4, key: makeKey('d'), path: '$/b/$/d', size: 2},
-                    {level: 5, open: 'attributes', path: '$/b/$/d/@', size: 1},
+                    {
+                        level: 4,
+                        key: makeKey('d'),
+                        path: ['$', 'b', '$', 'd'],
+                        size: 2,
+                        collapsable: true,
+                    },
+                    {
+                        level: 5,
+                        open: 'attributes',
+                        path: ['$', 'b', '$', 'd', '@'],
+                        size: 1,
+                        collapsable: true,
+                    },
                     {
                         level: 6,
                         key: makeKey('attr4'),
                         value: makeValue('Attr4', 'string'),
+                        path: ['$', 'b', '$', 'd', '@', 'attr4'],
                     },
-                    {level: 5, close: 'attributes'},
+                    {level: 5, close: 'attributes', path: ['$', 'b', '$', 'd', '@']},
                     {
                         level: 5,
                         open: 'object',
                         isAfterAttributes: true,
-                        path: '$/b/$/d/$',
+                        path: ['$', 'b', '$', 'd', '$'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 6,
                         key: makeKey('e'),
                         value: makeValue('E', 'string'),
                         hasDelimiter: true,
+                        path: ['$', 'b', '$', 'd', '$', 'e'],
                     },
                     {
                         level: 6,
                         key: makeKey('f'),
                         value: makeValue('F', 'string'),
+                        path: ['$', 'b', '$', 'd', '$', 'f'],
                     },
-                    {level: 5, close: 'object', hasDelimiter: true},
+                    {
+                        level: 5,
+                        close: 'object',
+                        hasDelimiter: true,
+                        path: ['$', 'b', '$', 'd', '$'],
+                    },
                     {
                         level: 4,
                         key: makeKey('g'),
                         value: makeValue('G', 'string'),
+                        path: ['$', 'b', '$', 'g'],
                     },
-                    {level: 3, close: 'object'},
-                    {level: 1, close: 'object'},
+                    {level: 3, close: 'object', path: ['$', 'b', '$']},
+                    {level: 1, close: 'object', path: ['$']},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -600,8 +719,10 @@ describe('flattenUnipika', () => {
         describe('YSON light containers', () => {
             it('empty list', () => {
                 const converted = unipika.converters.yson([]);
-                const expected: UnipikaFlattenTree = [{level: 0, open: 'array', close: 'array'}];
-                expect(flattenUnipika(converted)).toEqual({
+                const expected: UnipikaFlattenTree = [
+                    {level: 0, open: 'array', close: 'array', path: []},
+                ];
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -609,19 +730,21 @@ describe('flattenUnipika', () => {
             it('empty list -> empty list', () => {
                 const converted = unipika.converters.yson([[]]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 1},
-                    {level: 1, open: 'array', close: 'array'},
-                    {level: 0, close: 'array'},
+                    {level: 0, open: 'array', size: 1, path: []},
+                    {level: 1, open: 'array', close: 'array', path: ['0']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
             });
             it('empty map', () => {
                 const converted = unipika.converters.yson({});
-                const expected: UnipikaFlattenTree = [{level: 0, open: 'object', close: 'object'}];
-                expect(flattenUnipika(converted)).toEqual({
+                const expected: UnipikaFlattenTree = [
+                    {level: 0, open: 'object', close: 'object', path: []},
+                ];
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -629,11 +752,11 @@ describe('flattenUnipika', () => {
             it('list -> empty map', () => {
                 const converted = unipika.converters.yson([{}]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 1},
-                    {level: 1, open: 'object', close: 'object'},
-                    {level: 0, close: 'array'},
+                    {level: 0, open: 'array', size: 1, path: []},
+                    {level: 1, open: 'object', close: 'object', path: ['0']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -641,16 +764,17 @@ describe('flattenUnipika', () => {
             it('map -> empty list', () => {
                 const converted = unipika.converters.yson({a: []});
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object', size: 1},
+                    {level: 0, open: 'object', size: 1, path: []},
                     {
                         level: 1,
                         key: makeKey('a'),
                         open: 'array',
                         close: 'array',
+                        path: ['a'],
                     },
-                    {level: 0, close: 'object'},
+                    {level: 0, close: 'object', path: []},
                 ];
-                expect(flattenUnipika(converted)).toEqual({
+                expect(flattenUnipika(converted)).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -666,9 +790,10 @@ describe('flattenUnipika', () => {
                     {
                         level: 0,
                         value: {$value: null, $type: 'null'},
+                        path: [],
                     },
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -679,9 +804,10 @@ describe('flattenUnipika', () => {
                     {
                         level: 0,
                         value: {$type: 'number', $value: 123},
+                        path: [],
                     },
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -692,9 +818,10 @@ describe('flattenUnipika', () => {
                     {
                         level: 0,
                         value: {$value: 'hello', $type: 'string'},
+                        path: [],
                     },
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -705,9 +832,10 @@ describe('flattenUnipika', () => {
                     {
                         level: 0,
                         value: {$value: true, $type: 'boolean'},
+                        path: [],
                     },
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -715,21 +843,23 @@ describe('flattenUnipika', () => {
             it('list', () => {
                 const converted = unipika.converters.raw([1, 2, 'three']);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 3},
+                    {level: 0, open: 'array', size: 3, path: []},
                     {
                         level: 1,
                         value: {$type: 'number', $value: 1},
                         hasDelimiter: true,
+                        path: ['0'],
                     },
                     {
                         level: 1,
                         value: {$type: 'number', $value: 2},
                         hasDelimiter: true,
+                        path: ['1'],
                     },
-                    {level: 1, value: {$type: 'string', $value: 'three'}},
-                    {level: 0, close: 'array'},
+                    {level: 1, value: {$type: 'string', $value: 'three'}, path: ['2']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -741,27 +871,30 @@ describe('flattenUnipika', () => {
                     c: 'C',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object', size: 3},
+                    {level: 0, open: 'object', size: 3, path: []},
                     {
                         level: 1,
                         key: {$key: true, $value: 'a', $type: 'string'},
                         value: {$value: 'A', $type: 'string'},
                         hasDelimiter: true,
+                        path: ['a'],
                     },
                     {
                         level: 1,
                         key: {$key: true, $value: 'b', $type: 'string'},
                         value: {$value: 'B', $type: 'string'},
                         hasDelimiter: true,
+                        path: ['b'],
                     },
                     {
                         level: 1,
                         key: {$key: true, $value: 'c', $type: 'string'},
                         value: {$value: 'C', $type: 'string'},
+                        path: ['c'],
                     },
-                    {level: 0, close: 'object'},
+                    {level: 0, close: 'object', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -775,37 +908,41 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 2},
+                    {level: 0, open: 'array', size: 2, path: []},
                     {
                         level: 1,
                         value: {$type: 'string', $value: 'a'},
                         hasDelimiter: true,
+                        path: ['0'],
                     },
-                    {level: 1, open: 'object', path: '1', size: 2},
+                    {level: 1, open: 'object', path: ['1'], size: 2, collapsable: true},
                     {
                         level: 2,
                         key: {$key: true, $value: 'b', $type: 'string'},
                         value: {$type: 'string', $value: 'B'},
                         hasDelimiter: true,
+                        path: ['1', 'b'],
                     },
                     {
                         level: 2,
                         key: {$key: true, $value: 'c', $type: 'string'},
                         open: 'array',
-                        path: '1/c',
+                        path: ['1', 'c'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 3,
                         value: {$type: 'number', $value: 1},
                         hasDelimiter: true,
+                        path: ['1', 'c', '0'],
                     },
-                    {level: 3, value: {$type: 'number', $value: 2}},
-                    {level: 2, close: 'array'},
-                    {level: 1, close: 'object'},
-                    {level: 0, close: 'array'},
+                    {level: 3, value: {$type: 'number', $value: 2}, path: ['1', 'c', '1']},
+                    {level: 2, close: 'array', path: ['1', 'c']},
+                    {level: 1, close: 'object', path: ['1']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -813,32 +950,35 @@ describe('flattenUnipika', () => {
             it('list -> list -> list', () => {
                 const converted = unipika.converters.raw([1, [2, [3, 4], 5], 6]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 3},
+                    {level: 0, open: 'array', size: 3, path: []},
                     {
                         level: 1,
                         value: makeRawValue(1, 'number'),
                         hasDelimiter: true,
+                        path: ['0'],
                     },
-                    {level: 1, open: 'array', path: '1', size: 3},
+                    {level: 1, open: 'array', path: ['1'], size: 3, collapsable: true},
                     {
                         level: 2,
                         value: makeRawValue(2, 'number'),
                         hasDelimiter: true,
+                        path: ['1', '0'],
                     },
-                    {level: 2, open: 'array', path: '1/1', size: 2},
+                    {level: 2, open: 'array', path: ['1', '1'], size: 2, collapsable: true},
                     {
                         level: 3,
                         value: makeRawValue(3, 'number'),
                         hasDelimiter: true,
+                        path: ['1', '1', '0'],
                     },
-                    {level: 3, value: makeRawValue(4, 'number')},
-                    {level: 2, close: 'array', hasDelimiter: true},
-                    {level: 2, value: makeRawValue(5, 'number')},
-                    {level: 1, close: 'array', hasDelimiter: true},
-                    {level: 1, value: makeRawValue(6, 'number')},
-                    {level: 0, close: 'array'},
+                    {level: 3, value: makeRawValue(4, 'number'), path: ['1', '1', '1']},
+                    {level: 2, close: 'array', hasDelimiter: true, path: ['1', '1']},
+                    {level: 2, value: makeRawValue(5, 'number'), path: ['1', '2']},
+                    {level: 1, close: 'array', hasDelimiter: true, path: ['1']},
+                    {level: 1, value: makeRawValue(6, 'number'), path: ['2']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -856,36 +996,47 @@ describe('flattenUnipika', () => {
                     g: 'G',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object', size: 3},
+                    {level: 0, open: 'object', size: 3, path: []},
                     {
                         level: 1,
                         key: makeKey('a'),
                         value: makeValue('A', 'string'),
                         hasDelimiter: true,
+                        path: ['a'],
                     },
-                    {level: 1, key: makeKey('b'), open: 'array', path: 'b', size: 3},
+                    {
+                        level: 1,
+                        key: makeKey('b'),
+                        open: 'array',
+                        path: ['b'],
+                        size: 3,
+                        collapsable: true,
+                    },
                     {
                         level: 2,
                         value: makeValue('C', 'string'),
                         hasDelimiter: true,
+                        path: ['b', '0'],
                     },
-                    {level: 2, open: 'object', path: 'b/1', size: 1},
+                    {level: 2, open: 'object', path: ['b', '1'], size: 1, collapsable: true},
                     {
                         level: 3,
                         key: makeKey('e'),
                         value: makeValue('E', 'string'),
+                        path: ['b', '1', 'e'],
                     },
-                    {level: 2, close: 'object', hasDelimiter: true},
-                    {level: 2, value: makeValue('F', 'string')},
-                    {level: 1, close: 'array', hasDelimiter: true},
+                    {level: 2, close: 'object', hasDelimiter: true, path: ['b', '1']},
+                    {level: 2, value: makeValue('F', 'string'), path: ['b', '2']},
+                    {level: 1, close: 'array', hasDelimiter: true, path: ['b']},
                     {
                         level: 1,
                         key: makeKey('g'),
                         value: makeValue('G', 'string'),
+                        path: ['g'],
                     },
-                    {level: 0, close: 'object'},
+                    {level: 0, close: 'object', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -903,53 +1054,60 @@ describe('flattenUnipika', () => {
                     g: 'G',
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object', size: 3},
+                    {level: 0, open: 'object', size: 3, path: []},
                     {
                         level: 1,
                         key: makeRawKey('a'),
                         value: makeRawValue('A', 'string'),
                         hasDelimiter: true,
+                        path: ['a'],
                     },
                     {
                         level: 1,
                         key: makeRawKey('b'),
                         open: 'object',
-                        path: 'b',
+                        path: ['b'],
                         size: 3,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         key: makeRawKey('c'),
                         value: makeRawValue('C', 'string'),
                         hasDelimiter: true,
+                        path: ['b', 'c'],
                     },
                     {
                         level: 2,
                         key: makeRawKey('d'),
                         open: 'object',
-                        path: 'b/d',
+                        path: ['b', 'd'],
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 3,
                         key: makeRawKey('e'),
                         value: makeRawValue('E', 'string'),
+                        path: ['b', 'd', 'e'],
                     },
-                    {level: 2, close: 'object', hasDelimiter: true},
+                    {level: 2, close: 'object', hasDelimiter: true, path: ['b', 'd']},
                     {
                         level: 2,
                         key: makeRawKey('f'),
                         value: makeRawValue('F', 'string'),
+                        path: ['b', 'f'],
                     },
-                    {level: 1, close: 'object', hasDelimiter: true},
+                    {level: 1, close: 'object', hasDelimiter: true, path: ['b']},
                     {
                         level: 1,
                         key: makeRawKey('g'),
                         value: makeRawValue('G', 'string'),
+                        path: ['g'],
                     },
-                    {level: 0, close: 'object'},
+                    {level: 0, close: 'object', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -963,22 +1121,24 @@ describe('flattenUnipika', () => {
                     $attributes: {a: 'A'},
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'attributes-value'},
-                    {level: 1, open: 'attributes', path: '@', size: 1},
+                    {level: 0, open: 'attributes-value', path: []},
+                    {level: 1, open: 'attributes', path: ['@'], size: 1, collapsable: true},
                     {
                         level: 2,
                         key: makeKey('a'),
                         value: makeValue('A', 'string'),
+                        path: ['@', 'a'],
                     },
-                    {level: 1, close: 'attributes', hasDelimiter: true},
+                    {level: 1, close: 'attributes', hasDelimiter: true, path: ['@']},
                     {
                         level: 1,
                         value: makeValue(null, 'null'),
                         isAfterAttributes: true,
+                        path: [],
                     },
-                    {level: 0, close: 'attributes-value'},
+                    {level: 0, close: 'attributes-value', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -1000,65 +1160,93 @@ describe('flattenUnipika', () => {
                     $value: 123,
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'attributes-value'},
-                    {level: 1, open: 'attributes', path: '@', size: 2},
+                    {level: 0, open: 'attributes-value', path: []},
+                    {level: 1, open: 'attributes', path: ['@'], size: 2, collapsable: true},
                     {
                         level: 2,
                         key: makeKey('schema'),
                         open: 'attributes-value',
-                        path: '@/schema',
+                        path: ['@', 'schema'],
                         size: 2,
+                        collapsable: true,
                     },
-                    {level: 3, open: 'attributes', path: '@/schema/@', size: 2},
+                    {
+                        level: 3,
+                        open: 'attributes',
+                        path: ['@', 'schema', '@'],
+                        size: 2,
+                        collapsable: true,
+                    },
                     {
                         level: 4,
                         key: makeKey('columns'),
                         open: 'array',
-                        path: '@/schema/@/columns',
+                        path: ['@', 'schema', '@', 'columns'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 5,
                         value: makeValue('a', 'string'),
                         hasDelimiter: true,
+                        path: ['@', 'schema', '@', 'columns', '0'],
                     },
-                    {level: 5, value: makeValue('b', 'string')},
-                    {level: 4, close: 'array', hasDelimiter: true},
+                    {
+                        level: 5,
+                        value: makeValue('b', 'string'),
+                        path: ['@', 'schema', '@', 'columns', '1'],
+                    },
+                    {
+                        level: 4,
+                        close: 'array',
+                        hasDelimiter: true,
+                        path: ['@', 'schema', '@', 'columns'],
+                    },
                     {
                         level: 4,
                         key: makeKey('writeable'),
                         value: makeValue(false, 'boolean'),
+                        path: ['@', 'schema', '@', 'writeable'],
                     },
-                    {level: 3, close: 'attributes', hasDelimiter: true},
+                    {level: 3, close: 'attributes', hasDelimiter: true, path: ['@', 'schema', '@']},
                     {
                         level: 3,
                         open: 'array',
                         isAfterAttributes: true,
-                        path: '@/schema/$',
+                        path: ['@', 'schema', '$'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 4,
                         value: makeValue(1, 'number'),
                         hasDelimiter: true,
+                        path: ['@', 'schema', '$', '0'],
                     },
-                    {level: 4, value: makeValue(2, 'number')},
-                    {level: 3, close: 'array'},
-                    {level: 2, close: 'attributes-value', hasDelimiter: true},
+                    {level: 4, value: makeValue(2, 'number'), path: ['@', 'schema', '$', '1']},
+                    {level: 3, close: 'array', path: ['@', 'schema', '$']},
+                    {
+                        level: 2,
+                        close: 'attributes-value',
+                        hasDelimiter: true,
+                        path: ['@', 'schema'],
+                    },
                     {
                         level: 2,
                         key: makeKey('rowCount'),
                         value: makeValue(22, 'number'),
+                        path: ['@', 'rowCount'],
                     },
-                    {level: 1, close: 'attributes', hasDelimiter: true},
+                    {level: 1, close: 'attributes', hasDelimiter: true, path: ['@']},
                     {
                         level: 1,
                         value: makeValue(123, 'number'),
                         isAfterAttributes: true,
+                        path: [],
                     },
-                    {level: 0, close: 'attributes-value'},
+                    {level: 0, close: 'attributes-value', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -1088,92 +1276,127 @@ describe('flattenUnipika', () => {
                 });
 
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'attributes-value', size: 1},
-                    {level: 1, open: 'attributes', path: '@', size: 3},
+                    {level: 0, open: 'attributes-value', size: 1, path: []},
+                    {level: 1, open: 'attributes', path: ['@'], size: 3, collapsable: true},
                     {
                         level: 2,
                         key: makeKey('attr1'),
                         value: makeValue('Attr1', 'string'),
                         hasDelimiter: true,
+                        path: ['@', 'attr1'],
                     },
                     {
                         level: 2,
                         open: 'array',
                         key: makeKey('attr2'),
-                        path: '@/attr2',
+                        path: ['@', 'attr2'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 3,
                         value: makeValue(1, 'number'),
                         hasDelimiter: true,
+                        path: ['@', 'attr2', '0'],
                     },
-                    {level: 3, open: 'attributes-value', path: '@/attr2/1', size: 3},
-                    {level: 4, open: 'attributes', path: '@/attr2/1/@', size: 2},
+                    {
+                        level: 3,
+                        open: 'attributes-value',
+                        path: ['@', 'attr2', '1'],
+                        size: 3,
+                        collapsable: true,
+                    },
+                    {
+                        level: 4,
+                        open: 'attributes',
+                        path: ['@', 'attr2', '1', '@'],
+                        size: 2,
+                        collapsable: true,
+                    },
                     {
                         level: 5,
                         key: makeKey('a'),
                         value: makeValue('A', 'string'),
                         hasDelimiter: true,
+                        path: ['@', 'attr2', '1', '@', 'a'],
                     },
                     {
                         level: 5,
                         key: makeKey('b'),
                         value: makeValue('B', 'string'),
+                        path: ['@', 'attr2', '1', '@', 'b'],
                     },
-                    {level: 4, close: 'attributes', hasDelimiter: true},
+                    {
+                        level: 4,
+                        close: 'attributes',
+                        hasDelimiter: true,
+                        path: ['@', 'attr2', '1', '@'],
+                    },
                     {
                         level: 4,
                         open: 'array',
-                        path: '@/attr2/1/$',
+                        path: ['@', 'attr2', '1', '$'],
                         isAfterAttributes: true,
                         size: 3,
+                        collapsable: true,
                     },
                     {
                         level: 5,
                         value: makeValue(2, 'number'),
                         hasDelimiter: true,
+                        path: ['@', 'attr2', '1', '$', '0'],
                     },
                     {
                         level: 5,
                         value: makeValue(3, 'number'),
                         hasDelimiter: true,
+                        path: ['@', 'attr2', '1', '$', '1'],
                     },
-                    {level: 5, value: makeValue(4, 'number')},
-                    {level: 4, close: 'array'},
-                    {level: 3, close: 'attributes-value'},
-                    {level: 2, close: 'array', hasDelimiter: true},
+                    {level: 5, value: makeValue(4, 'number'), path: ['@', 'attr2', '1', '$', '2']},
+                    {level: 4, close: 'array', path: ['@', 'attr2', '1', '$']},
+                    {level: 3, close: 'attributes-value', path: ['@', 'attr2', '1']},
+                    {level: 2, close: 'array', hasDelimiter: true, path: ['@', 'attr2']},
                     {
                         level: 2,
                         key: makeKey('q'),
                         value: makeValue(42, 'number'),
+                        path: ['@', 'q'],
                     },
-                    {level: 1, close: 'attributes', hasDelimiter: true},
+                    {level: 1, close: 'attributes', hasDelimiter: true, path: ['@']},
                     {
                         level: 1,
                         open: 'array',
                         isAfterAttributes: true,
-                        path: '$',
+                        path: ['$'],
                         size: 1,
+                        collapsable: true,
                     },
-                    {level: 2, open: 'attributes-value', path: '$/0'},
-                    {level: 3, open: 'attributes', path: '$/0/@', size: 1},
+                    {level: 2, open: 'attributes-value', path: ['$', '0'], collapsable: true},
+                    {
+                        level: 3,
+                        open: 'attributes',
+                        path: ['$', '0', '@'],
+                        size: 1,
+                        collapsable: true,
+                    },
                     {
                         level: 4,
                         key: makeKey('attr3'),
                         value: makeValue('Attr3', 'string'),
+                        path: ['$', '0', '@', 'attr3'],
                     },
-                    {level: 3, close: 'attributes', hasDelimiter: true},
+                    {level: 3, close: 'attributes', hasDelimiter: true, path: ['$', '0', '@']},
                     {
                         level: 3,
                         value: makeValue('test', 'string'),
                         isAfterAttributes: true,
+                        path: ['$', '0'],
                     },
-                    {level: 2, close: 'attributes-value'},
-                    {level: 1, close: 'array'},
-                    {level: 0, close: 'attributes-value'},
+                    {level: 2, close: 'attributes-value', path: ['$', '0']},
+                    {level: 1, close: 'array', path: ['$']},
+                    {level: 0, close: 'attributes-value', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -1204,89 +1427,113 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'attributes-value', size: 3},
-                    {level: 1, open: 'attributes', path: '@', size: 3},
+                    {level: 0, open: 'attributes-value', size: 3, path: []},
+                    {level: 1, open: 'attributes', path: ['@'], size: 3, collapsable: true},
                     {
                         level: 2,
                         key: makeKey('attr2'),
                         value: makeValue(false, 'boolean'),
                         hasDelimiter: true,
+                        path: ['@', 'attr2'],
                     },
                     {
                         level: 2,
                         key: makeKey('attr3'),
                         open: 'attributes-value',
-                        path: '@/attr3',
+                        path: ['@', 'attr3'],
+                        collapsable: true,
                     },
-                    {level: 3, open: 'attributes', path: '@/attr3/@', size: 1},
+                    {
+                        level: 3,
+                        open: 'attributes',
+                        path: ['@', 'attr3', '@'],
+                        size: 1,
+                        collapsable: true,
+                    },
                     {
                         level: 4,
                         key: makeKey('foo'),
                         value: makeValue('bar', 'string'),
+                        path: ['@', 'attr3', '@', 'foo'],
                     },
-                    {level: 3, close: 'attributes', hasDelimiter: true},
+                    {level: 3, close: 'attributes', hasDelimiter: true, path: ['@', 'attr3', '@']},
                     {
                         level: 3,
                         value: makeValue('Attr3', 'string'),
                         isAfterAttributes: true,
+                        path: ['@', 'attr3'],
                     },
-                    {level: 2, close: 'attributes-value', hasDelimiter: true},
+                    {level: 2, close: 'attributes-value', hasDelimiter: true, path: ['@', 'attr3']},
                     {
                         level: 2,
                         key: makeKey('attr4'),
                         value: makeValue(100, 'number'),
+                        path: ['@', 'attr4'],
                     },
-                    {level: 1, close: 'attributes', hasDelimiter: true},
+                    {level: 1, close: 'attributes', hasDelimiter: true, path: ['@']},
                     {
                         level: 1,
                         open: 'object',
                         isAfterAttributes: true,
-                        path: '$',
+                        path: ['$'],
                         size: 3,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         key: makeKey('a'),
                         value: makeValue('test', 'string'),
                         hasDelimiter: true,
+                        path: ['$', 'a'],
                     },
                     {
                         level: 2,
                         key: makeKey('b'),
                         open: 'attributes-value',
-                        path: '$/b',
+                        path: ['$', 'b'],
                         size: 1,
+                        collapsable: true,
                     },
-                    {level: 3, open: 'attributes', path: '$/b/@', size: 1},
+                    {
+                        level: 3,
+                        open: 'attributes',
+                        path: ['$', 'b', '@'],
+                        size: 1,
+                        collapsable: true,
+                    },
                     {
                         level: 4,
                         key: makeKey('attr3'),
                         value: makeValue('Attr3', 'string'),
+                        path: ['$', 'b', '@', 'attr3'],
                     },
-                    {level: 3, close: 'attributes', hasDelimiter: true},
+                    {level: 3, close: 'attributes', hasDelimiter: true, path: ['$', 'b', '@']},
                     {
                         level: 3,
                         open: 'object',
                         isAfterAttributes: true,
-                        path: '$/b/$',
+                        path: ['$', 'b', '$'],
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 4,
                         key: makeKey('c'),
                         value: makeValue('C', 'string'),
+                        path: ['$', 'b', '$', 'c'],
                     },
-                    {level: 3, close: 'object'},
-                    {level: 2, close: 'attributes-value', hasDelimiter: true},
+                    {level: 3, close: 'object', path: ['$', 'b', '$']},
+                    {level: 2, close: 'attributes-value', hasDelimiter: true, path: ['$', 'b']},
                     {
                         level: 2,
                         key: makeKey('d'),
                         value: makeValue('D', 'string'),
+                        path: ['$', 'd'],
                     },
-                    {level: 1, close: 'object'},
-                    {level: 0, close: 'attributes-value'},
+                    {level: 1, close: 'object', path: ['$']},
+                    {level: 0, close: 'attributes-value', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -1299,29 +1546,32 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object', size: 1},
+                    {level: 0, open: 'object', size: 1, path: []},
                     {
                         level: 1,
                         key: makeKey('a'),
                         open: 'attributes-value',
-                        path: 'a',
+                        path: ['a'],
+                        collapsable: true,
                     },
-                    {level: 2, open: 'attributes', path: 'a/@', size: 1},
+                    {level: 2, open: 'attributes', path: ['a', '@'], size: 1, collapsable: true},
                     {
                         level: 3,
                         key: makeKey('b'),
                         value: makeValue('B', 'string'),
+                        path: ['a', '@', 'b'],
                     },
-                    {level: 2, close: 'attributes', hasDelimiter: true},
+                    {level: 2, close: 'attributes', hasDelimiter: true, path: ['a', '@']},
                     {
                         level: 2,
                         value: makeValue('C', 'string'),
                         isAfterAttributes: true,
+                        path: ['a'],
                     },
-                    {level: 1, close: 'attributes-value'},
-                    {level: 0, close: 'object'},
+                    {level: 1, close: 'attributes-value', path: ['a']},
+                    {level: 0, close: 'object', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -1331,8 +1581,10 @@ describe('flattenUnipika', () => {
         describe('JSON light containers', () => {
             it('empty list', () => {
                 const converted = unipika.converters.yson([]);
-                const expected: UnipikaFlattenTree = [{level: 0, open: 'array', close: 'array'}];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                const expected: UnipikaFlattenTree = [
+                    {level: 0, open: 'array', close: 'array', path: []},
+                ];
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -1340,19 +1592,21 @@ describe('flattenUnipika', () => {
             it('list -> empty list', () => {
                 const converted = unipika.converters.yson([[]]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 1},
-                    {level: 1, open: 'array', close: 'array'},
-                    {level: 0, close: 'array'},
+                    {level: 0, open: 'array', size: 1, path: []},
+                    {level: 1, open: 'array', close: 'array', path: ['0']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
             });
             it('empty map', () => {
                 const converted = unipika.converters.yson({});
-                const expected: UnipikaFlattenTree = [{level: 0, open: 'object', close: 'object'}];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                const expected: UnipikaFlattenTree = [
+                    {level: 0, open: 'object', close: 'object', path: []},
+                ];
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -1360,11 +1614,11 @@ describe('flattenUnipika', () => {
             it('list -> empty map', () => {
                 const converted = unipika.converters.yson([{}]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 1},
-                    {level: 1, open: 'object', close: 'object'},
-                    {level: 0, close: 'array'},
+                    {level: 0, open: 'array', size: 1, path: []},
+                    {level: 1, open: 'object', close: 'object', path: ['0']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -1372,16 +1626,17 @@ describe('flattenUnipika', () => {
             it('map -> empty list', () => {
                 const converted = unipika.converters.yson({a: []});
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'object', size: 1},
+                    {level: 0, open: 'object', size: 1, path: []},
                     {
                         level: 1,
                         key: makeKey('a'),
                         open: 'array',
                         close: 'array',
+                        path: ['a'],
                     },
-                    {level: 0, close: 'object'},
+                    {level: 0, close: 'object', path: []},
                 ];
-                expect(flattenUnipika(converted, {isJson: true})).toEqual({
+                expect(flattenUnipika(converted, {isJson: true})).toStrictEqual({
                     data: expected,
                     searchIndex: {},
                 });
@@ -1402,43 +1657,48 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 4},
+                    {level: 0, open: 'array', size: 4, path: []},
                     {
                         level: 1,
                         value: makeValue(1, 'number'),
                         hasDelimiter: true,
+                        path: ['0'],
                     },
-                    {level: 1, open: 'array', path: '1', size: 3},
+                    {level: 1, open: 'array', path: ['1'], size: 3, collapsable: true},
                     {
                         level: 2,
                         value: makeValue(2, 'number'),
                         hasDelimiter: true,
+                        path: ['1', '0'],
                     },
                     {
                         level: 2,
                         open: 'array',
-                        path: '1/1',
+                        path: ['1', '1'],
                         collapsed: true,
                         close: 'array',
                         hasDelimiter: true,
                         size: 2,
+                        collapsable: true,
                     },
-                    {level: 2, value: makeValue(5, 'number')},
-                    {level: 1, close: 'array', hasDelimiter: true},
+                    {level: 2, value: makeValue(5, 'number'), path: ['1', '2']},
+                    {level: 1, close: 'array', hasDelimiter: true, path: ['1']},
                     {
                         level: 1,
                         value: makeValue(6, 'number'),
                         hasDelimiter: true,
+                        path: ['2'],
                     },
                     {
                         level: 1,
                         open: 'array',
-                        path: '3',
+                        path: ['3'],
                         collapsed: true,
                         close: 'array',
                         size: 3,
+                        collapsable: true,
                     },
-                    {level: 0, close: 'array'},
+                    {level: 0, close: 'array', path: []},
                 ];
                 const result = flattenUnipika(converted, {
                     collapsedState: {
@@ -1446,7 +1706,7 @@ describe('flattenUnipika', () => {
                         '3': true,
                     },
                 });
-                expect(result).toEqual({data: expected, searchIndex: {}});
+                expect(result).toStrictEqual({data: expected, searchIndex: {}});
             });
             it('list -> map -> list with collapsedState', () => {
                 const converted = unipika.converters.yson([
@@ -1465,44 +1725,49 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 3},
+                    {level: 0, open: 'array', size: 3, path: []},
                     {
                         level: 1,
                         value: makeValue('a', 'string'),
                         hasDelimiter: true,
+                        path: ['0'],
                     },
-                    {level: 1, open: 'object', path: '1', size: 3},
+                    {level: 1, open: 'object', path: ['1'], size: 3, collapsable: true},
                     {
                         level: 2,
                         key: makeKey('b'),
                         value: makeValue('B', 'string'),
                         hasDelimiter: true,
+                        path: ['1', 'b'],
                     },
                     {
                         level: 2,
                         key: makeKey('c'),
                         open: 'array',
-                        path: '1/c',
+                        path: ['1', 'c'],
                         collapsed: true,
                         close: 'array',
                         hasDelimiter: true,
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         key: makeKey('z'),
                         value: makeValue('Z', 'string'),
+                        path: ['1', 'z'],
                     },
-                    {level: 1, close: 'object', hasDelimiter: true},
+                    {level: 1, close: 'object', hasDelimiter: true, path: ['1']},
                     {
                         level: 1,
                         open: 'object',
-                        path: '2',
+                        path: ['2'],
                         collapsed: true,
                         close: 'object',
                         size: 2,
+                        collapsable: true,
                     },
-                    {level: 0, close: 'array'},
+                    {level: 0, close: 'array', path: []},
                 ];
                 const result = flattenUnipika(converted, {
                     collapsedState: {
@@ -1510,7 +1775,7 @@ describe('flattenUnipika', () => {
                         '2': true,
                     },
                 });
-                expect(result).toEqual({data: expected, searchIndex: {}});
+                expect(result).toStrictEqual({data: expected, searchIndex: {}});
             });
 
             it('list -> collapsed item with attribute', () => {
@@ -1522,24 +1787,25 @@ describe('flattenUnipika', () => {
                     1,
                 ]);
                 const expected = [
-                    {level: 0, open: 'array', size: 2},
+                    {level: 0, open: 'array', size: 2, path: []},
                     {
                         level: 1,
                         open: 'attributes-value',
                         close: 'attributes-value',
                         collapsed: true,
                         hasDelimiter: true,
-                        path: '0',
+                        path: ['0'],
+                        collapsable: true,
                     },
-                    {level: 1, value: makeValue(1, 'number')},
-                    {level: 0, close: 'array'},
+                    {level: 1, value: makeValue(1, 'number'), path: ['1']},
+                    {level: 0, close: 'array', path: []},
                 ];
                 const result = flattenUnipika(converted, {
                     collapsedState: {
                         '0': true,
                     },
                 });
-                expect(result).toEqual({data: expected, searchIndex: {}});
+                expect(result).toStrictEqual({data: expected, searchIndex: {}});
             });
 
             // TODO: it.todo('Collapsed values');
@@ -1557,43 +1823,48 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 4},
+                    {level: 0, open: 'array', size: 4, path: []},
                     {
                         level: 1,
                         value: makeValue(1, 'number'),
                         hasDelimiter: true,
+                        path: ['0'],
                     },
-                    {level: 1, open: 'array', path: '1', size: 3},
+                    {level: 1, open: 'array', path: ['1'], size: 3, collapsable: true},
                     {
                         level: 2,
                         value: makeValue(2, 'number'),
                         hasDelimiter: true,
+                        path: ['1', '0'],
                     },
                     {
                         level: 2,
                         open: 'array',
-                        path: '1/1',
+                        path: ['1', '1'],
                         collapsed: true,
                         close: 'array',
                         hasDelimiter: true,
                         size: 2,
+                        collapsable: true,
                     },
-                    {level: 2, value: makeValue(5, 'number')},
-                    {level: 1, close: 'array', hasDelimiter: true},
+                    {level: 2, value: makeValue(5, 'number'), path: ['1', '2']},
+                    {level: 1, close: 'array', hasDelimiter: true, path: ['1']},
                     {
                         level: 1,
                         value: makeValue(6, 'number'),
                         hasDelimiter: true,
+                        path: ['2'],
                     },
                     {
                         level: 1,
                         open: 'array',
-                        path: '3',
+                        path: ['3'],
                         collapsed: true,
                         close: 'array',
                         size: 3,
+                        collapsable: true,
                     },
-                    {level: 0, close: 'array'},
+                    {level: 0, close: 'array', path: []},
                 ];
                 const result = flattenUnipika(converted, {
                     isJson: true,
@@ -1602,7 +1873,7 @@ describe('flattenUnipika', () => {
                         '3': true,
                     },
                 });
-                expect(result).toEqual({data: expected, searchIndex: {}});
+                expect(result).toStrictEqual({data: expected, searchIndex: {}});
             });
             it('list -> map -> list with collapsedState', () => {
                 const converted = unipika.converters.raw([
@@ -1621,44 +1892,49 @@ describe('flattenUnipika', () => {
                     },
                 ]);
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 3},
+                    {level: 0, open: 'array', size: 3, path: []},
                     {
                         level: 1,
                         value: {$type: 'string', $value: 'a'},
                         hasDelimiter: true,
+                        path: ['0'],
                     },
-                    {level: 1, open: 'object', path: '1', size: 3},
+                    {level: 1, open: 'object', path: ['1'], size: 3, collapsable: true},
                     {
                         level: 2,
                         key: {$key: true, $value: 'b', $type: 'string'},
                         value: {$type: 'string', $value: 'B'},
                         hasDelimiter: true,
+                        path: ['1', 'b'],
                     },
                     {
                         level: 2,
                         key: {$key: true, $value: 'c', $type: 'string'},
                         open: 'array',
-                        path: '1/c',
+                        path: ['1', 'c'],
                         collapsed: true,
                         close: 'array',
                         hasDelimiter: true,
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         key: makeRawKey('z'),
                         value: makeRawValue('Z', 'string'),
+                        path: ['1', 'z'],
                     },
-                    {level: 1, close: 'object', hasDelimiter: true},
+                    {level: 1, close: 'object', hasDelimiter: true, path: ['1']},
                     {
                         level: 1,
                         open: 'object',
-                        path: '2',
+                        path: ['2'],
                         collapsed: true,
                         close: 'object',
                         size: 2,
+                        collapsable: true,
                     },
-                    {level: 0, close: 'array'},
+                    {level: 0, close: 'array', path: []},
                 ];
                 const result = flattenUnipika(converted, {
                     isJson: true,
@@ -1667,7 +1943,7 @@ describe('flattenUnipika', () => {
                         '2': true,
                     },
                 });
-                expect(result).toEqual({data: expected, searchIndex: {}});
+                expect(result).toStrictEqual({data: expected, searchIndex: {}});
             });
 
             it('list -> collapsed item with attribute', () => {
@@ -1679,24 +1955,25 @@ describe('flattenUnipika', () => {
                     1,
                 ]);
                 const expected = [
-                    {level: 0, open: 'array', size: 2},
+                    {level: 0, open: 'array', size: 2, path: []},
                     {
                         level: 1,
                         open: 'attributes-value',
                         close: 'attributes-value',
                         collapsed: true,
                         hasDelimiter: true,
-                        path: '0',
+                        path: ['0'],
+                        collapsable: true,
                     },
-                    {level: 1, value: makeValue(1, 'number')},
-                    {level: 0, close: 'array'},
+                    {level: 1, value: makeValue(1, 'number'), path: ['1']},
+                    {level: 0, close: 'array', path: []},
                 ];
                 const result = flattenUnipika(converted, {
                     collapsedState: {
                         '0': true,
                     },
                 });
-                expect(result).toEqual({data: expected, searchIndex: {}});
+                expect(result).toStrictEqual({data: expected, searchIndex: {}});
             });
 
             it('null with collapsed attributes', () => {
@@ -1714,24 +1991,26 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'attributes-value'},
+                    {level: 0, open: 'attributes-value', path: []},
                     {
                         level: 1,
                         open: 'attributes',
                         collapsed: true,
-                        path: '@',
+                        path: ['@'],
                         close: 'attributes',
                         hasDelimiter: true,
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 1,
                         value: makeValue(null, 'null'),
                         isAfterAttributes: true,
+                        path: [],
                     },
-                    {level: 0, close: 'attributes-value'},
+                    {level: 0, close: 'attributes-value', path: []},
                 ];
-                expect(result).toEqual({data: expected, searchIndex: {}});
+                expect(result).toStrictEqual({data: expected, searchIndex: {}});
             });
 
             it('collapsed attributes', () => {
@@ -1766,96 +2045,111 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, open: 'array', size: 2},
-                    {level: 1, open: 'attributes-value', path: '0'},
-                    {level: 2, open: 'attributes', path: '0/@', size: 2},
+                    {level: 0, open: 'array', size: 2, path: []},
+                    {level: 1, open: 'attributes-value', path: ['0'], collapsable: true},
+                    {level: 2, open: 'attributes', path: ['0', '@'], size: 2, collapsable: true},
                     {
                         level: 3,
                         open: 'array',
                         key: makeKey('columns'),
                         collapsed: true,
-                        path: '0/@/columns',
+                        path: ['0', '@', 'columns'],
                         close: 'array',
                         hasDelimiter: true,
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 3,
                         open: 'object',
                         key: makeKey('data'),
-                        path: '0/@/data',
+                        path: ['0', '@', 'data'],
                         size: 3,
+                        collapsable: true,
                     },
 
                     {
                         level: 4,
                         key: makeKey('a'),
                         open: 'attributes-value',
-                        path: '0/@/data/a',
+                        path: ['0', '@', 'data', 'a'],
+                        collapsable: true,
                     },
                     {
                         level: 5,
                         open: 'attributes',
-                        path: '0/@/data/a/@',
+                        path: ['0', '@', 'data', 'a', '@'],
                         collapsed: true,
                         close: 'attributes',
                         hasDelimiter: true,
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 5,
                         value: makeValue(1, 'number'),
                         isAfterAttributes: true,
+                        path: ['0', '@', 'data', 'a'],
                     },
-                    {level: 4, close: 'attributes-value', hasDelimiter: true},
+                    {
+                        level: 4,
+                        close: 'attributes-value',
+                        hasDelimiter: true,
+                        path: ['0', '@', 'data', 'a'],
+                    },
 
                     {
                         level: 4,
                         open: 'object',
                         key: makeKey('b'),
                         collapsed: true,
-                        path: '0/@/data/b',
+                        path: ['0', '@', 'data', 'b'],
                         close: 'object',
                         hasDelimiter: true,
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 4,
                         open: 'array',
                         key: makeKey('c'),
                         collapsed: true,
-                        path: '0/@/data/c',
+                        path: ['0', '@', 'data', 'c'],
                         close: 'array',
                         size: 2,
+                        collapsable: true,
                     },
-                    {level: 3, close: 'object'},
-                    {level: 2, close: 'attributes', hasDelimiter: true},
+                    {level: 3, close: 'object', path: ['0', '@', 'data']},
+                    {level: 2, close: 'attributes', hasDelimiter: true, path: ['0', '@']},
                     {
                         level: 2,
                         value: makeValue(null, 'null'),
                         isAfterAttributes: true,
+                        path: ['0'],
                     },
-                    {level: 1, close: 'attributes-value', hasDelimiter: true},
+                    {level: 1, close: 'attributes-value', hasDelimiter: true, path: ['0']},
 
-                    {level: 1, open: 'attributes-value', path: '1'},
+                    {level: 1, open: 'attributes-value', path: ['1'], collapsable: true},
                     {
                         level: 2,
                         open: 'attributes',
-                        path: '1/@',
+                        path: ['1', '@'],
                         collapsed: true,
                         close: 'attributes',
                         hasDelimiter: true,
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         value: makeValue(null, 'null'),
                         isAfterAttributes: true,
+                        path: ['1'],
                     },
-                    {level: 1, close: 'attributes-value'},
-                    {level: 0, close: 'array'},
+                    {level: 1, close: 'attributes-value', path: ['1']},
+                    {level: 0, close: 'array', path: []},
                 ];
-                expect(result).toEqual({data: expected, searchIndex: {}});
+                expect(result).toStrictEqual({data: expected, searchIndex: {}});
             });
 
             it('collapsed values', () => {
@@ -1890,83 +2184,98 @@ describe('flattenUnipika', () => {
                     },
                 });
                 const expected: UnipikaFlattenTree = [
-                    {level: 0, size: 2, open: 'attributes-value'},
-                    {level: 1, open: 'attributes', path: '@', size: 1},
+                    {level: 0, size: 2, open: 'attributes-value', path: []},
+                    {level: 1, open: 'attributes', path: ['@'], size: 1, collapsable: true},
                     {
                         level: 2,
                         size: 3,
                         key: makeKey('a'),
                         open: 'attributes-value',
-                        path: '@/a',
+                        path: ['@', 'a'],
+                        collapsable: true,
                     },
-                    {level: 3, open: 'attributes', path: '@/a/@', size: 1},
+                    {
+                        level: 3,
+                        open: 'attributes',
+                        path: ['@', 'a', '@'],
+                        size: 1,
+                        collapsable: true,
+                    },
                     {
                         level: 4,
                         key: makeKey('test'),
                         value: makeValue(123, 'number'),
+                        path: ['@', 'a', '@', 'test'],
                     },
-                    {level: 3, close: 'attributes', hasDelimiter: true},
+                    {level: 3, close: 'attributes', hasDelimiter: true, path: ['@', 'a', '@']},
                     {
                         level: 3,
                         open: 'array',
                         collapsed: true,
-                        path: '@/a/$',
+                        path: ['@', 'a', '$'],
                         isAfterAttributes: true,
                         close: 'array',
                         size: 3,
+                        collapsable: true,
                     },
-                    {level: 2, close: 'attributes-value'},
-                    {level: 1, close: 'attributes', hasDelimiter: true},
+                    {level: 2, close: 'attributes-value', path: ['@', 'a']},
+                    {level: 1, close: 'attributes', hasDelimiter: true, path: ['@']},
                     {
                         level: 1,
                         open: 'object',
                         isAfterAttributes: true,
-                        path: '$',
+                        path: ['$'],
                         size: 2,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         open: 'array',
                         key: makeKey('d'),
-                        path: '$/d',
+                        path: ['$', 'd'],
                         collapsed: true,
                         close: 'array',
                         hasDelimiter: true,
                         size: 3,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         open: 'object',
                         key: makeKey('e'),
-                        path: '$/e',
+                        path: ['$', 'e'],
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 3,
                         key: makeKey('f'),
                         open: 'attributes-value',
-                        path: '$/e/f',
+                        path: ['$', 'e', 'f'],
+                        collapsable: true,
                     },
                     {
                         level: 4,
                         open: 'attributes',
-                        path: '$/e/f/@',
+                        path: ['$', 'e', 'f', '@'],
                         collapsed: true,
                         close: 'attributes',
                         hasDelimiter: true,
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 4,
                         value: makeValue('F', 'string'),
                         isAfterAttributes: true,
+                        path: ['$', 'e', 'f'],
                     },
-                    {level: 3, close: 'attributes-value'},
-                    {level: 2, close: 'object'},
-                    {level: 1, close: 'object'},
-                    {level: 0, close: 'attributes-value'},
+                    {level: 3, close: 'attributes-value', path: ['$', 'e', 'f']},
+                    {level: 2, close: 'object', path: ['$', 'e']},
+                    {level: 1, close: 'object', path: ['$']},
+                    {level: 0, close: 'attributes-value', path: []},
                 ];
-                expect(result).toEqual({data: expected, searchIndex: {}});
+                expect(result).toStrictEqual({data: expected, searchIndex: {}});
             });
         });
     });
@@ -1993,67 +2302,76 @@ describe('flattenUnipika', () => {
                 });
 
                 expected = [
-                    {level: 0, open: 'object', size: 2},
+                    {level: 0, open: 'object', size: 2, path: []},
                     {
                         level: 1,
                         key: makeKey('allow_aggressive'),
                         value: makeValue(true, 'boolean'),
                         hasDelimiter: true,
+                        path: ['allow_aggressive'],
                     },
                     {
                         level: 1,
                         open: 'object',
                         key: makeKey('auto_merge'),
-                        path: 'auto_merge',
+                        path: ['auto_merge'],
                         size: 3,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         key: makeKey('chunk_size_size'),
                         value: makeValue(134217728, 'number'),
                         hasDelimiter: true,
+                        path: ['auto_merge', 'chunk_size_size'],
                     },
                     {
                         level: 2,
                         key: makeKey('mode'),
                         value: makeValue('disabled_size', 'string'),
                         hasDelimiter: true,
+                        path: ['auto_merge', 'mode'],
                     },
                     {
                         level: 2,
                         open: 'object',
                         key: makeKey('job_io'),
-                        path: 'auto_merge/job_io',
+                        path: ['auto_merge', 'job_io'],
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 3,
                         open: 'object',
                         key: makeKey('table_writer'),
-                        path: 'auto_merge/job_io/table_writer',
+                        path: ['auto_merge', 'job_io', 'table_writer'],
                         size: 3,
+                        collapsable: true,
                     },
                     {
                         level: 4,
                         key: makeKey('max_key_weight'),
                         value: makeValue(16384, 'number'),
                         hasDelimiter: true,
+                        path: ['auto_merge', 'job_io', 'table_writer', 'max_key_weight'],
                     },
                     {
                         level: 4,
                         key: makeKey('desired_chunk_size'),
                         value: makeValue(2147483648, 'number'),
                         hasDelimiter: true,
+                        path: ['auto_merge', 'job_io', 'table_writer', 'desired_chunk_size'],
                     },
                     {
                         level: 4,
                         key: makeKey('group_size'),
                         value: makeValue('1size_2size_3size', 'string'),
+                        path: ['auto_merge', 'job_io', 'table_writer', 'group_size'],
                     },
-                    {level: 3, close: 'object'},
-                    {level: 2, close: 'object'},
-                    {level: 1, close: 'object'},
-                    {level: 0, close: 'object'},
+                    {level: 3, close: 'object', path: ['auto_merge', 'job_io', 'table_writer']},
+                    {level: 2, close: 'object', path: ['auto_merge', 'job_io']},
+                    {level: 1, close: 'object', path: ['auto_merge']},
+                    {level: 0, close: 'object', path: []},
                 ];
             });
             it('find part of a string', () => {
@@ -2083,7 +2401,7 @@ describe('flattenUnipika', () => {
                     filter: 'size',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
+                expect(result).toStrictEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a string no matches', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {};
@@ -2092,7 +2410,7 @@ describe('flattenUnipika', () => {
                     filter: 'Size',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
+                expect(result).toStrictEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a string case-insensitive', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2122,7 +2440,7 @@ describe('flattenUnipika', () => {
                     settings: {format: 'yson'},
                     caseInsensitive: true,
                 });
-                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
+                expect(result).toStrictEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a number', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2135,7 +2453,7 @@ describe('flattenUnipika', () => {
                     filter: '2177',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
+                expect(result).toStrictEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a boolean', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2148,7 +2466,7 @@ describe('flattenUnipika', () => {
                     filter: '%true',
                     settings: {format: 'yson'},
                 });
-                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
+                expect(result).toStrictEqual({data: expected, searchIndex, allMatchPaths});
             });
         });
         describe('JSON', () => {
@@ -2172,67 +2490,76 @@ describe('flattenUnipika', () => {
                 });
 
                 expected = [
-                    {level: 0, open: 'object', size: 2},
+                    {level: 0, open: 'object', size: 2, path: []},
                     {
                         level: 1,
                         key: makeKey('allow_aggressive'),
                         value: makeValue(true, 'boolean'),
                         hasDelimiter: true,
+                        path: ['allow_aggressive'],
                     },
                     {
                         level: 1,
                         open: 'object',
                         key: makeKey('auto_merge'),
-                        path: 'auto_merge',
+                        path: ['auto_merge'],
                         size: 3,
+                        collapsable: true,
                     },
                     {
                         level: 2,
                         key: makeKey('chunk_size_size'),
                         value: makeValue(134217728, 'number'),
                         hasDelimiter: true,
+                        path: ['auto_merge', 'chunk_size_size'],
                     },
                     {
                         level: 2,
                         key: makeKey('mode'),
                         value: makeValue('disabled_size', 'string'),
                         hasDelimiter: true,
+                        path: ['auto_merge', 'mode'],
                     },
                     {
                         level: 2,
                         open: 'object',
                         key: makeKey('job_io'),
-                        path: 'auto_merge/job_io',
+                        path: ['auto_merge', 'job_io'],
                         size: 1,
+                        collapsable: true,
                     },
                     {
                         level: 3,
                         open: 'object',
                         key: makeKey('table_writer'),
-                        path: 'auto_merge/job_io/table_writer',
+                        path: ['auto_merge', 'job_io', 'table_writer'],
                         size: 3,
+                        collapsable: true,
                     },
                     {
                         level: 4,
                         key: makeKey('max_key_weight'),
                         value: makeValue(16384, 'number'),
                         hasDelimiter: true,
+                        path: ['auto_merge', 'job_io', 'table_writer', 'max_key_weight'],
                     },
                     {
                         level: 4,
                         key: makeKey('desired_chunk_size'),
                         value: makeValue(2147483648, 'number'),
                         hasDelimiter: true,
+                        path: ['auto_merge', 'job_io', 'table_writer', 'desired_chunk_size'],
                     },
                     {
                         level: 4,
                         key: makeKey('group_size'),
                         value: makeValue('1size_2size_3size', 'string'),
+                        path: ['auto_merge', 'job_io', 'table_writer', 'group_size'],
                     },
-                    {level: 3, close: 'object'},
-                    {level: 2, close: 'object'},
-                    {level: 1, close: 'object'},
-                    {level: 0, close: 'object'},
+                    {level: 3, close: 'object', path: ['auto_merge', 'job_io', 'table_writer']},
+                    {level: 2, close: 'object', path: ['auto_merge', 'job_io']},
+                    {level: 1, close: 'object', path: ['auto_merge']},
+                    {level: 0, close: 'object', path: []},
                 ];
             });
             it('find part of a string', () => {
@@ -2263,7 +2590,7 @@ describe('flattenUnipika', () => {
                     isJson: true,
                     settings: {format: 'json'},
                 });
-                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
+                expect(result).toStrictEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a number', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2277,7 +2604,7 @@ describe('flattenUnipika', () => {
                     isJson: true,
                     settings: {format: 'json'},
                 });
-                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
+                expect(result).toStrictEqual({data: expected, searchIndex, allMatchPaths});
             });
             it('find part of a boolean', () => {
                 const searchIndex: FlattenUnipikaResult['searchIndex'] = {
@@ -2291,7 +2618,7 @@ describe('flattenUnipika', () => {
                     isJson: true,
                     settings: {format: 'json'},
                 });
-                expect(result).toEqual({data: expected, searchIndex, allMatchPaths});
+                expect(result).toStrictEqual({data: expected, searchIndex, allMatchPaths});
             });
         });
     });
@@ -2315,7 +2642,7 @@ describe('flattenUnipika', () => {
                 settings: {format: 'yson'},
             });
 
-            expect(result.allMatchPaths).toEqual(['@', 'level1/@', 'level1/level2']);
+            expect(result.allMatchPaths).toStrictEqual(['@', 'level1/@', 'level1/level2']);
         });
 
         it('should find matches in collapsed map keys', () => {
@@ -2349,7 +2676,7 @@ describe('flattenUnipika', () => {
                 collapsedState: {items: true},
             });
 
-            expect(result.allMatchPaths).toEqual(['items/0', 'items/1', 'items/2']);
+            expect(result.allMatchPaths).toStrictEqual(['items/0', 'items/1', 'items/2']);
         });
 
         it('should find matches in deeply nested attributes', () => {
@@ -2385,7 +2712,7 @@ describe('flattenUnipika', () => {
                 settings: {format: 'yson'},
             });
 
-            expect(result.allMatchPaths).toEqual([]);
+            expect(result.allMatchPaths).toStrictEqual([]);
         });
 
         it('should work with JSON format', () => {

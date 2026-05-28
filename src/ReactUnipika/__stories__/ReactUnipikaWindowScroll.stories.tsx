@@ -8,6 +8,7 @@ import {ReactUnipika, ReactUnipikaProps} from '../../window-scroll';
 
 import data from './data.json';
 import {CustomToolbarExample} from './CustomToolbarExample';
+import {renderRowExtraToolsExample} from './renderRowExtraToolsExample';
 
 const meta: Meta<ReactUnipikaProps> = {
     title: 'ReactUnipika/Window Scroll',
@@ -119,5 +120,12 @@ export const WithCustomToolbar: StoryObj<ReactUnipikaProps> = {
     args: {
         value: data,
         renderToolbar: CustomToolbarExample,
+    },
+};
+
+export const WithRowExtraTools: StoryObj<ReactUnipikaProps> = {
+    args: {
+        value: data,
+        renderRowExtraTools: renderRowExtraToolsExample,
     },
 };

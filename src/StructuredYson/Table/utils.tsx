@@ -1,13 +1,17 @@
 import React from 'react';
 import {useRowVirtualizer, useTable, useWindowRowVirtualizer} from '@gravity-ui/table';
 import type {ColumnDef, Row} from '@gravity-ui/table/tanstack';
-import {UnipikaFlattenTreeItem} from '../../utils/flattenUnipika';
+import type {UnipikaFlattenTreeItem} from '../../utils/flattenUnipika';
 
-import {asModifier, Cell} from '../Cell';
+import {Cell} from '../Cell';
 import {cn} from '../../utils/classname';
-import {TableProps} from './types';
+import type {TableProps} from './types';
 
 export const block = cn('g-ru-table');
+
+function asModifier(path = '') {
+    return path.replace(/[^-\w\d]/g, '_');
+}
 
 export function rowClassName(row?: Row<UnipikaFlattenTreeItem>) {
     const {key} = row?.original ?? {};
@@ -41,6 +45,7 @@ export function useGetTable({
     onShowFullText,
     collapseIconType,
     showContainerSize,
+    renderRowExtraTools,
 }: Omit<TableProps, 'scrollToRef'>) {
     const renderCell: ColumnDef<UnipikaFlattenTreeItem>['cell'] = ({row}) => {
         const {original, index} = row;
@@ -56,6 +61,7 @@ export function useGetTable({
                 index={index}
                 collapseIconType={collapseIconType}
                 showContainerSize={showContainerSize}
+                renderRowExtraTools={renderRowExtraTools}
             />
         );
     };

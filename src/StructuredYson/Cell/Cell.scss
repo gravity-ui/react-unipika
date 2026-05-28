@@ -14,6 +14,8 @@
 .g-ru-cell {
     position: relative;
 
+    line-height: 20px;
+
     &__key {
         color: var(--color-unipika-key);
     }
@@ -64,5 +66,10 @@
         font-size: 0.85em;
         color: var(--g-color-text-warning);
         font-style: italic;
+    }
+
+    &__row-extra-tools {
+        margin-left: var(--g-spacing-1);
+        display: inline-block;
     }
 }

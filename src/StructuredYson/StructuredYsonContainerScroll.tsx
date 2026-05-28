@@ -15,7 +15,8 @@ export class StructuredYsonContainerScroll extends StructuredYsonBase<Structured
             settings,
             filter,
         } = this.state;
-        const {collapseIconType, showContainerSize, scrollContainerRef} = this.props;
+        const {collapseIconType, showContainerSize, scrollContainerRef, renderRowExtraTools} =
+            this.props;
 
         return (
             <Table
@@ -30,6 +31,7 @@ export class StructuredYsonContainerScroll extends StructuredYsonBase<Structured
                 collapseIconType={collapseIconType}
                 showContainerSize={showContainerSize}
                 scrollContainerRef={scrollContainerRef}
+                renderRowExtraTools={renderRowExtraTools}
             />
         );
     }
