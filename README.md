@@ -89,6 +89,7 @@ See more examples in [storybook](https://preview.yandexcloud.dev/react-unipika).
 | `initiallyCollapsed`    | `boolean`                                                                         | -         | Whether to render the tree initially collapsed                                    |
 | `caseInsensitiveSearch` | `boolean`                                                                         | -         | Enable case-insensitive search                                                    |
 | `renderError`           | `(error: unknown) => React.ReactNode`                                             | -         | Custom error renderer function                                                    |
+| `renderRowExtraTools`   | `(params: RenderRowExtraToolsParams) => React.ReactNode`                          | -         | Render custom tools for each row                                                  |
 | `scrollContainerRef`    | `React.RefObject<Element \| null>`                                                | -         | **Required for container-scroll only**. Reference to the scroll container element |
 
 ### UnipikaSettings
