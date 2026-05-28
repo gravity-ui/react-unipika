@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/gravity-ui/react-unipika/compare/v0.6.4...v0.7.0) (2026-05-28)
+
+
+### Features
+
+* add renderRowExtraTools prop ([#47](https://github.com/gravity-ui/react-unipika/issues/47)) ([7d0a418](https://github.com/gravity-ui/react-unipika/commit/7d0a418392dedf62b29584df7fb08453fabb87f3))
+
 ## [0.6.4](https://github.com/gravity-ui/react-unipika/compare/v0.6.3...v0.6.4) (2026-05-21)
 
 
