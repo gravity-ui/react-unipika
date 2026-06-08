@@ -1,11 +1,13 @@
-import {
-    UnipikaList,
+import type {
+    UnipikaListLike,
     UnipikaMap,
     UnipikaMapKey,
+    UnipikaMapLike,
     UnipikaPrimitive,
     UnipikaSettings,
-    UnipikaString,
     UnipikaValue,
+    UnipikaYqlList,
+    UnipikaYqlMap,
 } from '../StructuredYson/types';
 
 import pickBy_ from 'lodash/pickBy';
@@ -60,7 +62,7 @@ export interface UnipikaFlattenTreeItem {
      */
     key?: UnipikaMapKey;
 
-    value?: UnipikaString | UnipikaPrimitive;
+    value?: UnipikaPrimitive;
 
     /**
      * For YSON should not be true for closing blockType === 'attributes' cause for YSON a delimiter is not required
@@ -156,6 +158,15 @@ interface FlatContext {
 
 export type CollapsedState = {[path: UnipikaFlattenTreeJoinedPath]: boolean};
 
+const YQL_MAP_TYPES = new Set<UnipikaYqlMap['$type']>(['yql.struct', 'yql.dict', 'yql.variant']);
+
+const YQL_LIST_TYPES = new Set<UnipikaYqlList['$type']>([
+    'yql.list',
+    'yql.stream',
+    'yql.tuple',
+    'yql.set',
+]);
+
 function compactObj<T extends object>(obj: T): T {
     return pickBy_(obj, (value) => value !== undefined) as T;
 }
@@ -178,7 +189,7 @@ function flattenUnipikaJsonImpl(value: UnipikaValue, level = 0, ctx: FlatContext
     const itemPathIndex = isObjectLike(type) ? beforeAttrs - 1 : ctx.dst.length;
 
     const isCollapsed = isPathCollapsed(ctx);
-    const isContainerType = isValueContainerType(value);
+    const isContainerType = isUnipikaContainerType(value);
 
     let containerSize = 0;
 
@@ -244,7 +255,7 @@ function handleJsonAttributes(
     } else {
         const attrsLevelInfo = openBlock('attributes', valueLevel, ctx, $attributes.length);
         handlePath(ctx, ctx.dst.length - 1);
-        handleUnipikaMapImpl($attributes, valueLevel + 1, ctx, attrsLevelInfo);
+        handleUnipikaMapLikeImpl($attributes, valueLevel + 1, ctx, attrsLevelInfo);
         closeBlock('attributes', valueLevel, ctx);
     }
 
@@ -269,24 +280,15 @@ function handleValueBlock(
     if (isValueCollapsed) {
         handleCollapsedValue(value, valueLevel, ctx);
         // Get container size even for collapsed $value
-        containerSize = value.$type === 'map' || value.$type === 'list' ? value.$value.length : 0;
+        containerSize = isUnipikaContainerType(value) ? value.$value.length : 0;
+    } else if (isUnipikaMapLike(value)) {
+        handleUnipikaMapLike(value, valueLevel, ctx);
+        containerSize = value.$value.length;
+    } else if (isUnipikaListLike(value)) {
+        handleUnipikaListLike(value, valueLevel, ctx);
+        containerSize = value.$value.length;
     } else {
-        switch (value.$type) {
-            case 'map':
-                handleUnipikaMap(value, valueLevel, ctx);
-                containerSize = value.$value.length;
-                break;
-            case 'list':
-                handleUnipikaList(value, valueLevel, ctx);
-                containerSize = value.$value.length;
-                break;
-            case 'string':
-                handleElement(fromUnipikaString(value, valueLevel), ctx);
-                break;
-            default:
-                handleElement(fromUnipikaPrimitive(value, valueLevel), ctx);
-                break;
-        }
+        handleElement(fromUnipikaPrimitive(value, valueLevel), ctx);
     }
 
     if (isContainerType && hasAttributes) {
@@ -307,7 +309,7 @@ function flattenUnipikaYsonImpl(value: UnipikaValue, level = 0, ctx: FlatContext
     let hasAttributes = false;
     let valueLevel = level;
 
-    const isContainerType = isValueContainerType(value);
+    const isContainerType = isUnipikaContainerType(value);
     let containerSize = 0;
 
     const isCollapsed = isPathCollapsed(ctx);
@@ -348,18 +350,12 @@ function flattenUnipikaYsonImpl(value: UnipikaValue, level = 0, ctx: FlatContext
 }
 
 function handleCollapsedValue(value: UnipikaValue, level: number, ctx: FlatContext) {
-    switch (value.$type) {
-        case 'map': {
-            handleCollapsedBlock('object', level, ctx, value.$value.length);
-            break;
-        }
-        case 'list': {
-            handleCollapsedBlock('array', level, ctx, value.$value.length);
-            break;
-        }
-        default: {
-            handleCollapsedBlock('attributes-value', level, ctx);
-        }
+    if (isUnipikaMapLike(value)) {
+        handleCollapsedBlock('object', level, ctx, value.$value.length);
+    } else if (isUnipikaListLike(value)) {
+        handleCollapsedBlock('array', level, ctx, value.$value.length);
+    } else {
+        handleCollapsedBlock('attributes-value', level, ctx);
     }
 }
 
@@ -384,8 +380,24 @@ function popPath(ctx: FlatContext) {
     ctx.path.pop();
 }
 
-function isValueContainerType(value: UnipikaValue) {
-    return value.$type === 'map' || value.$type === 'list';
+function isYqlMap(value: UnipikaValue): value is UnipikaYqlMap {
+    return YQL_MAP_TYPES.has(value.$type as UnipikaYqlMap['$type']);
+}
+
+function isYqlList(value: UnipikaValue): value is UnipikaYqlList {
+    return YQL_LIST_TYPES.has(value.$type as UnipikaYqlList['$type']);
+}
+
+function isUnipikaMapLike(value: UnipikaValue): value is UnipikaMapLike {
+    return value.$type === 'map' || isYqlMap(value);
+}
+
+function isUnipikaListLike(value: UnipikaValue): value is UnipikaListLike {
+    return value.$type === 'list' || isYqlList(value);
+}
+
+function isUnipikaContainerType(value: UnipikaValue) {
+    return isUnipikaMapLike(value) || isUnipikaListLike(value);
 }
 
 function isPathCollapsed(ctx: FlatContext) {
@@ -471,14 +483,14 @@ function getLastAsKey(dst: UnipikaFlattenTree) {
     return item?.key && !item?.close ? item : null;
 }
 
-function handleUnipikaMap(map: UnipikaMap, level: number, ctx: FlatContext) {
+function handleUnipikaMapLike(map: UnipikaMapLike, level: number, ctx: FlatContext) {
     const info = openBlock('object', level, ctx, map.$value.length);
-    handleUnipikaMapImpl(map.$value, level + 1, ctx, info);
+    handleUnipikaMapLikeImpl(map.$value, level + 1, ctx, info);
     closeBlock('object', level, ctx);
 }
 
-function handleUnipikaMapImpl(
-    items: UnipikaMap['$value'],
+function handleUnipikaMapLikeImpl(
+    items: UnipikaMapLike['$value'],
     level: number,
     ctx: FlatContext,
     info: LevelInfo,
@@ -498,7 +510,7 @@ function handleUnipikaMapImpl(
     }
 }
 
-function handleUnipikaList(value: UnipikaList, level: number, ctx: FlatContext) {
+function handleUnipikaListLike(value: UnipikaListLike, level: number, ctx: FlatContext) {
     const {$value: items} = value;
     const info = openBlock('array', level, ctx, items.length);
     for (let i = 0; i < items.length; ++i) {
@@ -510,16 +522,9 @@ function handleUnipikaList(value: UnipikaList, level: number, ctx: FlatContext) 
     closeBlock('array', level, ctx);
 }
 
-function fromUnipikaString(value: UnipikaString, level: number): UnipikaFlattenTreeItem {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {$attributes, ...rest} = value;
-    return {level: level, value: rest};
-}
-
 function fromUnipikaPrimitive(value: UnipikaPrimitive, level: number): UnipikaFlattenTreeItem {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {$attributes, ...rest} = value;
-    return {level: level, value: rest};
+    const {$attributes: _$attributes, ...rest} = value;
+    return {level, value: rest};
 }
 
 interface SearchParams {
@@ -559,24 +564,24 @@ function makeSearchIndex(
     return res;
 }
 
-type SearchValue = undefined | UnipikaMapKey | UnipikaString | UnipikaPrimitive;
+type SearchValue = undefined | UnipikaMapKey | UnipikaPrimitive;
 
 function rowSearchInfo(
-    v: SearchValue,
+    value: SearchValue,
     filter: string,
     settings: UnipikaSettings,
     caseInsensitive?: boolean,
 ): Array<number> | undefined {
-    if (!v) {
+    if (!value) {
         return undefined;
     }
     const res = [];
-    let tmp = unipika.formatValue(v, settings);
+    let tmp = unipika.formatValue(value, settings);
     if (!tmp) {
         return undefined;
     }
     tmp = String(tmp); //unipika.formatValue might return an instance of Number
-    if (v.$type === 'string') {
+    if (value.$type === 'string') {
         tmp = tmp.substring(1, tmp.length - 1); // skip quotes
     }
     let from = 0;
@@ -637,7 +642,7 @@ function getJsonValuePath(
         isJson &&
         value.$attributes &&
         value.$attributes.length > 0 &&
-        (value.$type === 'map' || value.$type === 'list')
+        isUnipikaContainerType(value)
     ) {
         return currentPath ? `${currentPath}/$` : '$';
     }
@@ -683,7 +688,7 @@ function collectMapMatches(
  * Collect matches from list items
  */
 function collectListMatches(
-    listValue: UnipikaList['$value'],
+    listValue: UnipikaListLike['$value'],
     filter: string,
     settings: UnipikaSettings,
     isJson: boolean,
@@ -736,7 +741,7 @@ function collectAllMatchPaths(
     }
 
     // Process nested structures
-    if (value.$type === 'map') {
+    if (isUnipikaMapLike(value)) {
         // Get value path with JSON $ prefix if needed for structures
         const valuePath = getJsonValuePath(value, isJson, currentPath);
         const mapMatches = collectMapMatches(
@@ -750,7 +755,7 @@ function collectAllMatchPaths(
         if (mapMatches.length > 0) {
             dstPaths.push(...mapMatches);
         }
-    } else if (value.$type === 'list') {
+    } else if (isUnipikaListLike(value)) {
         // Get value path with JSON $ prefix if needed for structures
         const valuePath = getJsonValuePath(value, isJson, currentPath);
         const listMatches = collectListMatches(
