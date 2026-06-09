@@ -18,7 +18,6 @@ export type UnipikaSettings = {
     maxStringSize?: number;
     omitStructNull?: boolean;
     treatValAsData?: boolean;
-
     validateSrcUrl?: (taggedTypeUrl: string) => boolean;
     normalizeUrl?: (url?: string) => string;
 };
@@ -43,8 +42,6 @@ interface BaseUnipikaValue {
     $attributes?: UnipikaMap['$value'];
 }
 
-export type UnipikaValue = UnipikaMap | UnipikaList | UnipikaString | UnipikaPrimitive;
-
 export interface UnipikaMap extends BaseUnipikaValue {
     $type: 'map';
     $value: Array<[UnipikaMapKey, UnipikaValue]>;
@@ -67,7 +64,7 @@ export interface UnipikaList extends BaseUnipikaValue {
     $value: Array<UnipikaValue>;
 }
 
-export type UnipikaString = UnipikaType<'string', string> & {
+type UnipikaString = UnipikaType<'string', string> & {
     $decoded_value?: string;
 };
 
@@ -76,10 +73,30 @@ export type UnipikaString = UnipikaType<'string', string> & {
  * it is enought to know that there are specific interfaces for 'map', 'list' and 'string',
  * and similar structure for all rest types.
  */
-export type UnipikaPrimitive = UnipikaType<
+type UnipikaRestPrimitive = UnipikaType<
     'null' | 'boolean' | 'number' | 'double' | 'int64',
     string | number | boolean | null
 >;
+
+export type UnipikaPrimitive = UnipikaString | UnipikaRestPrimitive;
+
+export interface UnipikaYqlList extends BaseUnipikaValue {
+    $type: 'yql.list' | 'yql.stream' | 'yql.tuple' | 'yql.set';
+    $value: Array<UnipikaValue>;
+}
+
+export interface UnipikaYqlMap extends BaseUnipikaValue {
+    $type: 'yql.struct' | 'yql.dict' | 'yql.variant';
+    $value: Array<[UnipikaMapKey, UnipikaValue]>;
+}
+
+export type UnipikaMapLike = UnipikaMap | UnipikaYqlMap;
+
+export type UnipikaListLike = UnipikaList | UnipikaYqlList;
+
+export type UnipikaContainer = UnipikaMapLike | UnipikaListLike;
+
+export type UnipikaValue = UnipikaContainer | UnipikaPrimitive;
 
 export type RenderRowExtraToolsParams = Pick<UnipikaFlattenTreeItem, 'path' | 'value'>;
 
