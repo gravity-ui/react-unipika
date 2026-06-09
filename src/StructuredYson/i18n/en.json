@@ -17,5 +17,8 @@
     "{{count}} matches",
     "{{count}} matches"
   ],
-  "label_matched-rows": "Matched rows"
+  "label_matched-rows": "Matched rows",
+  "full-value_title": "Full value",
+  "full-value_parsed": "Parsed",
+  "full-value_raw": "Raw"
 }

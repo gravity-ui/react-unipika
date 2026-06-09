@@ -1,10 +1,9 @@
 .g-ru-full-value-dialog {
     &__full-value {
-        word-break: break-all;
         max-width: 90vw;
         max-height: 90vh;
-        overflow-y: auto;
-        overflow-x: auto;
+        overflow: auto;
+        word-break: break-all;
     }
 
     &__full-value-radio-buttons {

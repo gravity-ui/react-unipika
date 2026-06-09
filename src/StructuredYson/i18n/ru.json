@@ -17,5 +17,8 @@
     "{{count}} совпадений",
     "{{count}} совпадений"
   ],
-  "label_matched-rows": "Совпадающие строки"
+  "label_matched-rows": "Совпадающие строки",
+  "full-value_title": "Полное значение",
+  "full-value_parsed": "Parsed",
+  "full-value_raw": "Raw"
 }
