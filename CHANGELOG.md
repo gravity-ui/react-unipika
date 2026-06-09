@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.1](https://github.com/gravity-ui/react-unipika/compare/v0.7.0...v0.7.1) (2026-06-09)
+
+
+### Bug Fixes
+
+* **ReactUnipika:** full value dialog lines breaks ([#53](https://github.com/gravity-ui/react-unipika/issues/53)) ([20925db](https://github.com/gravity-ui/react-unipika/commit/20925db95c6b8913ca65733667e2de5a39262faa))
+* **ReactUnipika:** yql containers types support ([#52](https://github.com/gravity-ui/react-unipika/issues/52)) ([366d098](https://github.com/gravity-ui/react-unipika/commit/366d09808b969cf66bb75a30df7c0ab4ec001226))
+
 ## [0.7.0](https://github.com/gravity-ui/react-unipika/compare/v0.6.4...v0.7.0) (2026-05-28)
 
 
