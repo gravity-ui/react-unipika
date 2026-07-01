@@ -1,7 +1,7 @@
 import React, {useRef} from 'react';
 
-import {Button, Icon, TextInput, ActionTooltip} from '@gravity-ui/uikit';
-import {ArrowDownToLine, ArrowUpToLine, ChevronDown, ChevronUp} from '@gravity-ui/icons';
+import {Button, Flex, Icon, TextInput, ActionTooltip} from '@gravity-ui/uikit';
+import {ChevronDown, ChevronUp, ChevronsDown, ChevronsUp} from '@gravity-ui/icons';
 
 import {Toolbar} from '../Toolbar/Toolbar';
 import {cn} from '../utils/classname';
@@ -102,19 +102,19 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                 {
                     name: 'buttons',
                     node: (
-                        <span className={block('buttons')}>
+                        <Flex gap={2} wrap="nowrap">
                             <ActionTooltip title={i18n('action_expand-all')}>
                                 <Button onClick={onExpandAll} qa="qa:structuredyson:expand-all">
-                                    <Icon data={ArrowDownToLine} />
+                                    <Icon data={ChevronsDown} />
                                 </Button>
                             </ActionTooltip>
-                            &nbsp;&nbsp;
+
                             <ActionTooltip title={i18n('action_collapse-all')}>
                                 <Button onClick={onCollapseAll} qa="qa:structuredyson:collapse-all">
-                                    <Icon data={ArrowUpToLine} />
+                                    <Icon data={ChevronsUp} />
                                 </Button>
                             </ActionTooltip>
-                        </span>
+                        </Flex>
                     ),
                 },
                 {
@@ -123,9 +123,9 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                 },
                 {
                     name: 'extra-tools',
-                    node: !extraTools ? null : (
+                    node: extraTools ? (
                         <span className={block('extra-tools')}>{extraTools}</span>
-                    ),
+                    ) : null,
                 },
             ]}
         />
