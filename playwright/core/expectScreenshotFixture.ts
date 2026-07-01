@@ -50,6 +50,9 @@ export const expectScreenshotFixture: PlaywrightFixture<ExpectScreenshotFixture>
         const expectThemeScreenshot = async (theme: Exclude<typeof themes, undefined>[number]) => {
             await page.emulateMedia({colorScheme: theme});
 
+            // Wait until ThemeProvider applies the new theme class to the DOM.
+            await page.locator(`.g-root_theme_${theme}`).waitFor({state: 'attached'});
+
             const {project} = testInfo;
 
             const nameScreenshot =
