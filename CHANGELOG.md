@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.0](https://github.com/gravity-ui/react-unipika/compare/v0.7.1...v0.8.0) (2026-07-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **ReactUnipika:** toolbar icons have been replaced with new ones
+
+### Features
+
+* **ReactUnipika:** replace toolbar icons ([bc609fd](https://github.com/gravity-ui/react-unipika/commit/bc609fd0a6eb00b6d27a6e7f1de0f0ee9ea53746))
+
+
+### Bug Fixes
+
+* **storybook:** sass build warnings ([e6aa722](https://github.com/gravity-ui/react-unipika/commit/e6aa722893d7974c31faf3a12e018e86fc1e415f))
+
 ## [0.7.1](https://github.com/gravity-ui/react-unipika/compare/v0.7.0...v0.7.1) (2026-06-09)
 
 
