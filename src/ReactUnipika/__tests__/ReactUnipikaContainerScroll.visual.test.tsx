@@ -58,6 +58,8 @@ test('ReactUnipika: preview', async ({mount, expectScreenshot, page}) => {
     await page.getByTestId('qa:structuredyson:search').locator('input').fill('value-to-search');
 
     await page.locator('.g-ru-clickable-text').click();
+    await page.getByRole('radio', {name: 'Raw'}).click();
+
     await expectScreenshot({component: page});
 });
 
