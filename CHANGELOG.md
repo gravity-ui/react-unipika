@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.1](https://github.com/gravity-ui/react-unipika/compare/v0.8.0...v0.8.1) (2026-07-03)
+
+
+### Bug Fixes
+
+* **ReactUnipika:** count key/value matches per row instead of per attribute group ([dae8adc](https://github.com/gravity-ui/react-unipika/commit/dae8adcc8d772900e7aed26a44b6f1611eb8af8c))
+* **ReactUnipika:** position and view for toolbar icons ([c19fa50](https://github.com/gravity-ui/react-unipika/commit/c19fa50845a65c8f8598a44895220899bd140c88))
+
 ## [0.8.0](https://github.com/gravity-ui/react-unipika/compare/v0.7.1...v0.8.0) (2026-07-01)
 
 
