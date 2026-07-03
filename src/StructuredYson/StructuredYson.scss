@@ -3,22 +3,6 @@
         box-sizing: border-box;
     }
 
-    &__toolbar {
-        .textinput__box {
-            border-radius: 4px;
-        }
-    }
-
-    &__match-counter {
-        color: var(--g-color-text-secondary);
-        padding-left: 1ex;
-        white-space: nowrap;
-    }
-
-    &__match-btn {
-        margin-left: -1px;
-    }
-
     &__extra-tools {
         margin-left: 1ex;
     }
