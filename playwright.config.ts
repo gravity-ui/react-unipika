@@ -6,7 +6,7 @@ import {defineConfig, devices} from '@playwright/experimental-ct-react';
 export default defineConfig({
     expect: {
         toMatchSnapshot: {
-            maxDiffPixelRatio: 0.0005,
+            maxDiffPixelRatio: 0.0001,
         },
     },
     testDir: './src',

@@ -108,8 +108,11 @@ test('ReactUnipika: search in collapsed - collapsed tree with search', async ({
     await page.getByTestId('qa:structuredyson:search').locator('input').fill('attr');
 
     // Wait for search to complete by checking match counter is updated
-    await page.locator('.g-ru-structured-yson__match-counter').waitFor({state: 'visible'});
-    await page.locator('.g-ru-structured-yson__match-counter:has-text("1 / 9")').waitFor();
+    await page.getByTestId('qa:structuredyson:search:match-counter').waitFor({state: 'visible'});
+    await page
+        .getByTestId('qa:structuredyson:search:match-counter')
+        .filter({hasText: '1 / 9'})
+        .waitFor();
 
     // Wait for the first match to be automatically expanded and highlighted text to be visible
     await page
@@ -145,14 +148,20 @@ test('ReactUnipika: search in collapsed - navigate forward', async ({
     await page.getByTestId('qa:structuredyson:search').locator('input').fill('attr');
 
     // Wait for search to complete by checking match counter is updated
-    await page.locator('.g-ru-structured-yson__match-counter').waitFor({state: 'visible'});
-    await page.locator('.g-ru-structured-yson__match-counter:has-text("1 / 9")').waitFor();
+    await page.getByTestId('qa:structuredyson:search:match-counter').waitFor({state: 'visible'});
+    await page
+        .getByTestId('qa:structuredyson:search:match-counter')
+        .filter({hasText: '1 / 9'})
+        .waitFor();
 
     // Navigate forward (should expand first collapsed node with match)
     await page.getByTestId('qa:structuredyson:search:next').click();
 
     // Wait for expansion and navigation by checking the match counter updates to show position
-    await page.locator('.g-ru-structured-yson__match-counter:has-text("2 / 9")').waitFor();
+    await page
+        .getByTestId('qa:structuredyson:search:match-counter')
+        .filter({hasText: '2 / 9'})
+        .waitFor();
 
     // Wait for the second match to be visible
     await page
@@ -213,9 +222,15 @@ test('ReactUnipika: with case insensitive search navigation and toggle', async (
 
     // Case-insensitive: "Type" (uppercase) finds lowercase "type", next navigation works
     await page.getByTestId('qa:structuredyson:search').locator('input').fill('Type');
-    await page.locator('.g-ru-structured-yson__match-counter:has-text("1 /")').waitFor();
+    await page
+        .getByTestId('qa:structuredyson:search:match-counter')
+        .filter({hasText: '1 /'})
+        .waitFor();
     await page.getByTestId('qa:structuredyson:search:next').click();
-    await page.locator('.g-ru-structured-yson__match-counter:has-text("2 /")').waitFor();
+    await page
+        .getByTestId('qa:structuredyson:search:match-counter')
+        .filter({hasText: '2 /'})
+        .waitFor();
     await expectScreenshot({component: page});
 
     // Toggle to case-sensitive: "Type_1" no longer matches lowercase "type_1"
