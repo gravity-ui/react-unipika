@@ -2395,7 +2395,6 @@ describe('flattenUnipika', () => {
                     'auto_merge/mode',
                     'auto_merge/job_io/table_writer/desired_chunk_size',
                     'auto_merge/job_io/table_writer/group_size',
-                    'auto_merge/job_io/table_writer/group_size',
                 ];
                 const result = flattenUnipika(converted, {
                     filter: 'size',
@@ -2432,7 +2431,6 @@ describe('flattenUnipika', () => {
                     'auto_merge/chunk_size_size',
                     'auto_merge/mode',
                     'auto_merge/job_io/table_writer/desired_chunk_size',
-                    'auto_merge/job_io/table_writer/group_size',
                     'auto_merge/job_io/table_writer/group_size',
                 ];
                 const result = flattenUnipika(converted, {
@@ -2583,7 +2581,6 @@ describe('flattenUnipika', () => {
                     'auto_merge/mode',
                     'auto_merge/job_io/table_writer/desired_chunk_size',
                     'auto_merge/job_io/table_writer/group_size',
-                    'auto_merge/job_io/table_writer/group_size',
                 ];
                 const result = flattenUnipika(converted, {
                     filter: 'size',
@@ -2642,7 +2639,11 @@ describe('flattenUnipika', () => {
                 settings: {format: 'yson'},
             });
 
-            expect(result.allMatchPaths).toStrictEqual(['@', 'level1/@', 'level1/level2']);
+            expect(result.allMatchPaths).toStrictEqual([
+                '@/attr1',
+                'level1/@/attr2',
+                'level1/level2',
+            ]);
         });
 
         it('should find matches in collapsed map keys', () => {
@@ -2699,7 +2700,8 @@ describe('flattenUnipika', () => {
                 settings: {format: 'yson'},
             });
 
-            expect(result.allMatchPaths).toContain('@/columns/0');
+            expect(result.allMatchPaths).toContain('@/schema/@/testAttr');
+            expect(result.allMatchPaths).toContain('@/schema/columns/0');
         });
 
         it('should return empty allMatchPaths when no matches found', () => {
@@ -2731,6 +2733,52 @@ describe('flattenUnipika', () => {
 
             expect(result.allMatchPaths).toContain('$attributes/testAttr');
             expect(result.allMatchPaths).toContain('$value/testKey');
+        });
+
+        it('should not count a primitive map value twice when both its key and value match', () => {
+            const converted = unipika.converters.yson({
+                test: 'test',
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+            });
+
+            expect(result.allMatchPaths).toStrictEqual(['test']);
+        });
+
+        it('should not count a primitive attribute value twice when both its key and value match', () => {
+            const converted = unipika.converters.yson({
+                $attributes: {test: 'test'},
+                $value: 'data',
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+            });
+
+            expect(result.allMatchPaths).toStrictEqual(['@/test']);
+        });
+
+        it('allMatchPaths.length should equal the number of matched rows when nothing is collapsed', () => {
+            const converted = unipika.converters.yson({
+                $attributes: {test: 'test'},
+                $value: {
+                    test: 'test',
+                    subtitle: 'value',
+                    nested: {caption: 'test'},
+                    list: ['test'],
+                },
+            });
+
+            const result = flattenUnipika(converted, {
+                filter: 'test',
+                settings: {format: 'yson'},
+            });
+
+            expect(result.allMatchPaths?.length).toBe(Object.keys(result.searchIndex).length);
         });
     });
 });
