@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 
-import {Button, Flex, Icon, TextInput, ActionTooltip} from '@gravity-ui/uikit';
+import {Button, Flex, Icon, TextInput, ActionTooltip, Text} from '@gravity-ui/uikit';
 import {ChevronDown, ChevronUp, ChevronsDown, ChevronsUp} from '@gravity-ui/icons';
 
 import {Toolbar} from '../Toolbar/Toolbar';
@@ -48,12 +48,12 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
     const totalMatches = allMatchPaths?.length || 0;
     const count = totalMatches || matchedRows.length;
     const matchPosition = count ? 1 + (matchIndex % count) : 0;
+
     const renderFilter = () => {
         return (
-            <React.Fragment>
+            <Flex gap={1} alignItems="center">
                 <TextInput
                     controlRef={searchRef}
-                    className={block('filter')}
                     hasClear
                     size="m"
                     type="text"
@@ -62,39 +62,43 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                     onUpdate={onFilterChange}
                     autoFocus={false}
                     onKeyDown={onEnterKeyDown}
-                    qa={'qa:structuredyson:search'}
+                    qa="qa:structuredyson:search"
                 />
 
                 <ActionTooltip title={i18n('action_next')}>
                     <Button
-                        className={block('match-btn')}
                         view="flat-secondary"
                         onClick={onNextMatch}
                         disabled={!count}
-                        pin={'clear-clear'}
-                        qa={'qa:structuredyson:search:next'}
+                        qa="qa:structuredyson:search:next"
                     >
                         <Icon data={ChevronDown} />
                     </Button>
                 </ActionTooltip>
+
                 <ActionTooltip title={i18n('action_back')}>
                     <Button
-                        className={block('match-btn')}
                         view="flat-secondary"
                         onClick={onPrevMatch}
                         disabled={!count}
-                        pin={'brick-brick'}
-                        qa={'qa:structuredyson:search:prev'}
+                        qa="qa:structuredyson:search:prev"
                     >
                         <Icon data={ChevronUp} />
                     </Button>
                 </ActionTooltip>
-                <span className={block('match-counter')} title={i18n('label_matched-rows')}>
-                    {matchPosition} / {count || 0}
-                </span>
-            </React.Fragment>
+
+                <Text
+                    whiteSpace="nowrap"
+                    color="secondary"
+                    title={i18n('label_matched-rows')}
+                    qa="qa:structuredyson:search:match-counter"
+                >
+                    {matchPosition} / {count}
+                </Text>
+            </Flex>
         );
     };
+
     return (
         <Toolbar
             className={block('toolbar', className)}
@@ -104,13 +108,21 @@ export const StructuredYsonToolbar: React.FC<StructuredYsonToolbarProps> = ({
                     node: (
                         <Flex gap={2} wrap="nowrap">
                             <ActionTooltip title={i18n('action_expand-all')}>
-                                <Button onClick={onExpandAll} qa="qa:structuredyson:expand-all">
+                                <Button
+                                    view="outlined"
+                                    onClick={onExpandAll}
+                                    qa="qa:structuredyson:expand-all"
+                                >
                                     <Icon data={ChevronsDown} />
                                 </Button>
                             </ActionTooltip>
 
                             <ActionTooltip title={i18n('action_collapse-all')}>
-                                <Button onClick={onCollapseAll} qa="qa:structuredyson:collapse-all">
+                                <Button
+                                    view="outlined"
+                                    onClick={onCollapseAll}
+                                    qa="qa:structuredyson:collapse-all"
+                                >
                                     <Icon data={ChevronsUp} />
                                 </Button>
                             </ActionTooltip>
