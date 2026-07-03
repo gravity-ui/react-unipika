@@ -614,17 +614,49 @@ function collectAttributeMatches(
 ): Array<UnipikaFlattenTreeJoinedPath> {
     const paths: Array<UnipikaFlattenTreeJoinedPath> = [];
     if (value.$attributes && value.$attributes.length > 0) {
-        for (const [_key, attrValue] of value.$attributes) {
-            const attrPath = currentPath ? `${currentPath}/@` : '@';
-            collectAllMatchPaths(
-                paths,
-                attrValue,
-                filter,
-                settings,
-                isJson,
-                attrPath,
-                caseInsensitive,
-            );
+        const attrsPath = currentPath ? `${currentPath}/@` : '@';
+
+        for (const [key, attrValue] of value.$attributes) {
+            const attrPath = `${attrsPath}/${key.$value}`;
+            const keyMatch = rowSearchInfo(key, filter, settings, caseInsensitive);
+
+            if (isUnipikaContainerType(attrValue)) {
+                // The attribute's key opens its own row, separate from its nested rows.
+                if (keyMatch) {
+                    paths.push(attrPath);
+                }
+
+                collectAllMatchPaths(
+                    paths,
+                    attrValue,
+                    filter,
+                    settings,
+                    isJson,
+                    attrPath,
+                    caseInsensitive,
+                );
+            } else {
+                // A primitive attribute value is rendered on the same row as its key,
+                // so a key match and a value match must not be counted twice.
+                const valueMatch = rowSearchInfo(attrValue, filter, settings, caseInsensitive);
+
+                if (keyMatch || valueMatch) {
+                    paths.push(attrPath);
+                }
+
+                const nestedAttrMatches = collectAttributeMatches(
+                    attrValue,
+                    filter,
+                    settings,
+                    isJson,
+                    attrPath,
+                    caseInsensitive,
+                );
+
+                if (nestedAttrMatches.length > 0) {
+                    paths.push(...nestedAttrMatches);
+                }
+            }
         }
     }
     return paths;
@@ -663,23 +695,45 @@ function collectMapMatches(
     const paths: Array<UnipikaFlattenTreeJoinedPath> = [];
     for (const [key, childValue] of mapValue) {
         const childPath = valuePath ? `${valuePath}/${key.$value}` : key.$value;
-
-        // Check if key matches
         const keyMatch = rowSearchInfo(key, filter, settings, caseInsensitive);
-        if (keyMatch) {
-            paths.push(childPath);
-        }
 
-        // Recursively collect from value
-        collectAllMatchPaths(
-            paths,
-            childValue,
-            filter,
-            settings,
-            isJson,
-            childPath,
-            caseInsensitive,
-        );
+        if (isUnipikaContainerType(childValue)) {
+            // The key opens its own row, separate from the container's nested rows.
+            if (keyMatch) {
+                paths.push(childPath);
+            }
+
+            collectAllMatchPaths(
+                paths,
+                childValue,
+                filter,
+                settings,
+                isJson,
+                childPath,
+                caseInsensitive,
+            );
+        } else {
+            // A primitive value is rendered on the same row as its key,
+            // so a key match and a value match must not be counted twice.
+            const valueMatch = rowSearchInfo(childValue, filter, settings, caseInsensitive);
+
+            if (keyMatch || valueMatch) {
+                paths.push(childPath);
+            }
+
+            const attrMatches = collectAttributeMatches(
+                childValue,
+                filter,
+                settings,
+                isJson,
+                childPath,
+                caseInsensitive,
+            );
+
+            if (attrMatches.length > 0) {
+                paths.push(...attrMatches);
+            }
+        }
     }
     return paths;
 }
