@@ -8,11 +8,31 @@ test('ReactUnipika: first render', async ({mount, expectScreenshot, page}) => {
     await expectScreenshot({component: page});
 });
 
+test('ReactUnipika: search key match', async ({mount, expectScreenshot, page}) => {
+    await mount(<Stories.Json />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('timestamp');
+
+    await expectScreenshot({component: page});
+});
+
+test('ReactUnipika: search key match in collapsed tree', async ({
+    mount,
+    expectScreenshot,
+    page,
+}) => {
+    await mount(<Stories.Json />, {width: 1280});
+
+    await page.getByTestId('qa:structuredyson:search').locator('input').fill('timestamp');
+    await page.getByTestId('qa:structuredyson:collapse-all').click();
+
+    await expectScreenshot({component: page});
+});
+
 test('ReactUnipika: search next', async ({mount, expectScreenshot, page}) => {
     await mount(<Stories.Json />, {width: 1280});
 
     await page.getByTestId('qa:structuredyson:search').locator('input').fill('level10_item0');
-
     await page.getByTestId('qa:structuredyson:search:next').click();
     await expectScreenshot({component: page});
 });
